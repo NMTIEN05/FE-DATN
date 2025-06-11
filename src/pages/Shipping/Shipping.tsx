@@ -1,0 +1,194 @@
+import React, { useState } from 'react';
+import './Shipping.css';
+import {
+  FaTruck,
+  FaMapMarkerAlt,
+  FaCreditCard,
+  FaMoneyBill,
+  FaShieldAlt,
+  FaClock,
+  FaCheckCircle,
+} from 'react-icons/fa';
+
+const Shipping = () => {
+  const [selectedPayment, setSelectedPayment] = useState('cod');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Handle form submission
+  };
+
+  return (
+    <div className="shipping-page">
+      <div className="container">
+        <h1 className="page-title">Thông tin giao hàng</h1>
+
+        <div className="shipping-layout">
+          {/* Shipping Form */}
+          <div className="shipping-form">
+            <form onSubmit={handleSubmit}>
+              {/* Personal Information */}
+              <div className="form-section">
+                <h2>Thông tin cá nhân</h2>
+                <div className="form-group">
+                  <label htmlFor="name">Họ và tên</label>
+                  <input type="text" id="name" placeholder="Nhập họ và tên của bạn" required />
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="email">Email</label>
+                    <input type="email" id="email" placeholder="Nhập email của bạn" required />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="phone">Số điện thoại</label>
+                    <input type="tel" id="phone" placeholder="Nhập số điện thoại của bạn" required />
+                  </div>
+                </div>
+              </div>
+
+              {/* Shipping Address */}
+              <div className="form-section">
+                <h2>Địa chỉ giao hàng</h2>
+                <div className="form-group">
+                  <label htmlFor="address">Địa chỉ</label>
+                  <input type="text" id="address" placeholder="Nhập địa chỉ của bạn" required />
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="city">Tỉnh/Thành phố</label>
+                    <select id="city" required>
+                      <option value="">Chọn tỉnh/thành phố</option>
+                      <option value="hcm">TP. Hồ Chí Minh</option>
+                      <option value="hn">Hà Nội</option>
+                      {/* Add more cities */}
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="district">Quận/Huyện</label>
+                    <select id="district" required>
+                      <option value="">Chọn quận/huyện</option>
+                      {/* Add districts */}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="ward">Phường/Xã</label>
+                  <select id="ward" required>
+                    <option value="">Chọn phường/xã</option>
+                    {/* Add wards */}
+                  </select>
+                </div>
+              </div>
+
+              {/* Payment Method */}
+              <div className="form-section">
+                <h2>Phương thức thanh toán</h2>
+                <div className="payment-methods">
+                  <label className="payment-method">
+                    <input
+                      type="radio"
+                      name="payment"
+                      value="cod"
+                      checked={selectedPayment === 'cod'}
+                      onChange={(e) => setSelectedPayment(e.target.value)}
+                    />
+                    <div className="method-content">
+                      <FaMoneyBill className="method-icon" />
+                      <div className="method-info">
+                        <h3>Thanh toán khi nhận hàng (COD)</h3>
+                        <p>Thanh toán bằng tiền mặt khi nhận hàng</p>
+                      </div>
+                    </div>
+                  </label>
+
+                  <label className="payment-method">
+                    <input
+                      type="radio"
+                      name="payment"
+                      value="card"
+                      checked={selectedPayment === 'card'}
+                      onChange={(e) => setSelectedPayment(e.target.value)}
+                    />
+                    <div className="method-content">
+                      <FaCreditCard className="method-icon" />
+                      <div className="method-info">
+                        <h3>Thanh toán bằng thẻ</h3>
+                        <p>Thanh toán an toàn với thẻ tín dụng/ghi nợ</p>
+                      </div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <button type="submit" className="btn btn-primary submit-btn">
+                Xác nhận đặt hàng
+              </button>
+            </form>
+          </div>
+
+          {/* Order Summary */}
+          <div className="order-summary">
+            <h2>Đơn hàng của bạn</h2>
+
+            {/* Order Items */}
+            <div className="order-items">
+              <div className="order-item">
+                <img src="https://via.placeholder.com/60" alt="Product" />
+                <div className="item-info">
+                  <h3>iPhone 15 Pro Max</h3>
+                  <p>Titan Tự nhiên - 256GB</p>
+                  <div className="item-price">
+                    <span>27.990.000₫</span>
+                    <span className="quantity">x1</span>
+                  </div>
+                </div>
+              </div>
+              {/* Add more items */}
+            </div>
+
+            {/* Order Total */}
+            <div className="order-total">
+              <div className="total-row">
+                <span>Tạm tính</span>
+                <span>27.990.000₫</span>
+              </div>
+              <div className="total-row">
+                <span>Phí vận chuyển</span>
+                <span>Miễn phí</span>
+              </div>
+              <div className="total-row final">
+                <span>Tổng cộng</span>
+                <span>27.990.000₫</span>
+              </div>
+            </div>
+
+            {/* Shipping Features */}
+            <div className="shipping-features">
+              <div className="feature">
+                <FaTruck className="feature-icon" />
+                <span>Giao hàng miễn phí</span>
+              </div>
+              <div className="feature">
+                <FaClock className="feature-icon" />
+                <span>Giao hàng trong 24h</span>
+              </div>
+              <div className="feature">
+                <FaShieldAlt className="feature-icon" />
+                <span>Bảo hành 12 tháng</span>
+              </div>
+              <div className="feature">
+                <FaCheckCircle className="feature-icon" />
+                <span>Đổi trả trong 15 ngày</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Shipping; 

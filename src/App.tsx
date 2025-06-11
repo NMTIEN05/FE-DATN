@@ -1,18 +1,30 @@
-import React, { useEffect } from 'react';
-import axios from 'axios';
-import { useRoutes } from 'react-router-dom';
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import Header from './components/Header/Header';
+import Footer from './components/Footer/Footer';
+import HomePage from './pages/Home/HomePage';
+import Products from './pages/Products/Products';
+import Services from './pages/Services/Services';
+import Contact from './pages/Contact/Contact';
+import Cart from './pages/Cart/Cart';
+import Shipping from './pages/Shipping/Shipping';
+import './App.css';
 
 function App() {
-  useEffect(() => {
-    axios
-      .get("http://localhost:8888/api/ping")  // Kiểm tra URL có chính xác không
-      .then(response => {
-        console.log(response.data.message);  // In ra thông báo từ backend
-      })
-      .catch(error => {
-        console.error("Lỗi khi gọi API:", error);  // Hiển thị lỗi khi gọi API
-      });
-  }, []);
-
+  return (
+    <div className="App">
+      <Header />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/products" element={<Products />} />
+        <Route path="/services" element={<Services />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/shipping" element={<Shipping />} />
+      </Routes>
+      <Footer />
+    </div>
+  );
 }
+
 export default App;

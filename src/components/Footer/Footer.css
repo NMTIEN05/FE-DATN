@@ -1,0 +1,72 @@
+footer {
+  background-color: #f8f9fa;
+  padding: 3rem 2rem;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+}
+
+.footer-row {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.footer-row h5 {
+  color: #333;
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+.footer-row h4 {
+  color: #666;
+  font-size: 1rem;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.phone-number {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #007bff;
+}
+
+.footer-row ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-row ul li {
+  margin-bottom: 0.5rem;
+}
+
+.footer-row ul li a {
+  color: #666;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.footer-row ul li a:hover {
+  color: #007bff;
+}
+
+.payment-methods {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.payment-methods li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #666;
+}
+
+.payment-methods i {
+  font-size: 1.5rem;
+  color: #007bff;
+} 
