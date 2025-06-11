@@ -24,6 +24,27 @@ const HomePage: React.FC = () => {
     // Add more products as needed
   ];
 
+  const news = [
+    {
+      id: 1,
+      title: 'So sánh iPhone 15 Pro Max vs Samsung S24 Ultra: Chọn siêu phẩm nào?',
+      image: 'https://cdn.tgdd.vn/Files/2024/01/19/1583927/samsung-galaxy-s24-ultra-vs-iphone-15-pro-max-2-180124-022914.jpg',
+      date: '19/03/2024'
+    },
+    {
+      id: 2,
+      title: 'OPPO Find X7 Ultra ra mắt: Camera đỉnh cao, sạc siêu nhanh',
+      image: 'https://cdn.tgdd.vn/Files/2024/01/09/1582751/oppofindx7ultratongquan-090124-090310.jpg',
+      date: '18/03/2024'
+    },
+    {
+      id: 3,
+      title: 'Xiaomi 14 Ultra về Việt Nam: Đối thủ đáng gờm trong phân khúc cao cấp',
+      image: 'https://cdn.tgdd.vn/Files/2024/02/25/1587981/xiaomi14ultratongquan-250224-101426.jpg',
+      date: '17/03/2024'
+    }
+  ];
+
   return (
     <main>
       {/* Banner Section */}
@@ -87,23 +108,24 @@ const HomePage: React.FC = () => {
         </div>
       </div>
 
-      {/* Blog Section */}
+      {/* Tech News Section */}
       <div className="main-button">
-        <h2>Bản Tin Mới</h2>
+        <h2>Tin Công Nghệ Mới Nhất</h2>
         <div className="blog-grid">
-          <div className="blog-card" onClick={() => navigate('/blog/1')}>
-            <div className="blog-image">
-              <img src="/placeholder/400/320" alt="Blog 1" />
-              <span className="blog-date">02/05/2025</span>
+          {news.map((item) => (
+            <div key={item.id} className="blog-card" onClick={() => navigate(`/news/${item.id}`)}>
+              <div className="blog-image">
+                <img src={item.image} alt={item.title} />
+                <span className="blog-date">{item.date}</span>
+              </div>
+              <div className="blog-info">
+                <h3 className="blog-title">{item.title}</h3>
+              </div>
             </div>
-            <div className="blog-info">
-              <h3 className="blog-title">Áo Thời Trang Mùa Hè 2025</h3>
-            </div>
-          </div>
-          {/* Add more blog cards as needed */}
+          ))}
         </div>
         <div className="button-see">
-          <button className="showAllBtn" onClick={() => navigate('/blog')}>Xem tất cả</button>
+          <button className="showAllBtn" onClick={() => navigate('/news')}>Xem tất cả tin tức</button>
         </div>
       </div>
 
