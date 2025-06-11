@@ -1,0 +1,295 @@
+{
+  "categories": [
+    {
+      "id": 1,
+      "name": "Điện thoại iPhone",
+      "description": "Các dòng điện thoại iPhone chính hãng",
+      "image": "https://cdn.tgdd.vn/Category/42/iphone-14-pro-max-1-200x200.png"
+    },
+    {
+      "id": 2,
+      "name": "Điện thoại Samsung",
+      "description": "Các dòng điện thoại Samsung chính hãng",
+      "image": "https://cdn.tgdd.vn/Category/42/samsung-galaxy-s24-ultra-1-200x200.png"
+    },
+    {
+      "id": 4,
+      "name": "Điện thoại Samsung2",
+      "description": "Các dòng điện thoại Samsung chính hãng",
+      "image": "https://cdn.tgdd.vn/Category/42/samsung-galaxy-s24-ultra-1-200x200.png"
+    },
+    {
+      "id": 3,
+      "name": "Điện thoại OPPO",
+      "description": "Các dòng điện thoại OPPO chính hãng",
+      "image": "https://cdn.tgdd.vn/Category/42/oppo-find-x7-ultra-200x200.jpg"
+    }
+  ],
+  "brands": [
+    {
+      "id": 1,
+      "name": "Apple",
+      "logo": "https://cdn.tgdd.vn/Brand/1/logo-iphone-220x48.png",
+      "description": "iPhone - Think Different"
+    },
+    {
+      "id": 2,
+      "name": "Samsung",
+      "logo": "https://cdn.tgdd.vn/Brand/1/samsungnew-220x48-1.png",
+      "description": "Samsung - Do what you can't"
+    },
+    {
+      "id": 3,
+      "name": "OPPO",
+      "logo": "https://cdn.tgdd.vn/Brand/1/OPPO42-b_5.jpg",
+      "description": "OPPO - Inspiration Ahead"
+    }
+  ],
+  "products": [
+    {
+      "id": 1,
+      "name": "iPhone 15 Pro Max 256GB",
+      "price": 33990000,
+      "sale_price": 29990000,
+      "description": "iPhone 15 Pro Max đem đến một đẳng cấp hoàn toàn mới cho camera với ống kính tiềm vọng, khung titan chuẩn hàng không vũ trụ siêu bền, chip A17 Pro nhanh nhất thế giới smartphone.",
+      "image": "https://cdn.tgdd.vn/Products/Images/42/299033/iphone-15-pro-max-blue-1.jpg",
+      "category_id": 1,
+      "brand_id": 1,
+      "stock": 50,
+      "featured": true,
+      "status": "in_stock",
+      "specifications": {
+        "screen": "6.7 inch, OLED, Super Retina XDR, 2796 x 1290 Pixels",
+        "os": "iOS 17",
+        "camera": "Chính 48 MP & Phụ 12 MP, 12 MP",
+        "chip": "Apple A17 Pro",
+        "ram": "8 GB",
+        "storage": "256 GB",
+        "battery": "4422 mAh"
+      },
+      "created_at": "2024-03-19T10:00:00Z",
+      "updated_at": "2024-03-19T10:00:00Z"
+    },
+    {
+      "id": 2,
+      "name": "Samsung Galaxy S24 Ultra 256GB",
+      "price": 31990000,
+      "sale_price": 26990000,
+      "description": "Galaxy S24 Ultra là chiếc điện thoại Samsung cao cấp đầu tiên được tích hợp công nghệ AI, mang đến loạt tính năng thông minh cùng nhiều cải tiến đáng giá.",
+      "image": "https://cdn.tgdd.vn/Products/Images/42/305658/samsung-galaxy-s24-ultra-xam-1.jpg",
+      "category_id": 2,
+      "brand_id": 2,
+      "stock": 45,
+      "featured": true,
+      "status": "in_stock",
+      "specifications": {
+        "screen": "6.8 inch, Dynamic AMOLED 2X, QHD+, 3088 x 1440 Pixels",
+        "os": "Android 14, One UI 6.1",
+        "camera": "Chính 200 MP & Phụ 50 MP, 12 MP, 10 MP",
+        "chip": "Snapdragon 8 Gen 3",
+        "ram": "12 GB",
+        "storage": "256 GB",
+        "battery": "5000 mAh"
+      },
+      "created_at": "2024-03-19T10:00:00Z",
+      "updated_at": "2024-03-19T10:00:00Z"
+    },
+    {
+      "id": 4,
+      "name": "Samsung Galaxy S24 Ultra 256GB",
+      "price": 31990000,
+      "sale_price": 26990000,
+      "description": "Galaxy S24 Ultra là chiếc điện thoại Samsung cao cấp đầu tiên được tích hợp công nghệ AI, mang đến loạt tính năng thông minh cùng nhiều cải tiến đáng giá.",
+      "image": "https://cdn.tgdd.vn/Products/Images/42/305658/samsung-galaxy-s24-ultra-xam-1.jpg",
+      "category_id": 2,
+      "brand_id": 2,
+      "stock": 45,
+      "featured": true,
+      "status": "in_stock",
+      "specifications": {
+        "screen": "6.8 inch, Dynamic AMOLED 2X, QHD+, 3088 x 1440 Pixels",
+        "os": "Android 14, One UI 6.1",
+        "camera": "Chính 200 MP & Phụ 50 MP, 12 MP, 10 MP",
+        "chip": "Snapdragon 8 Gen 3",
+        "ram": "12 GB",
+        "storage": "256 GB",
+        "battery": "5000 mAh"
+      },
+      "created_at": "2024-03-19T10:00:00Z",
+      "updated_at": "2024-03-19T10:00:00Z"
+    },
+    {
+      "id": 3,
+      "name": "OPPO Find X7 Ultra 5G",
+      "price": 29990000,
+      "sale_price": 27990000,
+      "description": "OPPO Find X7 Ultra là flagship mới nhất của OPPO với camera Hasselblad thế hệ mới, chip Snapdragon 8 Gen 3 mạnh mẽ.",
+      "image": "https://cdn.tgdd.vn/Products/Images/42/315063/oppo-find-x7-ultra-den-1.jpg",
+      "category_id": 3,
+      "brand_id": 3,
+      "stock": 30,
+      "featured": true,
+      "status": "in_stock",
+      "specifications": {
+        "screen": "6.82 inch, AMOLED, QHD+, 3168 x 1440 Pixels",
+        "os": "Android 14, ColorOS 14",
+        "camera": "Chính 50 MP & Phụ 50 MP, 50 MP, 50 MP",
+        "chip": "Snapdragon 8 Gen 3",
+        "ram": "16 GB",
+        "storage": "512 GB",
+        "battery": "5000 mAh"
+      },
+      "created_at": "2024-03-19T10:00:00Z",
+      "updated_at": "2024-03-19T10:00:00Z"
+    }
+  ],
+  "product_variants": [
+    {
+      "id": 1,
+      "product_id": 1,
+      "color": "Titan Tự Nhiên",
+      "storage": "256GB",
+      "price": 33990000,
+      "stock": 20,
+      "image": "https://cdn.tgdd.vn/Products/Images/42/299033/iphone-15-pro-max-blue-1.jpg"
+    },
+    {
+      "id": 2,
+      "product_id": 1,
+      "color": "Titan Đen",
+      "storage": "256GB",
+      "price": 33990000,
+      "stock": 15,
+      "image": "https://cdn.tgdd.vn/Products/Images/42/299033/iphone-15-pro-max-black-1.jpg"
+    },
+    {
+      "id": 3,
+      "product_id": 2,
+      "color": "Xám Titan",
+      "storage": "256GB",
+      "price": 31990000,
+      "stock": 25,
+      "image": "https://cdn.tgdd.vn/Products/Images/42/305658/samsung-galaxy-s24-ultra-xam-1.jpg"
+    }
+  ],
+  "product_images": [
+    {
+      "id": 1,
+      "product_id": 1,
+      "url": "https://cdn.tgdd.vn/Products/Images/42/299033/iphone-15-pro-max-blue-1.jpg",
+      "is_main": true
+    },
+    {
+      "id": 2,
+      "product_id": 1,
+      "url": "https://cdn.tgdd.vn/Products/Images/42/299033/iphone-15-pro-max-blue-2.jpg",
+      "is_main": false
+    },
+    {
+      "id": 3,
+      "product_id": 2,
+      "url": "https://cdn.tgdd.vn/Products/Images/42/305658/samsung-galaxy-s24-ultra-xam-1.jpg",
+      "is_main": true
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "email": "admin@example.com",
+      "password": "$2a$10$XQFXqX5V5V5V5V5V5V5V5O5V5V5V5V5V5V5V5V5V5V5V5V5V5V",
+      "fullname": "Admin",
+      "role": "admin",
+      "phone": "0123456789",
+      "address": "Hà Nội",
+      "created_at": "2024-03-19T10:00:00Z",
+      "updated_at": "2024-03-19T10:00:00Z"
+    }
+  ],
+  "orders": [
+    {
+      "id": 1,
+      "user_id": 1,
+      "total_price": 33990000,
+      "status": "pending",
+      "shipping_address": "Hà Nội",
+      "shipping_phone": "0123456789",
+      "payment_method": "cod",
+      "created_at": "2024-03-19T10:00:00Z",
+      "updated_at": "2024-03-19T10:00:00Z"
+    }
+  ],
+  "order_items": [
+    {
+      "id": 1,
+      "order_id": 1,
+      "product_id": 1,
+      "product_variant_id": 1,
+      "quantity": 1,
+      "price": 33990000,
+      "created_at": "2024-03-19T10:00:00Z",
+      "updated_at": "2024-03-19T10:00:00Z"
+    }
+  ],
+  "banners": [
+    {
+      "id": 1,
+      "title": "iPhone 15 Pro Max Mới",
+      "description": "Trải nghiệm đẳng cấp mới với iPhone 15 Pro Max",
+      "image": "https://istore.ph/cdn/shop/articles/NPI-iPhone-16-Pro-Coming-Soon-Blog-Banners.jpg?v=1727424001",
+      "link": "/products/1",
+      "position": "home_slider",
+      "status": "active"
+    },
+    {
+      "id": 2,
+      "title": "Samsung Galaxy S24 Ultra",
+      "description": "Khám phá sức mạnh AI với Galaxy S24 Ultra",
+      "image": "https://vatvostudio.vn/wp-content/uploads/2023/01/Galaxy-S23-series-lo-poster-truoc-ngay-ra-mat-2.jpg",
+      "link": "/products/2",
+      "position": "home_slider",
+      "status": "active"
+    },
+    {
+      "id": 3,
+      "title": "OPPO Find X7 Ultra",
+      "description": "Camera Hasselblad thế hệ mới",
+      "image": "https://happyphone.vn/wp-content/uploads/2024/07/Oppo-Reno12-Pro-dong-tieu-chuan.png",
+      "link": "/products/3",
+      "position": "home_slider",
+      "status": "active"
+    }
+  ],
+  "reviews": [
+    {
+      "id": 1,
+      "product_id": 1,
+      "user_id": 1,
+      "rating": 5,
+      "comment": "Sản phẩm rất tốt, đáng tiền",
+      "created_at": "2024-03-19T10:00:00Z",
+      "updated_at": "2024-03-19T10:00:00Z"
+    }
+  ],
+  "news": [
+    {
+      "id": 1,
+      "title": "iPhone 15 Pro Max đạt doanh số kỷ lục trong quý 1/2024",
+      "content": "iPhone 15 Pro Max tiếp tục là smartphone bán chạy nhất...",
+      "image": "https://cdn.tgdd.vn/Files/2024/03/19/iPhone-15-Pro-Max-News-800x450.jpg",
+      "author": "Admin",
+      "category": "tin-tuc",
+      "created_at": "2024-03-19T10:00:00Z",
+      "updated_at": "2024-03-19T10:00:00Z"
+    },
+    {
+      "id": 2,
+      "title": "iPhone 15 Pro Max đạt doanh số kỷ lục trong quý 1/2024",
+      "content": "iPhone 15 Pro Max tiếp tục là smartphone bán chạy nhất...",
+      "image": "https://cdn.tgdd.vn/Files/2024/03/19/iPhone-15-Pro-Max-News-800x450.jpg",
+      "author": "Admin",
+      "category": "tin-tuc",
+      "created_at": "2024-03-19T10:00:00Z",
+      "updated_at": "2024-03-19T10:00:00Z"
+    }
+  ]
+}

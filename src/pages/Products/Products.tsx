@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useProducts } from '../../hooks/useProducts';
+import ProductCard from '../../components/ProductCard/ProductCard';
 import './Products.css';
 import { FaFilter, FaSearch, FaStar, FaHeart, FaShoppingCart, FaSort } from 'react-icons/fa';
 
@@ -17,18 +19,19 @@ const Products = () => {
     { value: 'price-desc', label: 'Giá giảm dần' },
   ];
 
-  // Sample products data
-  const products = Array(12).fill(null).map((_, index) => ({
-    id: index + 1,
-    name: 'iPhone 15 Pro Max',
-    image: 'https://via.placeholder.com/300',
-    price: 27990000,
-    oldPrice: 29990000,
-    rating: 4.5,
-    reviews: 150,
-    isNew: index < 3,
-    discount: 10,
-  }));
+  const [filters, setFilters] = useState({
+    page: 1,
+    limit: 12,
+    price_min: undefined as number | undefined,
+    price_max: undefined as number | undefined,
+    category_id: undefined as number | undefined,
+    sort: undefined as string | undefined
+  });
+
+  const { data, isLoading, error } = useProducts(filters);
+
+  if (isLoading) return <div>Đang tải...</div>;
+  if (error) return <div>Có lỗi xảy ra: {(error as Error).message}</div>;
 
   return (
     <div className="products-page">
@@ -141,62 +144,29 @@ const Products = () => {
 
             {/* Products Grid */}
             <div className="products-grid">
-              {products.map((product) => (
-                <div key={product.id} className="product-card">
-                  <div className="product-image">
-                    <img src={product.image} alt={product.name} />
-                    {product.isNew && <span className="badge badge-new">Mới</span>}
-                    {product.discount > 0 && (
-                      <span className="badge badge-discount">-{product.discount}%</span>
-                    )}
-                    <div className="product-actions">
-                      <button className="action-btn">
-                        <FaHeart />
-                      </button>
-                      <button className="action-btn">
-                        <FaShoppingCart />
-                      </button>
-                    </div>
-                  </div>
-                  <div className="product-info">
-                    <h3>{product.name}</h3>
-                    <div className="product-rating">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <FaStar
-                          key={star}
-                          className={`star-icon ${star <= product.rating ? 'active' : ''}`}
-                        />
-                      ))}
-                      <span>({product.reviews})</span>
-                    </div>
-                    <div className="product-price">
-                      <span className="price">
-                        {product.price.toLocaleString('vi-VN')}₫
-                      </span>
-                      {product.oldPrice && (
-                        <span className="price-old">
-                          {product.oldPrice.toLocaleString('vi-VN')}₫
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
+              {data?.products.map((product: any) => (
+                <ProductCard 
+                  key={product.id}
+                  name={product.name}
+                  image={product.image}
+                  oldPrice={product.price.toLocaleString('vi-VN') + '₫'}
+                  salePrice={product.sale_price?.toLocaleString('vi-VN') + '₫'}
+                  promoAmount="200.000₫"
+                />
               ))}
             </div>
 
             {/* Pagination */}
             <div className="pagination">
-              <button className="btn btn-outline" disabled>
+              <button 
+                disabled={filters.page === 1}
+                onClick={() => setFilters(prev => ({ ...prev, page: prev.page - 1 }))}>
                 Trước
               </button>
-              <div className="page-numbers">
-                <button className="btn btn-primary">1</button>
-                <button className="btn btn-outline">2</button>
-                <button className="btn btn-outline">3</button>
-                <span>...</span>
-                <button className="btn btn-outline">10</button>
-              </div>
-              <button className="btn btn-outline">
+              <span>Trang {filters.page}</span>
+              <button 
+                disabled={!data?.hasMore}
+                onClick={() => setFilters(prev => ({ ...prev, page: prev.page + 1 }))}>
                 Sau
               </button>
             </div>
