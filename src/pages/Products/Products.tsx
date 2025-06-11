@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useProducts } from '../../hooks/useProducts';
 import ProductCard from '../../components/ProductCard/ProductCard';
 import './Products.css';
-import { FaFilter, FaSearch, FaStar, FaHeart, FaShoppingCart, FaSort } from 'react-icons/fa';
+import { FaFilter, FaSearch, FaSort } from 'react-icons/fa';
 
 const Products = () => {
+  const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedBrand, setSelectedBrand] = useState('all');
   const [priceRange, setPriceRange] = useState([0, 50000000]);
@@ -22,13 +24,15 @@ const Products = () => {
   const [filters, setFilters] = useState({
     page: 1,
     limit: 12,
-    price_min: undefined as number | undefined,
-    price_max: undefined as number | undefined,
-    category_id: undefined as number | undefined,
+    category_id: undefined as string | undefined,
     sort: undefined as string | undefined
   });
 
   const { data, isLoading, error } = useProducts(filters);
+
+  const handleProductClick = (slug: string) => {
+    navigate(`/products/${slug}`);
+  };
 
   if (isLoading) return <div>Đang tải...</div>;
   if (error) return <div>Có lỗi xảy ra: {(error as Error).message}</div>;
@@ -145,14 +149,14 @@ const Products = () => {
             {/* Products Grid */}
             <div className="products-grid">
               {data?.products.map((product: any) => (
-                <ProductCard 
-                  key={product.id}
-                  name={product.name}
-                  image={product.image}
-                  oldPrice={product.price.toLocaleString('vi-VN') + '₫'}
-                  salePrice={product.sale_price?.toLocaleString('vi-VN') + '₫'}
-                  promoAmount="200.000₫"
-                />
+                <div key={product.id} onClick={() => handleProductClick(product.slug)}>
+                  <ProductCard 
+                    name={product.name}
+                    image={product.image_url}
+                    price={product.base_price.toLocaleString('vi-VN') + '₫'}
+                    slug={product.slug}
+                  />
+                </div>
               ))}
             </div>
 
@@ -165,7 +169,7 @@ const Products = () => {
               </button>
               <span>Trang {filters.page}</span>
               <button 
-                disabled={!data?.hasMore}
+                disabled={!data?.products || data.products.length < filters.limit}
                 onClick={() => setFilters(prev => ({ ...prev, page: prev.page + 1 }))}>
                 Sau
               </button>

@@ -4,6 +4,7 @@ import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
 import HomePage from './pages/Home/HomePage';
 import Products from './pages/Products/Products';
+import ProductDetail from './pages/Products/ProductDetail';
 import Services from './pages/Services/Services';
 import Contact from './pages/Contact/Contact';
 import Cart from './pages/Cart/Cart';
@@ -17,6 +18,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/products" element={<Products />} />
+        <Route path="/products/:slug" element={<ProductDetail />} />
         <Route path="/services" element={<Services />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/cart" element={<Cart />} />

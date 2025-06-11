@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProductCard from '../../components/ProductCard/ProductCard';
 import { useProducts } from '../../hooks/useProducts';
@@ -8,103 +8,45 @@ import './HomePage.css';
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
-  const [currentBanner, setCurrentBanner] = useState(0);
   
-  // Lấy sản phẩm nổi bật
+  // Lấy sản phẩm
   const { data: productsData, isLoading: isLoadingProducts } = useProducts({
     limit: 10,
-    page: 1,
-    sort: 'featured-desc'  // Sắp xếp theo featured để lấy sản phẩm nổi bật
+    page: 1
   });
 
-  // Lấy tin tức
-  const { data: newsData, isLoading: isLoadingNews } = useQuery({
-    queryKey: ['news'],
+  // Lấy bài viết blog
+  const { data: blogPosts, isLoading: isLoadingBlog } = useQuery({
+    queryKey: ['blog_posts'],
     queryFn: async () => {
-      const response = await axios.get('/news');
+      const response = await axios.get('/blog_posts?status=published');
       return response.data;
     }
   });
 
-  // Lấy banners
-  const { data: bannersData } = useQuery({
-    queryKey: ['banners'],
-    queryFn: async () => {
-      const response = await axios.get('/banners?position=home_slider&status=active');
-      return response.data;
-    }
-  });
-
-  // Auto slide banners
-  useEffect(() => {
-    if (bannersData && bannersData.length > 0) {
-      const timer = setInterval(() => {
-        setCurrentBanner((prev) => (prev + 1) % bannersData.length);
-      }, 5000);
-      return () => clearInterval(timer);
-    }
-  }, [bannersData]);
-
-  const nextBanner = () => {
-    if (bannersData) {
-      setCurrentBanner((prev) => (prev + 1) % bannersData.length);
-    }
-  };
-
-  const prevBanner = () => {
-    if (bannersData) {
-      setCurrentBanner((prev) => (prev - 1 + bannersData.length) % bannersData.length);
-    }
-  };
-
-  if (isLoadingProducts || isLoadingNews) {
+  if (isLoadingProducts || isLoadingBlog) {
     return <div>Đang tải...</div>;
   }
 
   return (
     <main>
-      {/* Banner Section */}
-      <div className="banner-max">
-        {bannersData && bannersData.length > 0 && (
-          <div className="slide active">
-            <img 
-              src={bannersData[currentBanner].image} 
-              alt={bannersData[currentBanner].title}
-              style={{ width: '100%', height: 'auto', maxHeight: '480px', objectFit: 'cover' }}
-            />
-          </div>
-        )}
-        <button className="prev" onClick={prevBanner}>&#10094;</button>
-        <button className="next" onClick={nextBanner}>&#10095;</button>
-      </div>
-
       {/* Hot Sale Section */}
       <div className="main-top">
         <div className="hot-sale-header">
-          <h1>Hot Sale Cuối Tuần</h1>
-          <p>Ưu đãi cực sốc - Mua ngay kẻo lỡ!</p>
-        </div>
-
-        <div className="countdown">
-          Kết thúc sau:
-          <span className="time-box" id="hours">48</span>
-          <span className="separator">:</span>
-          <span className="time-box" id="minutes">00</span>
-          <span className="separator">:</span>
-          <span className="time-box" id="seconds">00</span>
+          <h1>Sản phẩm nổi bật</h1>
+          <p>Các sản phẩm được yêu thích nhất</p>
         </div>
 
         <div className="product-row">
           <div className="slider-container">
             <div className="container-product">
               {productsData?.products.map((product: any) => (
-                <div key={product.id} onClick={() => navigate(`/products/${product.id}`)}>
+                <div key={product.id} onClick={() => navigate(`/products/${product.slug}`)}>
                   <ProductCard 
                     name={product.name}
-                    image={product.image}
-                    oldPrice={product.price.toLocaleString('vi-VN') + '₫'}
-                    salePrice={product.sale_price?.toLocaleString('vi-VN') + '₫'}
-                    promoAmount="200.000₫"
+                    image={product.image_url}
+                    price={product.base_price.toLocaleString('vi-VN') + '₫'}
+                    slug={product.slug}
                   />
                 </div>
               ))}
@@ -112,9 +54,6 @@ const HomePage: React.FC = () => {
             <div className="button-see">
               <button className="showAllBtn" onClick={() => navigate('/products')}>
                 Xem tất cả <i className="bi bi-chevron-down"></i>
-              </button>
-              <button className="collapseBtn" style={{ display: 'none' }}>
-                Thu gọn <i className="bi bi-chevron-up"></i>
               </button>
             </div>
           </div>
@@ -136,26 +75,26 @@ const HomePage: React.FC = () => {
         </div>
       </div>
 
-      {/* Tech News Section */}
+      {/* Blog Posts Section */}
       <div className="main-button">
         <h2>Tin Công Nghệ Mới Nhất</h2>
         <div className="blog-grid">
-          {newsData?.slice(0, 3).map((item: any) => (
-            <div key={item.id} className="blog-card" onClick={() => navigate(`/news/${item.id}`)}>
+          {blogPosts?.slice(0, 3).map((post: any) => (
+            <div key={post.id} className="blog-card" onClick={() => navigate(`/blog/${post.slug}`)}>
               <div className="blog-image">
-                <img src={item.image} alt={item.title} />
+                <img src={post.thumbnail_url} alt={post.title} />
                 <span className="blog-date">
-                  {new Date(item.created_at).toLocaleDateString('vi-VN')}
+                  {new Date(post.published_at).toLocaleDateString('vi-VN')}
                 </span>
               </div>
               <div className="blog-info">
-                <h3 className="blog-title">{item.title}</h3>
+                <h3 className="blog-title">{post.title}</h3>
               </div>
             </div>
           ))}
         </div>
         <div className="button-see">
-          <button className="showAllBtn" onClick={() => navigate('/news')}>Xem tất cả tin tức</button>
+          <button className="showAllBtn" onClick={() => navigate('/blog')}>Xem tất cả tin tức</button>
         </div>
       </div>
 
