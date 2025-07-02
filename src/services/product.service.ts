@@ -42,6 +42,11 @@ export const ProductService = {
         return response.data;
     },
 
+    getUsers: async () => {
+        const response = await axios.get('http://localhost:3001/users');
+        return response.data;
+    },
+
     // Lấy sản phẩm theo danh mục
     getProductsByCategory: async (categoryId: number) => {
         const response = await axios.get(`/products?category_id=${categoryId}`);
