@@ -4,8 +4,10 @@ import { useRoutes } from 'react-router-dom';
 import { routes } from './router';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
-import './App.css';
 import axios from 'axios';
+
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   useEffect(() => {
@@ -15,9 +17,11 @@ function App() {
         console.log(response.data.message);
       })
       .catch((error) => {
+        toast.error("Không thể kết nối tới server!");
         console.error("Lỗi khi gọi API:", error);
       });
   }, []);
+
   const routing = useRoutes(routes);
 
   return (
@@ -25,6 +29,7 @@ function App() {
      
       {routing}
       
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 }
