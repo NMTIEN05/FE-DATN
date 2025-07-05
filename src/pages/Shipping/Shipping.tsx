@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import './Shipping.css';
+import { useNavigate } from 'react-router-dom';
+import { useCart } from '../../contexts/CartContext';
 import {
   FaTruck,
   FaMapMarkerAlt,
@@ -11,12 +13,23 @@ import {
 } from 'react-icons/fa';
 
 const Shipping = () => {
+  const navigate = useNavigate();
+  const { items, totalItems, totalPrice, clearCart } = useCart();
   const [selectedPayment, setSelectedPayment] = useState('cod');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
+    // Xử lý đặt hàng thành công
+    clearCart();
+    navigate('/');
+    // Có thể thêm thông báo đặt hàng thành công
   };
+
+  // Nếu không có sản phẩm trong giỏ hàng, chuyển về trang giỏ hàng
+  if (items.length === 0) {
+    navigate('/cart');
+    return null;
+  }
 
   return (
     <div className="shipping-page">
@@ -135,25 +148,26 @@ const Shipping = () => {
 
             {/* Order Items */}
             <div className="order-items">
-              <div className="order-item">
-                <img src="https://via.placeholder.com/60" alt="Product" />
-                <div className="item-info">
-                  <h3>iPhone 15 Pro Max</h3>
-                  <p>Titan Tự nhiên - 256GB</p>
-                  <div className="item-price">
-                    <span>27.990.000₫</span>
-                    <span className="quantity">x1</span>
+              {items.map((item) => (
+                <div key={item.id} className="order-item">
+                  <img src={item.image} alt={item.name} />
+                  <div className="item-info">
+                    <h3>{item.name}</h3>
+                    <p>{item.color} - {item.storage}</p>
+                    <div className="item-price">
+                      <span>{item.price.toLocaleString('vi-VN')}₫</span>
+                      <span className="quantity">x{item.quantity}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-              {/* Add more items */}
+              ))}
             </div>
 
             {/* Order Total */}
             <div className="order-total">
               <div className="total-row">
-                <span>Tạm tính</span>
-                <span>27.990.000₫</span>
+                <span>Tạm tính ({totalItems} sản phẩm)</span>
+                <span>{totalPrice.toLocaleString('vi-VN')}₫</span>
               </div>
               <div className="total-row">
                 <span>Phí vận chuyển</span>
@@ -161,7 +175,7 @@ const Shipping = () => {
               </div>
               <div className="total-row final">
                 <span>Tổng cộng</span>
-                <span>27.990.000₫</span>
+                <span>{totalPrice.toLocaleString('vi-VN')}₫</span>
               </div>
             </div>
 

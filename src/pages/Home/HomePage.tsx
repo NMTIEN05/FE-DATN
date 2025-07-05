@@ -1,10 +1,60 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import ProductCard from '../../components/ProductCard/ProductCard';
 import { useProducts } from '../../hooks/useProducts';
 import { useQuery } from '@tanstack/react-query';
 import axios from '../../api/axios.config';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 import './HomePage.css';
+
+const banners = [
+  {
+    id: 1,
+    image: 'https://i.pinimg.com/736x/5a/7e/90/5a7e903fa4d36808abddba1d331a4a34.jpg',
+    link: 'htps://i.pinimg.com/736x/ac/a6/cd/aca6cdbfd7bacf9da83fec4d6230dae8.jpg',
+    title: 'iPhone 15 Pro Max'
+  },
+  {
+    id: 2,
+    image: 'https://i.pinimg.com/736x/0b/a9/43/0ba943ea32ac6f8450ad1cae3de07b18.jpg ',
+    link: '/products/samsung-s24-ultra',
+    title: 'Samsung S24 Ultra'
+  },
+  {
+    id: 3,
+    image: 'https://i.pinimg.com/736x/33/3f/b1/333fb13a2a0e48edc138b24b18af9b28.jpg',
+    link: '/products/xiaomi-14-ultra',
+    title: 'Xiaomi 14 Ultra'
+  }
+];
+
+const promotions = [
+  {
+    id: 1,
+    code: 'WELCOME2024',
+    discount: 'Giảm 500.000₫',
+    description: 'Áp dụng cho đơn hàng từ 5.000.000₫',
+    expiry: '31/03/2024'
+  },
+  {
+    id: 2,
+    code: 'NEWPHONE',
+    discount: 'Giảm 1.000.000₫',
+    description: 'Áp dụng cho iPhone 15 Series',
+    expiry: '31/03/2024'
+  },
+  {
+    id: 3,
+    code: 'SAMSUNG24',
+    discount: 'Giảm 2.000.000₫',
+    description: 'Áp dụng cho Samsung S24 Series',
+    expiry: '31/03/2024'
+  }
+];
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -24,62 +74,112 @@ const HomePage: React.FC = () => {
     }
   });
 
+  const handleCopyCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+    alert('Đã sao chép mã giảm giá!');
+  };
+
   if (isLoadingProducts || isLoadingBlog) {
     return <div>Đang tải...</div>;
   }
 
   return (
-    <main>
-      {/* Hot Sale Section */}
-      <div className="main-top">
-        <div className="hot-sale-header">
-          <h1>Sản phẩm nổi bật</h1>
-          <p>Các sản phẩm được yêu thích nhất</p>
-        </div>
+    <main className="home-page">
+      {/* Banner Slider */}
+      <div className="banner-container">
+        <Swiper
+          modules={[Navigation, Pagination, Autoplay]}
+          spaceBetween={0}
+          slidesPerView={1}
+          navigation
+          pagination={{ clickable: true }}
+          autoplay={{
+            delay: 3000,
+            disableOnInteraction: false,
+          }}
+          loop={true}
+          className="main-banner"
+        >
+          {banners.map((banner) => (
+            <SwiperSlide key={banner.id}>
+              <a href={banner.link} className="banner-link">
+                <img src={banner.image} alt={banner.title} className="banner-image" />
+              </a>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
 
-        <div className="product-row">
-          <div className="slider-container">
-            <div className="container-product">
-              {productsData?.products.map((product: any) => (
-                <div key={product.id} onClick={() => navigate(`/products/${product.slug}`)}>
-                  <ProductCard 
-                    name={product.name}
-                    image={product.image_url}
-                    price={product.base_price.toLocaleString('vi-VN') + '₫'}
-                    slug={product.slug}
-                  />
+      {/* Promotions */}
+      <div className="promotions-container">
+        <h2 className="promotions-title">
+          <span className="highlight">Mã giảm giá</span> hôm nay
+        </h2>
+        <div className="promotions-grid">
+          {promotions.map((promo) => (
+            <div key={promo.id} className="promotion-card">
+              <div className="promotion-content">
+                <div className="promotion-header">
+                  <div className="discount">{promo.discount}</div>
+                  <div className="code" onClick={() => handleCopyCode(promo.code)}>
+                    {promo.code}
+                    <span className="copy-hint">Nhấn để sao chép</span>
+                  </div>
                 </div>
-              ))}
+                <p className="description">{promo.description}</p>
+                <div className="expiry">HSD: {promo.expiry}</div>
+              </div>
+              <div className="promotion-border-dashed"></div>
             </div>
-            <div className="button-see">
-              <button className="showAllBtn" onClick={() => navigate('/products')}>
-                Xem tất cả <i className="bi bi-chevron-down"></i>
-              </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Hot Sale Section */}
+      <div className="products-section">
+        <div className="section-header">
+          <h2 className="section-title">
+            <span className="highlight">Sản phẩm</span> nổi bật
+          </h2>
+          <a href="/products" className="view-all">Xem tất cả</a>
+        </div>
+        <div className="products-grid">
+          {productsData?.products.map((product: any) => (
+            <div key={product.id} onClick={() => navigate(`/products/${product.slug}`)}>
+              <ProductCard 
+                name={product.name}
+                image={product.image_url}
+                price={product.base_price.toLocaleString('vi-VN') + '₫'}
+                slug={product.slug}
+              />
             </div>
-          </div>
+          ))}
         </div>
       </div>
 
       {/* Price Filter Section */}
-      <div className="main-filer">
-        <div className="filter-container">
-          <h2>Giá bạn mong muốn</h2>
-          <div className="price-filter">
-            <div className="price-btn active" onClick={() => navigate('/products?price=0-2000000')}>Dưới 2 triệu</div>
-            <div className="price-btn" onClick={() => navigate('/products?price=2000000-4000000')}>2 - 4 triệu</div>
-            <div className="price-btn" onClick={() => navigate('/products?price=4000000-7000000')}>4 - 7 triệu</div>
-            <div className="price-btn" onClick={() => navigate('/products?price=7000000-13000000')}>7 - 13 triệu</div>
-            <div className="price-btn" onClick={() => navigate('/products?price=13000000-20000000')}>13 - 20 triệu</div>
-            <div className="price-btn" onClick={() => navigate('/products?price=20000000-999999999')}>Trên 20 triệu</div>
-          </div>
+      <div className="filter-section">
+        <h2 className="section-title">Giá bạn mong muốn</h2>
+        <div className="price-filter">
+          <div className="price-btn active" onClick={() => navigate('/products?price=0-2000000')}>Dưới 2 triệu</div>
+          <div className="price-btn" onClick={() => navigate('/products?price=2000000-4000000')}>2 - 4 triệu</div>
+          <div className="price-btn" onClick={() => navigate('/products?price=4000000-7000000')}>4 - 7 triệu</div>
+          <div className="price-btn" onClick={() => navigate('/products?price=7000000-13000000')}>7 - 13 triệu</div>
+          <div className="price-btn" onClick={() => navigate('/products?price=13000000-20000000')}>13 - 20 triệu</div>
+          <div className="price-btn" onClick={() => navigate('/products?price=20000000-999999999')}>Trên 20 triệu</div>
         </div>
       </div>
 
       {/* Blog Posts Section */}
-      <div className="main-button">
-        <h2>Tin Công Nghệ Mới Nhất</h2>
+      <div className="blog-section">
+        <div className="section-header">
+          <h2 className="section-title">
+            <span className="highlight">Tin tức</span> công nghệ
+          </h2>
+          <a href="/blog" className="view-all">Xem tất cả</a>
+        </div>
         <div className="blog-grid">
-          {blogPosts?.slice(0, 3).map((post: any) => (
+          {blogPosts?.slice().map((post: any) => (
             <div key={post.id} className="blog-card" onClick={() => navigate(`/blog/${post.slug}`)}>
               <div className="blog-image">
                 <img src={post.thumbnail_url} alt={post.title} />
@@ -92,9 +192,6 @@ const HomePage: React.FC = () => {
               </div>
             </div>
           ))}
-        </div>
-        <div className="button-see">
-          <button className="showAllBtn" onClick={() => navigate('/blog')}>Xem tất cả tin tức</button>
         </div>
       </div>
 

@@ -2,8 +2,6 @@
 import React, { useEffect } from 'react';
 import { useRoutes } from 'react-router-dom';
 import { routes } from './router';
-import Header from './components/Header/Header';
-import Footer from './components/Footer/Footer';
 import './App.css';
 import axios from 'axios';
 
@@ -18,13 +16,12 @@ function App() {
         console.error("Lỗi khi gọi API:", error);
       });
   }, []);
+
   const routing = useRoutes(routes);
 
   return (
     <div className="App">
-     
       {routing}
-      
     </div>
   );
 }
