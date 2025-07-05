@@ -15,6 +15,7 @@ import Login from '../pages/auth/login';
 import Register from '../pages/auth/register';
 import EmailVerificationUI from '../pages/auth/CheckMail';
 import ForgotPassword from '../pages/auth/ForgotPassWord';
+import ResetPassword from '../pages/auth/ResetPass';
 
 export const routes: RouteObject[] = [
   {
@@ -33,7 +34,8 @@ export const routes: RouteObject[] = [
   { path: '/register', element: <Register /> }, // không có layout
   {path :'/login',element :<Login/>},
   {path :'/checkmail',element :<EmailVerificationUI/>},
-  {path:'/forgot-password',element:<ForgotPassword/>}
+  {path:'/forgot-password',element:<ForgotPassword/>},
+  {path:"/reset-password", element: <ResetPassword />}, // Đổi mật khẩu sau khi xác minh email
 ];
 
 

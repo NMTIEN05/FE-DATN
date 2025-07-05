@@ -35,6 +35,7 @@ const ForgotPassword = () => {
 
   // Xác minh mã
   const handleVerify = async (data: { email: string; code: string }) => {
+     const trimmedEmail = data.email.trim().toLowerCase(); // ✅ thêm dòng này
     try {
       const response = await axios.post("http://localhost:8888/api/auth/email-code", {
         code: data.code.trim(),
@@ -42,8 +43,9 @@ const ForgotPassword = () => {
       });
 
       toast.success(response.data.message || "✅ Xác minh thành công!");
+       localStorage.setItem("emailForReset", trimmedEmail);
       setTimeout(() => {
-        navigate(`/reset-password?email=${data.email}`);
+        navigate(`/reset-password`);
       }, 1500);
     } catch (error: any) {
       toast.error(error?.response?.data?.message || "❌ Mã xác minh không hợp lệ!");

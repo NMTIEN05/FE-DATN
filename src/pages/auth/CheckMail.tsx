@@ -27,22 +27,30 @@ useEffect(() => {
     formState: { errors },
   } = useForm<VerificationFormData>();
 
-  const onSubmit = async (data: VerificationFormData) => {
-    try {
-      const response = await axios.post("http://localhost:8888/api/auth/email-code", {
-        code: data.verificationCode,
-        email, // truyền kèm email
-      });
+ const onSubmit = async (data: VerificationFormData) => {
+  try {
+    const email = localStorage.getItem("emailForVerify"); // hoặc email bạn có sẵn
 
-      toast.success(response.data.message || "✅ Xác nhận thành công!");
-      // Chuyển hướng sau khi xác nhận (ví dụ về login)
-      setTimeout(() => {
-        navigate("/login");
-      }, 2000);
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || "❌ Mã xác nhận không hợp lệ!");
-    }
-  };
+    const response = await axios.post("http://localhost:8888/api/auth/email-code", {
+      code: data.verificationCode,
+      email, // gửi email kèm để xác thực
+    });
+
+    // ✅ Xác thực mã thành công
+    toast.success(response.data.message || "✅ Xác nhận thành công!");
+
+    // ✅ Lưu email vào localStorage để dùng sau (ví dụ cho reset password)
+    localStorage.setItem("emailForReset", email || "");
+
+    // 👉 Chuyển sang trang đổi mật khẩu
+    setTimeout(() => {
+      navigate("/reset-password");
+    }, 2000);
+  } catch (error: any) {
+    toast.error(error?.response?.data?.message || "❌ Mã xác nhận không hợp lệ!");
+  }
+};
+
 
   return (
     <>
