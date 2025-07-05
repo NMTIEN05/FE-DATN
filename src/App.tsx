@@ -12,6 +12,7 @@ import Shipping from './pages/Shipping/Shipping';
 import BlogDetail from './pages/Blog/BlogDetail';
 import { CartProvider } from './contexts/CartContext';
 import './App.css';
+import ServiceDetail from './pages/Services/serviceDetail';
 
 function App() {
   return (
@@ -24,6 +25,8 @@ function App() {
             <Route path="/products/:slug" element={<ProductDetail />} />
             <Route path="/blog/:slug" element={<BlogDetail />} />
             <Route path="/services" element={<Services />} />
+            <Route path="/services/:id" element={<ServiceDetail />} />
+
             <Route path="/contact" element={<Contact />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/shipping" element={<Shipping />} />

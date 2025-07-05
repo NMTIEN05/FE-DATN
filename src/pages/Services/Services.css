@@ -1,276 +1,498 @@
-.services-page {
-  padding-bottom: var(--space-xl);
+/* ===============  Chi tiết dịch vụ  =============== */
+.service-detail {
+  padding: 60px 20px;
+  background: #f7f7f9;
+  min-height: 100vh;
+  font-family: "Segoe UI", sans-serif;
 }
 
-/* Hero Section */
-.services-hero {
-  background: linear-gradient(to right, var(--primary-color), var(--primary-dark));
-  color: white;
-  padding: var(--space-xl) 0;
-  margin-bottom: var(--space-xl);
-  text-align: center;
-}
-
-.services-hero .hero-content {
-  max-width: 800px;
+.service-detail__card {
+  max-width: 1200px; /* Đã sửa lỗi: Giả sử một giá trị max-width hợp lý. Bạn có thể thay đổi tùy ý. */
   margin: 0 auto;
+  background: #ffffff;
+  padding: 48px 40px;
+  border-radius: 20px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+  position: relative;
 }
 
-.services-hero h1 {
-  font-size: 48px;
+/* --------- Tiêu đề & Biểu tượng --------- */
+.service-detail__title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 2.2rem;
   font-weight: 700;
-  margin: 0 0 var(--space-md);
+  color: #222;
+  margin-bottom: 10px;
+  letter-spacing: 0.015em; /* Tinh chỉnh nhỏ hơn một chút để tiêu đề có sự rõ ràng mà không bị giãn quá */
 }
 
-.services-hero p {
-  font-size: 18px;
-  line-height: 1.6;
-  opacity: 0.9;
-  margin: 0;
+.service-detail__icon svg {
+  font-size: 2.6rem;
+  color: #007bff;
 }
 
-/* Section Headers */
-.section-header {
-  text-align: center;
-  margin-bottom: var(--space-xl);
-}
-
-.section-header h2 {
-  font-size: 36px;
+/* --------- Thẻ loại dịch vụ --------- */
+.service-detail__type {
+  display: inline-block;
+  padding: 6px 16px;
+  font-size: 0.9rem;  
+  border-radius: 30px;
+  background: #e6f0ff;
+  color: #0056b3;
+  margin-bottom: 24px;
   font-weight: 600;
-  margin: 0 0 var(--space-sm);
-  color: var(--text-primary);
+  text-transform: capitalize;
+  letter-spacing: 0.025em; /* Giữ một chút độ thoáng để nổi bật */
 }
 
-.section-header p {
-  font-size: 16px;
-  color: var(--text-secondary);
-  max-width: 600px;
-  margin: 0 auto;
+/* --------- Mô tả --------- */
+.service-detail__desc {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: #333;
+  margin-bottom: 32px;
+  letter-spacing: 0.005em; /* Rất nhỏ, gần như mặc định, để đảm bảo dễ đọc cho đoạn văn dài */
 }
 
-/* Main Services */
-.main-services {
-  margin-bottom: var(--space-xl);
+/* --------- Tính năng --------- */
+.service-detail__features-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  letter-spacing: 0.01em; /* Tạo cảm giác rõ ràng cho tiêu đề tính năng */
 }
+
+.service-detail__features {
+  padding-left: 0;
+  margin-left: 0;
+}
+
+.service-detail__features li {
+  list-style: none;
+  margin-bottom: 12px;
+  color: #444;
+  position: relative;
+  padding-left: 24px;
+  cursor: default;
+  transition: color 0.3s ease;
+  letter-spacing: 0.008em; /* Hơi thoáng hơn mặc định một chút cho danh sách */
+}
+
+.service-detail__features li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 10px;
+  background: #007bff;
+  border-radius: 50%;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.service-detail__features li:hover {
+  color: #0056b3;
+}
+
+.service-detail__features li:hover::before {
+  background: #0057c2;
+  transform: translateY(-50%) scale(1.3);
+}
+
+/* --------- Nút quay lại --------- */
+.service-detail__back {
+  display: inline-block;
+  margin-bottom: 30px;
+  padding: 14px 24px;
+  background: #007bff;
+  color: #fff;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background 0.25s ease, box-shadow 0.25s ease;
+  letter-spacing: 0.03em; /* Tạo độ rõ ràng và cảm giác cao cấp cho nút */
+}
+
+.service-detail__back:hover {
+  background: #0057c2;
+  box-shadow: 0 4px 12px rgba(0, 91, 187, 0.4);
+}
+
+/* =============== Thẻ dịch vụ =============== */
 
 .services-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-lg);
+  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 }
 
 .service-card {
   background: white;
-  border-radius: var(--radius-lg);
-  padding: var(--space-lg);
+  border-radius: 16px;
+  padding: 24px 20px;
   text-align: center;
+  box-shadow: 0 4px 15px rgb(0 0 0 / 0.1);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
   transition: all 0.3s ease;
+  z-index: 0;
+}
+
+.service-card::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, #4ade80, #3b82f6, #facc15);
+  background-size: 600% 600%;
+  animation: gradientMove 20s ease infinite;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  border-radius: 16px;
+  z-index: -1;
+}
+
+.service-card:hover::before {
+  opacity: 0.2;
 }
 
 .service-card:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 8px 30px rgb(0 0 0 / 0.2);
 }
 
+/* Biểu tượng trong thẻ */
 .service-icon {
   width: 64px;
   height: 64px;
-  background: var(--primary-light);
-  color: var(--primary-color);
+  background: linear-gradient(135deg, #34d399, #3b82f6);
+  color: white;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto var(--space-md);
-  font-size: 24px;
+  margin: 0 auto 16px;
+  font-size: 28px;
+  transition: background 0.4s ease;
 }
 
-.service-card h3 {
-  margin: 0 0 var(--space-sm);
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--text-primary);
+.service-card:hover .service-icon {
+  background: linear-gradient(135deg, #f472b6, #facc15);
+  color: white;
 }
 
-.service-card p {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--text-secondary);
-}
-
-/* Additional Services */
-.additional-services {
-  background: var(--bg-light);
-  padding: var(--space-xl) 0;
-  margin-bottom: var(--space-xl);
-}
-
+/* Thẻ tính năng */
 .feature-card ul {
+  padding-left: 0;
   list-style: none;
-  padding: 0;
-  margin: var(--space-md) 0 0;
-  text-align: left;
+  margin-top: 16px;
 }
 
 .feature-card li {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  margin-bottom: var(--space-sm);
-  font-size: 14px;
-  color: var(--text-secondary);
+  position: relative;
+  margin-bottom: 10px;
+  padding-left: 24px;
+  cursor: default;
+  color: #444;
+  font-weight: 600;
+  transition: color 0.3s ease;
+  letter-spacing: 0.008em; /* Tương tự các mục danh sách thông thường */
 }
 
 .feature-card li::before {
-  content: '✓';
-  color: var(--success-color);
+  content: "✓";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
   font-weight: bold;
+  background: linear-gradient(45deg, #4ade80, #22d3ee, #f87171);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  transition: transform 0.3s ease;
 }
 
-/* Service Process */
-.service-process {
-  margin-bottom: var(--space-xl);
+.feature-card li:hover {
+  color: #0056b3;
 }
+
+.feature-card li:hover::before {
+  transform: scale(1.3);
+}
+
+/* =============== Các bước quy trình =============== */
 
 .process-steps {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-lg);
-  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 32px 24px;
+  margin-top: 40px;
 }
 
 .process-step {
-  text-align: center;
-  padding: var(--space-lg);
   background: white;
-  border-radius: var(--radius-lg);
-  position: relative;
+  padding: 20px;
+  border-radius: 16px;
+  width: 220px;
+  box-shadow: 0 4px 15px rgb(0 0 0 / 0.1);
+  text-align: center;
+  transition: box-shadow 0.3s ease;
+  flex-shrink: 0;
+}
+
+.process-step:hover {
+  box-shadow: 0 8px 30px rgb(0 0 0 / 0.2);
 }
 
 .step-number {
-  width: 40px;
-  height: 40px;
-  background: var(--primary-color);
+  background: linear-gradient(135deg, #facc15, #f87171);
   color: white;
+  font-weight: 700;
+  font-size: 1.5rem;
+  width: 48px;
+  height: 48px;
+  line-height: 48px;
+  margin: 0 auto 12px;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  font-weight: 600;
-  margin: 0 auto var(--space-md);
+  box-shadow: 0 0 10px rgba(250, 204, 21, 0.6);
+  transition: transform 0.3s ease;
+  letter-spacing: 0.03em; /* Giảm độ giãn của số bước để trông gọn gàng hơn */
+}
+
+.process-step:hover .step-number {
+  transform: scale(1.2);
 }
 
 .process-step h3 {
-  margin: 0 0 var(--space-sm);
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text-primary);
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+  letter-spacing: 0.015em; /* Điều chỉnh lại cho tiêu đề bước */
 }
 
 .process-step p {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--text-secondary);
+  font-size: 0.95rem;
+  color: #555;
+  letter-spacing: 0.005em; /* Rất nhỏ cho mô tả */
 }
 
-.step-arrow {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: var(--primary-color);
-  font-size: 24px;
+.process-arrow {
+  font-size: 2rem;
+  color: #007bff;
+  margin: 0 10px;
+  align-self: center;
 }
 
-/* Contact CTA */
-.contact-cta {
-  background: linear-gradient(to right, var(--primary-color), var(--primary-dark));
-  color: white;
-  padding: var(--space-xl) 0;
-  text-align: center;
-}
+/* =============== Nút bấm =============== */
 
-.cta-content {
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.cta-content h2 {
-  font-size: 36px;
+.btn {
+  border: none;
+  cursor: pointer;
   font-weight: 600;
-  margin: 0 0 var(--space-sm);
+  border-radius: 8px;
+  padding: 12px 24px;
+  transition: all 0.3s ease;
+  letter-spacing: 0.035em; /* Tinh chỉnh lại cho các nút bấm */
 }
 
-.cta-content p {
-  font-size: 16px;
-  opacity: 0.9;
-  margin: 0 0 var(--space-lg);
+.btn-primary {
+  background: linear-gradient(270deg, #34d399, #3b82f6, #f472b6, #facc15);
+  background-size: 800% 800%;
+  color: white;
+  box-shadow: 0 4px 12px rgb(52 211 153 / 0.7);
+}
+
+.btn-primary:hover {
+  background-position: 100% 50%;
+  box-shadow: 0 0 15px rgba(25 )
+}
+/* ===== Contact Modal ===== */
+.contact-modal__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.25s ease;
+}
+
+.contact-modal {
+  background: #fff;
+  width: 90%;
+  max-width: 400px;
+  border-radius: 12px;
+  padding: 28px 24px 32px;
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.3s ease;
+}
+
+.contact-modal__close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #666;
+}
+
+.contact-modal__close:hover {
+  color: #000;
+}
+
+.contact-modal h3 {
+  text-align: center;
+  color: #007bff;
+  font-size: 1.3rem;
+  margin-bottom: 16px;
+}
+
+.contact-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.contact-list li {
+  margin-bottom: 12px;
+}
+
+.contact-list a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.contact-list a:hover {
+  text-decoration: underline;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.contact-cta-enhanced {
+  background: linear-gradient(to right, #e0f2ff, #f0f8ff);
+  padding: 60px 20px;
+  text-align: center;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.cta-heading h2 {
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  color: #003c8f;
+}
+
+.cta-heading p {
+  font-size: 18px;
+  color: #555;
+  margin-bottom: 40px;
+}
+
+.contact-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.contact-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s, box-shadow 0.3s;
+  text-align: left;
+}
+
+.contact-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+}
+
+.contact-card h4 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #007bff;
+  margin-bottom: 12px;
+}
+
+.contact-card p {
+  font-size: 15px;
+  color: #333;
+  margin: 6px 0;
+}
+
+.contact-card a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.link-more {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 14px;
+  transition: color 0.25s;
+}
+
+.link-more:hover {
+  color: #0057c2;
 }
 
 .cta-buttons {
   display: flex;
-  align-items: center;
   justify-content: center;
-  gap: var(--space-md);
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
-/* Responsive */
-@media (max-width: 1200px) {
-  .services-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
+.btn-primary,
+.btn-outline {
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-decoration: none;
+  display: inline-block;
 }
 
-@media (max-width: 992px) {
-  .services-hero h1 {
-    font-size: 40px;
-  }
-
-  .services-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .process-steps {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .step-arrow {
-    display: none;
-  }
+.btn-primary {
+  background: #007bff;
+  color: white;
+  border: none;
 }
 
-@media (max-width: 768px) {
-  .services-hero h1 {
-    font-size: 32px;
-  }
-
-  .services-hero p {
-    font-size: 16px;
-  }
-
-  .section-header h2 {
-    font-size: 28px;
-  }
-
-  .cta-content h2 {
-    font-size: 28px;
-  }
-
-  .cta-buttons {
-    flex-direction: column;
-  }
+.btn-primary:hover {
+  background: #0057c2;
 }
 
-@media (max-width: 576px) {
-  .services-grid {
-    grid-template-columns: 1fr;
-  }
+.btn-outline {
+  background: transparent;
+  color: #007bff;
+  border: 2px solid #007bff;
+}
 
-  .process-steps {
-    grid-template-columns: 1fr;
-  }
-} 
+.btn-outline:hover {
+  background: #e7f0ff;
+  color: #0057c2;
+}

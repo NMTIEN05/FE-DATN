@@ -1,0 +1,128 @@
+/* ===============  Service Detail  =============== */
+.service-detail {
+  padding: 60px 20px;
+  background: #f7f7f9;
+  min-height: 100vh;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.service-detail__card {
+  max-width: 900px;
+  margin: 0 auto;
+  background: #ffffff;
+  padding: 48px 40px;
+  border-radius: 20px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+  position: relative;
+}
+
+/* --------- Title & Icon --------- */
+.service-detail__title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 10px;
+}
+
+.service-detail__icon svg {
+  font-size: 2.6rem;
+  color: #007bff;
+}
+
+/* --------- Type badge --------- */
+.service-detail__type {
+  display: inline-block;
+  padding: 6px 16px;
+  font-size: 0.9rem;  
+  border-radius: 30px;
+  background: #e6f0ff;
+  color: #0056b3;
+  margin-bottom: 24px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+/* --------- Description --------- */
+.service-detail__desc {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: #333;
+  margin-bottom: 32px;
+}
+
+/* --------- Features --------- */
+.service-detail__features-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.service-detail__features {
+  padding-left: 0; /* bỏ padding-left mặc định */
+  margin-left: 0;
+}
+
+.service-detail__features li {
+  list-style: none; /* tắt dấu chấm mặc định */
+  margin-bottom: 12px;
+  color: #444;
+  position: relative;
+  padding-left: 24px; /* tạo chỗ cho dấu chấm custom */
+  cursor: default;
+  transition: color 0.3s ease;
+}
+
+.service-detail__features li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 10px;
+  background: #007bff;
+  border-radius: 50%;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.service-detail__features li:hover {
+  color: #0056b3;
+}
+
+.service-detail__features li:hover::before {
+  background: #0057c2;
+  transform: translateY(-50%) scale(1.3);
+}
+
+/* --------- Back button --------- */
+.service-detail__back {
+  display: inline-block;
+  margin-bottom: 30px;
+  padding: 21px 21px;
+  background: #007bff;
+  color: #fff;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background 0.25s ease;
+}
+
+.service-detail__back:hover {
+  background: #0057c2;
+}
+
+/* --------- Mobile tweaks --------- */
+@media (max-width: 767px) {
+  .service-detail__card {
+    padding: 32px 24px;
+  }
+  .service-detail__title {
+    font-size: 1.75rem;
+  }
+  .service-detail__icon svg {
+    font-size: 2.2rem;
+  }
+}

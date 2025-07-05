@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './Services.css';
 import {
   FaShieldAlt,
@@ -10,49 +10,37 @@ import {
   FaCheckCircle,
   FaArrowRight,
 } from 'react-icons/fa';
+import axios from 'axios';
+import { Link } from 'react-router-dom';
+
+const iconMap = {
+  FaShieldAlt: <FaShieldAlt />,
+  FaTools: <FaTools />,
+  FaExchangeAlt: <FaExchangeAlt />,
+  FaHeadset: <FaHeadset />,
+  FaTruck: <FaTruck />,
+  FaClock: <FaClock />,
+  FaCheckCircle: <FaCheckCircle />,
+};
 
 const Services = () => {
-  const mainServices = [
-    {
-      icon: <FaShieldAlt />,
-      title: 'Bảo hành chính hãng',
-      description:
-        'Tất cả sản phẩm đều được bảo hành chính hãng theo chính sách của nhà sản xuất',
-    },
-    {
-      icon: <FaTools />,
-      title: 'Sửa chữa chuyên nghiệp',
-      description: 'Đội ngũ kỹ thuật viên có tay nghề cao, được đào tạo chuyên sâu',
-    },
-    {
-      icon: <FaExchangeAlt />,
-      title: 'Đổi trả miễn phí',
-      description: 'Hỗ trợ đổi trả sản phẩm trong vòng 15 ngày nếu có lỗi từ nhà sản xuất',
-    },
-    {
-      icon: <FaHeadset />,
-      title: 'Tư vấn 24/7',
-      description: 'Đội ngũ tư vấn viên nhiệt tình, sẵn sàng hỗ trợ mọi lúc mọi nơi',
-    },
-  ];
+  const [mainServices, setMainServices] = useState([]);
+  const [additionalServices, setAdditionalServices] = useState([]);
 
-  const additionalServices = [
-    {
-      icon: <FaTruck />,
-      title: 'Giao hàng tận nơi',
-      features: ['Miễn phí giao hàng trong nội thành', 'Đóng gói cẩn thận, an toàn', 'Theo dõi đơn hàng trực tuyến'],
-    },
-    {
-      icon: <FaClock />,
-      title: 'Sửa chữa nhanh chóng',
-      features: ['Tiếp nhận máy trong 15 phút', 'Sửa chữa trong 24h', 'Cập nhật tiến độ qua SMS'],
-    },
-    {
-      icon: <FaCheckCircle />,
-      title: 'Dịch vụ cao cấp',
-      features: ['Bảo hành tận nơi', 'Vệ sinh máy miễn phí', 'Tư vấn sử dụng sau bán hàng'],
-    },
-  ];
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const res = await axios.get('http://localhost:8888/api/services');
+        const services = res.data;
+        setMainServices(services.filter(s => s.type === 'main'));
+        setAdditionalServices(services.filter(s => s.type === 'additional'));
+      } catch (error) {
+        console.error('Lỗi khi tải dịch vụ:', error);
+      }
+    };
+
+    fetchServices();
+  }, []);
 
   return (
     <div className="services-page">
@@ -61,10 +49,7 @@ const Services = () => {
         <div className="container">
           <div className="hero-content">
             <h1>Dịch vụ của chúng tôi</h1>
-            <p>
-              Cam kết mang đến trải nghiệm dịch vụ tốt nhất cho khách hàng với đội ngũ nhân viên chuyên
-              nghiệp và tận tâm
-            </p>
+          
           </div>
         </div>
       </section>
@@ -73,16 +58,21 @@ const Services = () => {
       <section className="main-services">
         <div className="container">
           <div className="section-header">
-            <h2>Dịch vụ chính</h2>
-            <p>Những dịch vụ nổi bật mà chúng tôi cung cấp cho khách hàng</p>
+      
           </div>
           <div className="services-grid">
-            {mainServices.map((service, index) => (
-              <div key={index} className="service-card">
-                <div className="service-icon">{service.icon}</div>
+            {mainServices.map((service) => (
+              <Link
+                to={`/services/${service._id}`}
+                key={service._id}
+                className="service-card"
+              >
+                <div className="service-icon">
+                  {iconMap[service.icon] || <FaCheckCircle />}
+                </div>
                 <h3>{service.title}</h3>
                 <p>{service.description}</p>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
@@ -93,19 +83,24 @@ const Services = () => {
         <div className="container">
           <div className="section-header">
             <h2>Dịch vụ bổ sung</h2>
-            <p>Các dịch vụ đi kèm giúp nâng cao trải nghiệm khách hàng</p>
           </div>
           <div className="services-grid">
-            {additionalServices.map((service, index) => (
-              <div key={index} className="service-card feature-card">
-                <div className="service-icon">{service.icon}</div>
+            {additionalServices.map((service) => (
+              <Link
+                to={`/services/${service._id}`}
+                key={service._id}
+                className="service-card feature-card"
+              >
+                <div className="service-icon">
+                  {iconMap[service.icon] || <FaCheckCircle />}
+                </div>
                 <h3>{service.title}</h3>
                 <ul>
-                  {service.features.map((feature, idx) => (
+                  {service.features?.map((feature, idx) => (
                     <li key={idx}>{feature}</li>
                   ))}
                 </ul>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
@@ -116,7 +111,7 @@ const Services = () => {
         <div className="container">
           <div className="section-header">
             <h2>Quy trình dịch vụ</h2>
-            <p>Các bước thực hiện dịch vụ chuyên nghiệp, nhanh chóng</p>
+            
           </div>
           <div className="process-steps">
             <div className="process-step">
@@ -147,22 +142,44 @@ const Services = () => {
       </section>
 
       {/* Contact CTA */}
-      <section className="contact-cta">
-        <div className="container">
-          <div className="cta-content">
-            <h2>Bạn cần hỗ trợ?</h2>
-            <p>Đội ngũ chuyên viên của chúng tôi luôn sẵn sàng hỗ trợ bạn 24/7</p>
-            <div className="cta-buttons">
-              <button className="btn btn-primary">
-                Liên hệ ngay <FaArrowRight />
-              </button>
-              <button className="btn btn-outline">Tìm hiểu thêm</button>
-            </div>
-          </div>
-        </div>
-      </section>
+      <section className="contact-cta-enhanced">
+  <div className="container">
+    <div className="cta-heading">
+      <h2>Liên hệ ngay với chúng tôi</h2>
+      <p>Đội ngũ hỗ trợ luôn sẵn sàng giải đáp mọi thắc mắc của bạn 24/7</p>
+    </div>
+    <div className="contact-info-grid">
+      <div className="contact-card">
+        <h4>📞 Hotline hỗ trợ</h4>
+        <p><strong>1800 1234</strong> (miễn phí)</p>
+        <p><strong>1900 5678</strong> (1000đ/phút)</p>
+      </div>
+      <div className="contact-card">
+        <h4>✉️ Email</h4>
+        <p><a href="mailto:hotro@yourshop.vn">hotro@yourshop.vn</a></p>
+        <p><a href="mailto:contact@yourshop.vn">contact@yourshop.vn</a></p>
+      </div>
+      <div className="contact-card">
+        <h4>📍 Cửa hàng</h4>
+        <p>123 Nguyễn Trãi, Q.1, TP.HCM</p>
+        <p>45 Lê Duẩn, Q.Đống Đa, Hà Nội</p>
+        <a href="/store-locator" className="link-more">→ Xem tất cả</a>
+      </div>
+      <div className="contact-card">
+        <h4>⏰ Giờ làm việc</h4>
+        <p>Thứ 2 - CN: <strong>8:00 – 21:00</strong></p>
+        <p>Online hỗ trợ: <strong>24/7</strong></p>
+      </div>
+    </div>
+    <div className="cta-buttons">
+      <a href="/contact" className="btn-primary">Liên hệ ngay</a>
+      <a href="/faq" className="btn-outline">Câu hỏi thường gặp</a>
+    </div>
+  </div>
+</section>
+
     </div>
   );
 };
 
-export default Services; 
+export default Services;
