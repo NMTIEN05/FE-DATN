@@ -1,104 +1,191 @@
+/* AuthForm.module.css */
+
+.wrapper {
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(to right bottom, #6a11cb, #2575fc); /* Màu gradient mới */
+    overflow: hidden; /* Ngăn tràn nội dung */
+    position: relative; /* Cho phép các shape được định vị tương đối */
+}
+
 .background {
     width: 430px;
     height: 520px;
-    position: absolute;
+    position: absolute; /* Giữ nguyên vị trí của background */
     transform: translate(-50%, -50%);
     left: 50%;
     top: 50%;
-}
-.wrapper {
-    width: 100vw;
-    height: 100vh;
-    background-color: #1e1e2f; /* Đen dịu */
-    position: relative;
-    overflow: hidden;
+    z-index: 0; /* Đảm bảo background nằm dưới form */
 }
 
-.shape {
+.background .shape {
     height: 200px;
     width: 200px;
     position: absolute;
     border-radius: 50%;
+    background: linear-gradient(#f0fffe, #96e6a1); /* Màu gradient cho shape */
+    filter: blur(50px); /* Làm mờ để tạo hiệu ứng ánh sáng */
+    opacity: 0.7;
 }
 
-.shape1 {
-    background: linear-gradient(#1845ad, #23a2f6);
-    left: -80px;
-    top: -80px;
+.background .shape1 {
+    top: -50px;
+    left: -50px;
+    transform: rotate(45deg); /* Thêm xoay cho shape */
+    background: linear-gradient(to right, #ffc0cb, #e6b980); /* Màu khác cho shape 1 */
 }
 
-.shape2 {
-    background: linear-gradient(to right, #ff512f, #f09819);
-    right: -30px;
-    bottom: -80px;
+.background .shape2 {
+    bottom: -50px;
+    right: -50px;
+    transform: rotate(-30deg); /* Thêm xoay cho shape */
+    background: linear-gradient(to right, #89f7fe, #66a6ff); /* Màu khác cho shape 2 */
 }
 
 .form {
-    width: 400px;
-    background-color: rgba(255, 255, 255, 0.13);
-    position: absolute;
-    transform: translate(-50%, -50%);
-    top: 50%;
-    left: 50%;
+    height: auto; /* Điều chỉnh chiều cao tự động theo nội dung */
+    width: 450px; /* Tăng chiều rộng form một chút */
+    background-color: rgba(255, 255, 255, 0.9); /* Nền trắng hơi trong suốt */
+    position: relative;
     border-radius: 10px;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px); /* Hiệu ứng làm mờ nền phía sau */
     border: 2px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 0 40px rgba(8, 7, 16, 0.6);
-    padding: 50px 35px;
+    box-shadow: 0 0 40px rgba(8, 7, 16, 0.6); /* Đổ bóng mạnh hơn */
+    padding: 30px 45px; /* Tăng padding */
+    box-sizing: border-box; /* Đảm bảo padding không làm tăng kích thước tổng thể */
+    z-index: 1; /* Đảm bảo form nằm trên background */
+    display: flex; /* Dùng flexbox để sắp xếp các phần tử */
+    flex-direction: column; /* Sắp xếp theo cột */
+    gap: 15px; /* Khoảng cách giữa các phần tử */
 }
 
 .form * {
-    font-family: "Poppins", sans-serif;
-    color: #ffffff;
+    font-family: 'Poppins', sans-serif; /* Sử dụng font hiện đại hơn (cần import từ Google Fonts) */
+    color: #333; /* Màu chữ tối hơn */
     letter-spacing: 0.5px;
     outline: none;
     border: none;
 }
 
 .form h3 {
-    font-size: 32px;
-    font-weight: 500;
+    font-size: 32px; /* Tăng kích thước tiêu đề */
+    font-weight: 600;
     line-height: 42px;
     text-align: center;
+    color: #333;
+    margin-bottom: 25px; /* Khoảng cách dưới tiêu đề */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); /* Thêm chút bóng chữ */
 }
 
 .form label {
     display: block;
-    margin-top: 30px;
+    margin-top: 10px; /* Khoảng cách trên label */
     font-size: 16px;
     font-weight: 500;
+    color: #555;
 }
 
 .form input {
     display: block;
     height: 50px;
     width: 100%;
-    background-color: rgba(255, 255, 255, 0.07);
-    border-radius: 3px;
-    padding: 0 10px;
-    margin-top: 8px;
-    font-size: 14px;
+    background-color: rgba(255, 255, 255, 0.95); /* Nền input hơi trắng */
+    border-radius: 8px; /* Bo tròn góc input */
+    padding: 0 15px; /* Padding bên trong input */
+    font-size: 15px;
     font-weight: 300;
+    border: 1px solid #ddd; /* Viền mỏng cho input */
+    transition: all 0.3s ease; /* Hiệu ứng chuyển động mượt mà */
 }
 
-.form input::placeholder {
-    color: #e5e5e5;
+.form input:focus {
+    border-color: #6a11cb; /* Màu viền khi focus */
+    box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.2); /* Đổ bóng nhẹ khi focus */
 }
 
 .form button {
-    margin-top: 50px;
+    margin-top: 30px; /* Khoảng cách trên nút */
     width: 100%;
-    background-color: #ffffff;
-    color: #080710;
+    background-color: #6a11cb; /* Màu nút chính */
+    color: #ffffff; /* Màu chữ trắng */
     padding: 15px 0;
     font-size: 18px;
     font-weight: 600;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
+    transition: all 0.3s ease; /* Hiệu ứng chuyển động */
+    border: none;
+    text-transform: uppercase; /* Chữ hoa cho nút */
+    letter-spacing: 1px;
+}
+
+.form button:hover {
+    background-color: #2575fc; /* Màu nút khi hover */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px); /* Nhấc nhẹ nút lên khi hover */
 }
 
 .social {
-    margin-top: 30px;
+    margin-top: 25px; /* Khoảng cách trên social link */
     display: flex;
-    justify-content: center;
+    justify-content: center; /* Căn giữa link */
+    gap: 20px; /* Khoảng cách giữa các social icon (nếu có) */
+}
+
+.social a {
+    color: #6a11cb; /* Màu link */
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.social a:hover {
+    color: #2575fc; /* Màu link khi hover */
+    text-decoration: underline;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .form {
+        width: 90%; /* Thu nhỏ form trên màn hình nhỏ hơn */
+        padding: 25px 30px;
+    }
+
+    .form h3 {
+        font-size: 28px;
+    }
+
+    .form label {
+        font-size: 15px;
+    }
+
+    .form input {
+        height: 45px;
+        font-size: 14px;
+    }
+
+    .form button {
+        padding: 12px 0;
+        font-size: 16px;
+    }
+
+    .social a {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .form {
+        padding: 20px 25px;
+    }
+    .background {
+        transform: scale(0.7); /* Thu nhỏ background trên màn hình rất nhỏ */
+    }
+    .background .shape {
+        filter: blur(30px); /* Giảm độ mờ của shape */
+    }
 }

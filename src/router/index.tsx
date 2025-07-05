@@ -9,9 +9,12 @@ import Services from '../pages/Services/Services';
 import Contact from '../pages/Contact/Contact';
 import Cart from '../pages/Cart/Cart';
 import Shipping from '../pages/Shipping/Shipping';
-import Register from '../pages/auth/register';
+
 import MainLayout from '../components/Layouts/MainLayout';
 import Login from '../pages/auth/login';
+import Register from '../pages/auth/register';
+import EmailVerificationUI from '../pages/auth/CheckMail';
+import ForgotPassword from '../pages/auth/ForgotPassWord';
 
 export const routes: RouteObject[] = [
   {
@@ -28,7 +31,9 @@ export const routes: RouteObject[] = [
     ],
   },
   { path: '/register', element: <Register /> }, // không có layout
-  {path :'/login',element :<Login/>}
+  {path :'/login',element :<Login/>},
+  {path :'/checkmail',element :<EmailVerificationUI/>},
+  {path:'/forgot-password',element:<ForgotPassword/>}
 ];
 
 
