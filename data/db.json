@@ -1,191 +1,680 @@
 {
-  "users": [
-    {
-      "id": "1",
-      "username": "admin",
-      "password": "$2a$10$XQFXqX5V5V5V5V5V5V5V5O5V5V5V5V5V5V5V5V5V5V5V5V5V5V",
-      "email": "admin@example.com",
-      "full_name": "Admin User",
-      "phone": "0123456789",
-      "address": "Hà Nội",
-      "role": "admin",
-      "created_at": "2024-03-19T10:00:00Z",
-      "updated_at": "2024-03-19T10:00:00Z"
-    },
-    {
-      "id": "2",
-      "username": "client1",
-      "password": "$2a$10$XQFXqX5V5V5V5V5V5V5V5O5V5V5V5V5V5V5V5V5V5V5V5V5V5V",
-      "email": "client1@example.com",
-      "full_name": "Client User",
-      "phone": "0987654321",
-      "address": "Hồ Chí Minh",
-      "role": "client",
-      "created_at": "2024-03-19T10:00:00Z",
-      "updated_at": "2024-03-19T10:00:00Z"
-    }
-  ],
-  "categories": [
-    {
-      "id": "1",
-      "name": "Điện thoại cao cấp",
-      "description": "Các dòng điện thoại flagship cao cấp",
-      "image_url": "https://cdn.tgdd.vn/Category/42/iphone-14-pro-max-1-200x200.png",
-      "created_at": "2024-03-19T10:00:00Z",
-      "updated_at": "2024-03-19T10:00:00Z"
-    },
-    {
-      "id": "2", 
-      "name": "Điện thoại gaming",
-      "description": "Các dòng điện thoại chuyên game",
-      "image_url": "https://cdn.tgdd.vn/Category/42/rog-phone-200x200.png",
-      "created_at": "2024-03-19T10:00:00Z",
-      "updated_at": "2024-03-19T10:00:00Z"
-    }
-  ],
-  "products": [
-    {
-      "id": "1",
-      "name": "iPhone 15 Pro Max",
-      "slug": "iphone-15-pro-max",
-      "category_id": "1",
-      "description": "iPhone 15 Pro Max với chip A17 Pro mạnh mẽ",
-      "base_price": 29990000,
-      "image_url": "https://cdn.tgdd.vn/Products/Images/42/299033/iphone-15-pro-max-blue-1.jpg",
-      "stock_quantity": 100,
-      "is_available": true,
-      "created_at": "2024-03-19T10:00:00Z",
-      "updated_at": "2024-03-19T10:00:00Z"
-    }
-  ],
-  "product_variants": [
-    {
-      "id": "1",
-      "product_id": "1",
-      "storage": "256GB",
-      "color": "Titan Tự Nhiên",
-      "price": 33990000,
-      "stock_quantity": 50,
-      "image_url": "https://cdn.tgdd.vn/Products/Images/42/299033/iphone-15-pro-max-blue-1.jpg",
-      "created_at": "2024-03-19T10:00:00Z",
-      "updated_at": "2024-03-19T10:00:00Z"
-    },
-    {
-      "id": "2",
-      "product_id": "1",
-      "storage": "256GB",
-      "color": "Titan Đen",
-      "price": 33990000,
-      "stock_quantity": 30,
-      "image_url": "https://cdn.tgdd.vn/Products/Images/42/299033/iphone-15-pro-max-black-1.jpg",
-      "created_at": "2024-03-19T10:00:00Z",
-      "updated_at": "2024-03-19T10:00:00Z"
-    }
-  ],
-  "product_images": [
-    {
-      "id": "1",
-      "product_id": "1",
-      "image_url": "https://cdn.tgdd.vn/Products/Images/42/299033/iphone-15-pro-max-blue-1.jpg",
-      "is_primary": true,
-      "created_at": "2024-03-19T10:00:00Z"
-    },
-    {
-      "id": "2",
-      "product_id": "1", 
-      "image_url": "https://cdn.tgdd.vn/Products/Images/42/299033/iphone-15-pro-max-blue-2.jpg",
-      "is_primary": false,
-      "created_at": "2024-03-19T10:00:00Z"
-    }
-  ],
-  "carts": [
-    {
-      "id": "1",
-      "user_id": "2",
-      "status": "active",
-      "created_at": "2024-03-19T10:00:00Z",
-      "updated_at": "2024-03-19T10:00:00Z"
-    }
-  ],
-  "cart_items": [
-    {
-      "id": "1",
-      "cart_id": "1",
-      "product_variant_id": "1",
-      "quantity": 1,
-      "price": 33990000,
-      "added_at": "2024-03-19T10:00:00Z"
-    }
-  ],
-  "orders": [
-    {
-      "id": "1",
-      "user_id": "2",
-      "cart_id": "1",
-      "total_amount": 33990000,
-      "status": "pending",
-      "order_date": "2024-03-19T10:00:00Z",
-      "shipping_address": "123 Đường ABC, Quận 1, TP.HCM",
-      "payment_method": "cod",
-      "shipping_fee": 30000,
-      "tax": 0,
-      "created_at": "2024-03-19T10:00:00Z",
-      "updated_at": "2024-03-19T10:00:00Z"
-    }
-  ],
-  "order_details": [
-    {
-      "id": "1",
-      "order_id": "1",
-      "product_variant_id": "1",
-      "quantity": 1,
-      "price": 33990000,
-      "subtotal": 33990000
-    }
-  ],
-  "payments": [
-    {
-      "id": "1",
-      "order_id": "1",
-      "amount": 33990000,
-      "payment_method": "cod",
-      "status": "pending",
-      "payment_date": "2024-03-19T10:00:00Z"
-    }
-  ],
-  "coupons": [
-    {
-      "id": "1",
-      "code": "WELCOME2024",
-      "discount_type": "percentage",
-      "discount_value": 10,
-      "min_purchase": 1000000,
-      "start_date": "2024-01-01T00:00:00Z",
-      "end_date": "2024-12-31T23:59:59Z",
-      "is_active": true,
-      "created_at": "2024-03-19T10:00:00Z"
-    }
-  ],
-  "order_coupons": [
-    {
-      "id": "1",
-      "order_id": "1",
-      "coupon_id": "1",
-      "discount_amount": 3399000
-    }
-  ],
-  "blog_posts": [
-    {
-      "id": "1",
-      "title": "Đánh giá iPhone 15 Pro Max sau 1 tháng sử dụng",
-      "slug": "danh-gia-iphone-15-pro-max-sau-1-thang-su-dung",
-      "content": "Bài viết đánh giá chi tiết về iPhone 15 Pro Max...",
-      "thumbnail_url": "https://example.com/blog/iphone-15-review.jpg",
-      "author_id": "1",
-      "status": "published",
-      "published_at": "2024-03-19T10:00:00Z",
-      "created_at": "2024-03-19T10:00:00Z",
-      "updated_at": "2024-03-19T10:00:00Z"
-    }
-  ]
-}
+    "users": [
+      {
+        "id": "1",
+        "username": "admin",
+        "password": "$2a$10$XQFXqX5V5V5V5V5V5V5V5O5V5V5V5V5V5V5V5V5V5V5V5V5V5V",
+        "email": "admin@example.com",
+        "full_name": "Admin User",
+        "phone": "0123456789",
+        "address": "Hà Nội",
+        "role": "admin",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "2",
+        "username": "client1",
+        "password": "$2a$10$XQFXqX5V5V5V5V5V5V5V5O5V5V5V5V5V5V5V5V5V5V5V5V5V5V",
+        "email": "client1@example.com",
+        "full_name": "Client User",
+        "phone": "0987654321",
+        "address": "Hồ Chí Minh",
+        "role": "client",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      }
+    ],
+    "categories": [
+      {
+        "id": "1",
+        "name": "Điện thoại cao cấp",
+        "description": "Các dòng điện thoại flagship cao cấp",
+        "image_url": "https://cdn.tgdd.vn/Category/42/iphone-14-pro-max-1-200x200.png",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "2", 
+        "name": "Điện thoại gaming",
+        "description": "Các dòng điện thoại chuyên game",
+        "image_url": "https://cdn.tgdd.vn/Category/42/rog-phone-200x200.png",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "3", 
+        "name": "Điện thoại thông thường",
+        "description": "Các dòng điện thoại thông thường",
+        "image_url": "https://cdn.tgdd.vn/Category/42/iphone-14-pro-max-1-200x200.png",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      }
+    ],
+    "products": [
+      {
+        "id": "1",
+        "name": "iPhone 15 Pro Max",
+        "slug": "iphone-15-pro-max",
+        "category_id": "1",
+        "description": "iPhone 15 Pro Max với chip A17 Pro mạnh mẽ",
+        "base_price": 29990000,
+        "image_url": "src/assets/product/ip15.jpg",
+        "stock_quantity": 100,
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "2",
+        "name": "iPhone 14 Pro Max",
+        "slug": "iphone-14-pro-max",
+        "category_id": "1",
+        "description": "iPhone 14 Pro Max với chip A16 Bionic mạnh mẽ",
+        "base_price": 27990000,
+       "image_url": "src/assets/product/ip14.jpg",
+        "stock_quantity": 100,
+        "is_available": true,
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "3",
+        "name": "iPhone 13 Pro Max",
+        "slug": "iphone-13-pro-max",
+        "category_id": "1",
+        "description": "iPhone 13 Pro Max với chip A15 Bionic mạnh mẽ",
+        "base_price": 25990000,
+        "image_url": "src/assets/product/ip13.jpg",
+        "stock_quantity": 100,
+        "is_available": true,
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "4",
+        "name": "iPhone 12 Pro Max",
+        "slug": "iphone-12-pro-max",
+        "category_id": "1",
+        "description": "iPhone 12 Pro Max với chip A14 Bionic mạnh mẽ",
+        "base_price": 23990000,
+        "image_url": "src/assets/product/ip12.jpg",
+        "stock_quantity": 100,
+        "is_available": true,
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "5",
+        "name": "iPhone 11 Pro Max",
+        "slug": "iphone-11-pro-max",
+        "category_id": "1",
+        "description": "iPhone 11 Pro Max với chip A13 Bionic mạnh mẽ",
+        "base_price": 21990000,
+       "image_url": "src/assets/product/ip11.jpg",
+        "stock_quantity": 100,
+        "is_available": true,
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "6",
+        "name": "Samsung Galaxy S24 Ultra",
+        "slug": "samsung-galaxy-s24-ultra",
+        "category_id": "2",
+        "description": "Samsung Galaxy S24 Ultra với chip Snapdragon 8 Gen 3 mạnh mẽ",
+        "base_price": 29990000,
+        "image_url": "src/assets/product/s24.jpg",
+        "stock_quantity": 100,
+        "is_available": true,
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "7",
+        "name": "Samsung Galaxy S23 Ultra",
+        "slug": "samsung-galaxy-s23-ultra",
+        "category_id": "2",
+        "description": "Samsung Galaxy S23 Ultra với chip Snapdragon 8 Gen 2 mạnh mẽ",
+        "base_price": 26990000,
+      "image_url": "src/assets/product/s23.jpg",
+        "stock_quantity": 100,
+        "is_available": true,
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "8",
+        "name": "Samsung Galaxy S22 Ultra",
+        "slug": "samsung-galaxy-s22-ultra",
+        "category_id": "2",
+        "description": "Samsung Galaxy S22 Ultra với chip Snapdragon 8 Gen 1 mạnh mẽ",
+        "base_price": 23990000,
+       "image_url": "src/assets/product/s22.jpg",
+        "stock_quantity": 100,
+        "is_available": true,
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      }
+    ],
+    "product_variants": [
+      {
+        "id": "1",
+        "product_id": "1",
+        "storage": "256GB",
+        "color": "Titan Tự Nhiên",
+        "price": 33990000,
+        "stock_quantity": 50,
+            "image_url": "https://i.pinimg.com/736x/d1/74/30/d17430273d5dae339259ab40d02c0cfe.jpg",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "2",
+        "product_id": "1",
+        "storage": "512GB",
+        "color": "Titan Tự Nhiên",
+        "price": 37990000,
+        "stock_quantity": 30,
+             "image_url": "https://i.pinimg.com/736x/d1/74/30/d17430273d5dae339259ab40d02c0cfe.jpg",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "3",
+        "product_id": "1",
+        "storage": "256GB",
+        "color": "Titan Đen",
+        "price": 33990000,
+        "stock_quantity": 45,
+        "image_url": "https://i.pinimg.com/736x/d1/74/30/d17430273d5dae339259ab40d02c0cfe.jpg",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "4",
+        "product_id": "1",
+        "storage": "512GB",
+        "color": "Titan Đen",
+        "price": 37990000,
+        "stock_quantity": 25,
+        "image_url": "https://i.pinimg.com/736x/d1/74/30/d17430273d5dae339259ab40d02c0cfe.jpg",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "5",
+        "product_id": "2",
+        "storage": "256GB",
+        "color": "Tím Deep Purple",
+        "price": 31990000,
+        "stock_quantity": 40,
+        "image_url": "https://i.pinimg.com/736x/fb/20/8a/fb208a1d5fa38c1e85f9abf3ba370a44.jpg",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "6",
+        "product_id": "2",
+        "storage": "512GB",
+        "color": "Tím Deep Purple",
+        "price": 35990000,
+        "stock_quantity": 30,
+        "image_url": "https://i.pinimg.com/736x/fb/20/8a/fb208a1d5fa38c1e85f9abf3ba370a44.jpg",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "7",
+        "product_id": "2",
+        "storage": "256GB",
+        "color": "Vàng Gold",
+        "price": 31990000,
+        "stock_quantity": 35,
+        "image_url": "https://i.pinimg.com/736x/52/48/0c/52480c75f7283f45b9ffddc1c3394706.jpg",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "8",
+        "product_id": "2",
+        "storage": "512GB",
+        "color": "Vàng Gold",
+        "price": 35990000,
+        "stock_quantity": 25,
+        "image_url": "https://i.pinimg.com/736x/52/48/0c/52480c75f7283f45b9ffddc1c3394706.jpg",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "9",
+        "product_id": "3",
+        "storage": "256GB",
+        "color": "Xanh Sierra Blue",
+        "price": 29990000,
+        "stock_quantity": 30,
+        "image_url": "https://i.pinimg.com/736x/cc/66/82/cc66829234ffc14e64beb32d5c0f2248.jpg",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "10",
+        "product_id": "3",
+        "storage": "512GB",
+        "color": "Xanh Sierra Blue",
+        "price": 33990000,
+        "stock_quantity": 20,
+        "image_url": "https://i.pinimg.com/736x/cc/66/82/cc66829234ffc14e64beb32d5c0f2248.jpg",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "11",
+        "product_id": "3",
+        "storage": "256GB",
+        "color": "Đen Graphite",
+        "price": 29990000,
+        "stock_quantity": 25,
+        "image_url": "https://i.pinimg.com/736x/c4/72/b8/c472b8af37d00a15d2c22a37cf68ee6e.jpg",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "12",
+        "product_id": "3",
+        "storage": "512GB",
+        "color": "Đen Graphite",
+        "price": 33990000,
+        "stock_quantity": 15,
+        "image_url": "https://i.pinimg.com/736x/c4/72/b8/c472b8af37d00a15d2c22a37cf68ee6e.jpg",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "13",
+        "product_id": "4",
+        "storage": "256GB",
+        "color": "Xanh Pacific Blue",
+        "price": 27990000,
+        "stock_quantity": 25,
+        "image_url": "https://i.pinimg.com/736x/b7/ff/d2/b7ffd282559a5f1800a029ab2603d320.jpg",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "14",
+        "product_id": "4",
+        "storage": "512GB",
+        "color": "Xanh Pacific Blue",
+        "price": 31990000,
+        "stock_quantity": 15,
+        "image_url": "https://i.pinimg.com/736x/b7/ff/d2/b7ffd282559a5f1800a029ab2603d320.jpg",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "15",
+        "product_id": "4",
+        "storage": "256GB",
+        "color": "Bạc Silver",
+        "price": 27990000,
+        "stock_quantity": 20,
+        "image_url": "https://i.pinimg.com/736x/a3/46/0b/a3460bcd21d7839f40ff99bc64c128cd.jpg",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "16",
+        "product_id": "4",
+        "storage": "512GB",
+        "color": "Bạc Silver",
+        "price": 31990000,
+        "stock_quantity": 10,
+        "image_url": "https://i.pinimg.com/736x/a3/46/0b/a3460bcd21d7839f40ff99bc64c128cd.jpg",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "17",
+        "product_id": "5",
+        "storage": "256GB",
+        "color": "Xanh Midnight Green",
+        "price": 25990000,
+        "stock_quantity": 20,
+        "image_url": "https://i.pinimg.com/736x/56/7d/8a/567d8a83da5766185389c4d856f3f790.jpg",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "18",
+        "product_id": "5",
+        "storage": "512GB",
+        "color": "Xanh Midnight Green",
+        "price": 29990000,
+        "stock_quantity": 15,
+        "image_url": "https://i.pinimg.com/736x/56/7d/8a/567d8a83da5766185389c4d856f3f790.jpg",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "19",
+        "product_id": "5",
+        "storage": "256GB",
+        "color": "Vàng Gold",
+        "price": 25990000,
+        "stock_quantity": 18,
+        "image_url": "https://i.pinimg.com/736x/36/44/c3/3644c3b1ca45f82914af6ebb333d4a24.jpg",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "20",
+        "product_id": "5",
+        "storage": "512GB",
+        "color": "Vàng Gold",
+        "price": 29990000,
+        "stock_quantity": 12,
+        "image_url": "https://i.pinimg.com/736x/36/44/c3/3644c3b1ca45f82914af6ebb333d4a24.jpg",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "21",
+        "product_id": "6",
+        "storage": "256GB",
+        "color": "Titan Gray",
+        "price": 33990000,
+        "stock_quantity": 40,
+        "image_url": "https://i.pinimg.com/736x/56/7d/8a/567d8a83da5766185389c4d856f3f790.jpg",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "22",
+        "product_id": "6",
+        "storage": "512GB",
+        "color": "Titan Gray",
+        "price": 37990000,
+        "stock_quantity": 30,
+        "image_url": "https://i.pinimg.com/736x/56/7d/8a/567d8a83da5766185389c4d856f3f790.jpg",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "23",
+        "product_id": "6",
+        "storage": "256GB",
+        "color": "Titan Black",
+        "price": 33990000,
+        "stock_quantity": 35,
+        "image_url": "https://i.pinimg.com/736x/cc/66/82/cc66829234ffc14e64beb32d5c0f2248.jpg",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "24",
+        "product_id": "6",
+        "storage": "512GB",
+        "color": "Titan Black",
+        "price": 37990000,
+        "stock_quantity": 25,
+        "image_url": "https://i.pinimg.com/736x/cc/66/82/cc66829234ffc14e64beb32d5c0f2248.jpg",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "25",
+        "product_id": "7",
+        "storage": "256GB",
+        "color": "Cream",
+        "price": 30990000,
+        "stock_quantity": 35,
+        "image_url": "https://i.pinimg.com/736x/36/44/c3/3644c3b1ca45f82914af6ebb333d4a24.jpg",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "26",
+        "product_id": "7",
+        "storage": "512GB",
+        "color": "Cream",
+        "price": 34990000,
+        "stock_quantity": 25,
+        "image_url": "https://i.pinimg.com/736x/36/44/c3/3644c3b1ca45f82914af6ebb333d4a24.jpg",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "27",
+        "product_id": "7",
+        "storage": "256GB",
+        "color": "Green",
+        "price": 30990000,
+        "stock_quantity": 30,
+        "image_url": "https://i.pinimg.com/736x/c4/72/b8/c472b8af37d00a15d2c22a37cf68ee6e.jpg",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "28",
+        "product_id": "7",
+        "storage": "512GB",
+        "color": "Green",
+        "price": 34990000,
+        "stock_quantity": 20,
+        "image_url": "https://i.pinimg.com/736x/c4/72/b8/c472b8af37d00a15d2c22a37cf68ee6e.jpg",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "29",
+        "product_id": "8",
+        "storage": "256GB",
+        "color": "Burgundy",
+        "price": 27990000,
+        "stock_quantity": 30,
+        "image_url": "https://i.pinimg.com/736x/b7/ff/d2/b7ffd282559a5f1800a029ab2603d320.jpg",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "30",
+        "product_id": "8",
+        "storage": "512GB",
+        "color": "Burgundy",
+        "price": 31990000,
+        "stock_quantity": 20,
+        "image_url": "https://i.pinimg.com/736x/b7/ff/d2/b7ffd282559a5f1800a029ab2603d320.jpg",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "31",
+        "product_id": "8",
+        "storage": "256GB",
+        "color": "Phantom Black",
+        "price": 27990000,
+        "stock_quantity": 25,
+        "image_url": "https://i.pinimg.com/736x/a3/46/0b/a3460bcd21d7839f40ff99bc64c128cd.jpg",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "32",
+        "product_id": "8",
+        "storage": "512GB",
+        "color": "Phantom Black",
+        "price": 31990000,
+        "stock_quantity": 15,
+        "image_url": "https://i.pinimg.com/736x/a3/46/0b/a3460bcd21d7839f40ff99bc64c128cd.jpg",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      }
+    ],
+    "product_images": [
+      {
+        "id": "1",
+        "product_id": "1",
+        "image_url": "https://i.pinimg.com/736x/52/48/0c/52480c75f7283f45b9ffddc1c3394706.jpg",
+        "is_primary": true,
+        "created_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "2",
+        "product_id": "1", 
+        "image_url": "https://i.pinimg.com/736x/fb/20/8a/fb208a1d5fa38c1e85f9abf3ba370a44.jpg",
+        "is_primary": false,
+        "created_at": "2024-03-19T10:00:00Z"
+      }
+    ],
+    "carts": [
+      {
+        "id": "1",
+        "user_id": "2",
+        "status": "active",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      }
+    ],
+    "cart_items": [
+      {
+        "id": "1",
+        "cart_id": "1",
+        "product_variant_id": "1",
+        "quantity": 1,
+        "price": 33990000,
+        "added_at": "2024-03-19T10:00:00Z"
+      }
+    ],
+    "orders": [
+      {
+        "id": "1",
+        "user_id": "2",
+        "cart_id": "1",
+        "total_amount": 33990000,
+        "status": "pending",
+        "order_date": "2024-03-19T10:00:00Z",
+        "shipping_address": "123 Đường ABC, Quận 1, TP.HCM",
+        "payment_method": "cod",
+        "shipping_fee": 30000,
+        "tax": 0,
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      }
+    ],
+    "order_details": [
+      {
+        "id": "1",
+        "order_id": "1",
+        "product_variant_id": "1",
+        "quantity": 1,
+        "price": 33990000,
+        "subtotal": 33990000
+      }
+    ],
+    "payments": [
+      {
+        "id": "1",
+        "order_id": "1",
+        "amount": 33990000,
+        "payment_method": "cod",
+        "status": "pending",
+        "payment_date": "2024-03-19T10:00:00Z"
+      }
+    ],
+    "coupons": [
+      {
+        "id": "1",
+        "code": "WELCOME2024",
+        "discount_type": "percentage",
+        "discount_value": 10,
+        "min_purchase": 1000000,
+        "start_date": "2024-01-01T00:00:00Z",
+        "end_date": "2024-12-31T23:59:59Z",
+        "is_active": true,
+        "created_at": "2024-03-19T10:00:00Z"
+      }
+    ],
+    "order_coupons": [
+      {
+        "id": "1",
+        "order_id": "1",
+        "coupon_id": "1",
+        "discount_amount": 3399000
+      }
+    ],
+    "blog_posts": [
+  {
+    "id": "1",
+    "title": "Đánh giá iPhone 15 Pro Max sau 1 tháng sử dụng",
+    "slug": "danh-gia-iphone-15-pro-max-sau-1-thang-su-dung",
+    "content": "Bài viết đánh giá chi tiết về hiệu năng, camera và pin của iPhone 15 Pro Max sau thời gian sử dụng thực tế.",
+    "thumbnail_url": "/assets/blog/blog1.jpg",
+    "author_id": "1",
+    "status": "published",
+    "published_at": "2024-03-19T10:00:00Z",
+    "created_at": "2024-03-19T10:00:00Z",
+    "updated_at": "2024-03-19T10:00:00Z"
+  },
+  {
+    "id": "2",
+    "title": "iPhone 15 thường có đáng mua không?",
+    "slug": "iphone-15-thuong-co-dang-mua-khong",
+    "content": "Phân tích điểm mạnh và điểm yếu của iPhone 15 phiên bản tiêu chuẩn, so sánh với iPhone 14 và các đối thủ Android.",
+     "thumbnail_url": "/assets/blog/blog2.jpg",
+    "author_id": "1",
+    "status": "published",
+    "published_at": "2024-03-22T09:00:00Z",
+    "created_at": "2024-03-22T09:00:00Z",
+    "updated_at": "2024-03-22T09:00:00Z"
+  },
+  {
+    "id": "3",
+    "title": "So sánh iPhone 15 Pro và Galaxy S23 Ultra",
+    "slug": "so-sanh-iphone-15-pro-va-galaxy-s23-ultra",
+    "content": "Hai flagship cao cấp nhất từ Apple và Samsung có gì khác biệt? Bài viết sẽ đưa ra cái nhìn tổng quan về thiết kế, hiệu năng, camera và hệ sinh thái.",
+    "thumbnail_url": "/assets/blog/blog3.jpg",
+    "author_id": "1",
+    "status": "published",
+    "published_at": "2024-03-25T15:30:00Z",
+    "created_at": "2024-03-25T15:30:00Z",
+    "updated_at": "2024-03-25T15:30:00Z"
+  },
+  {
+    "id": "4",
+    "title": "iPhone 16 có gì mới so với iPhone 15?",
+    "slug": "iphone-16-co-gi-moi-so-voi-iphone-15",
+    "content": "Apple đã nâng cấp những gì trên iPhone 16 so với thế hệ trước? Camera, chip, cổng sạc, màn hình — bài viết sẽ làm rõ tất cả.",
+     "thumbnail_url": "/assets/blog/blog4.jpg",
+    "author_id": "1",
+    "status": "published",
+    "published_at": "2024-03-28T11:00:00Z",
+    "created_at": "2024-03-28T11:00:00Z",
+    "updated_at": "2024-03-28T11:00:00Z"
+  },
+  {
+    "id": "5",
+    "title": "iPhone 15 Pro Max có thực sự quá nóng?",
+    "slug": "iphone-15-pro-max-co-thuc-su-qua-nong",
+    "content": "Một số người dùng phản ánh iPhone 15 Pro Max bị nóng khi sử dụng. Bài viết sẽ kiểm chứng và đưa ra lời khuyên sử dụng.",
+    "thumbnail_url": "/assets/blog/blog5.jpg",
+    "author_id": "1", 
+    "status": "published",
+    "published_at": "2024-03-30T16:20:00Z",
+    "created_at": "2024-03-30T16:20:00Z",
+    "updated_at": "2024-03-30T16:20:00Z"
+  },
+  {
+    "id": "6",
+    "title": "Có nên nâng cấp lên iPhone 15 từ iPhone 13?",
+    "slug": "co-nen-nang-cap-len-iphone-15-tu-iphone-13",
+    "content": "Bạn đang dùng iPhone 13 và phân vân có nên lên đời iPhone 15? Bài viết này sẽ giúp bạn đưa ra quyết định đúng đắn.",
+    "thumbnail_url": "/assets/blog/blog6.jpg",
+    "author_id": "1",
+    "status": "published",
+    "published_at": "2024-04-02T08:45:00Z",
+    "created_at": "2024-04-02T08:45:00Z",
+    "updated_at": "2024-04-02T08:45:00Z"
+  }
+]
+
+  }

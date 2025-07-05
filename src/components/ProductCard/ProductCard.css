@@ -49,6 +49,7 @@
 
 .product-info {
   padding: 16px;
+  padding-bottom: 20px;
 }
 
 .product-name {
@@ -200,4 +201,25 @@
 
 .out-of-stock {
   color: var(--accent-color);
+}
+
+.buy-now-btn {
+  width: 100%;
+  padding: 10px 0;
+  background: linear-gradient(90deg, #ff512f 0%, #dd2476 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(221,36,118,0.12);
+  transition: background 0.2s, transform 0.2s;
+}
+
+.buy-now-btn:hover {
+  background: linear-gradient(90deg, #dd2476 0%, #ff512f 100%);
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 4px 16px rgba(221,36,118,0.18);
 } 

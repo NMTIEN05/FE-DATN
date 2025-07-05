@@ -21,7 +21,13 @@
     "@reduxjs/toolkit": "^2.8.2",
     "@tanstack/react-query": "^5.68.0",
     "antd": "^5.24.3",
+
     "axios": "^1.9.0",
+    "bootstrap": "^5.3.6",
+
+    
+
+
     "bootstrap-icons": "^1.13.1",
     "json-server": "^0.17.4",
     "json-server-auth": "^2.1.0",
@@ -39,8 +45,10 @@
   "devDependencies": {
     "@eslint/js": "^9.21.0",
     "@types/lodash": "^4.17.17",
-    "@types/react": "^19.1.8",
-    "@types/react-dom": "^19.1.6",
+
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.21",
     "eslint": "^9.21.0",

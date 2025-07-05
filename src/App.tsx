@@ -4,6 +4,7 @@ import { useRoutes } from 'react-router-dom';
 import { routes } from './router';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
+import './App.css';
 import axios from 'axios';
 
 import { ToastContainer, toast } from 'react-toastify';
@@ -26,9 +27,7 @@ function App() {
 
   return (
     <div className="App">
-     
       {routing}
-      
       <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );

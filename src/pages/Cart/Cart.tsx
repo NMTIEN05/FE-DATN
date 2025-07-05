@@ -1,45 +1,20 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Cart.css';
 import { FaTrash, FaMinus, FaPlus, FaTruck, FaCreditCard, FaShieldAlt } from 'react-icons/fa';
+import { useCart } from '../../contexts/CartContext';
 
 const Cart = () => {
-  // Sample cart items data
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      name: 'iPhone 15 Pro Max',
-      image: 'https://via.placeholder.com/100',
-      price: 27990000,
-      quantity: 1,
-      color: 'Titan Tự nhiên',
-      storage: '256GB',
-    },
-    {
-      id: 2,
-      name: 'Samsung Galaxy S24 Ultra',
-      image: 'https://via.placeholder.com/100',
-      price: 25990000,
-      quantity: 1,
-      color: 'Titan Đen',
-      storage: '256GB',
-    },
-  ]);
+  const navigate = useNavigate();
+  const { items, removeFromCart, updateQuantity, totalItems, totalPrice } = useCart();
 
-  const updateQuantity = (id: number, change: number) => {
-    setCartItems(
-      cartItems.map((item) =>
-        item.id === id ? { ...item, quantity: Math.max(1, item.quantity + change) } : item
-      )
-    );
+  const handleContinueShopping = () => {
+    navigate('/products');
   };
 
-  const removeItem = (id: number) => {
-    setCartItems(cartItems.filter((item) => item.id !== id));
+  const handleCheckout = () => {
+    navigate('/shipping');
   };
-
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const shipping = 0; // Free shipping
-  const total = subtotal + shipping;
 
   return (
     <div className="cart-page">
@@ -49,9 +24,9 @@ const Cart = () => {
         <div className="cart-layout">
           {/* Cart Items */}
           <div className="cart-items">
-            {cartItems.length > 0 ? (
+            {items.length > 0 ? (
               <>
-                {cartItems.map((item) => (
+                {items.map((item) => (
                   <div key={item.id} className="cart-item">
                     <div className="item-image">
                       <img src={item.image} alt={item.name} />
@@ -69,7 +44,7 @@ const Cart = () => {
                     <div className="item-quantity">
                       <button
                         className="quantity-btn"
-                        onClick={() => updateQuantity(item.id, -1)}
+                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
                         disabled={item.quantity === 1}
                       >
                         <FaMinus />
@@ -77,7 +52,7 @@ const Cart = () => {
                       <span>{item.quantity}</span>
                       <button
                         className="quantity-btn"
-                        onClick={() => updateQuantity(item.id, 1)}
+                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
                       >
                         <FaPlus />
                       </button>
@@ -87,7 +62,7 @@ const Cart = () => {
                     </div>
                     <button
                       className="remove-btn"
-                      onClick={() => removeItem(item.id)}
+                      onClick={() => removeFromCart(item.id)}
                     >
                       <FaTrash />
                     </button>
@@ -123,28 +98,36 @@ const Cart = () => {
               <div className="empty-cart">
                 <h2>Giỏ hàng trống</h2>
                 <p>Hãy thêm sản phẩm vào giỏ hàng của bạn</p>
-                <button className="btn btn-primary">Tiếp tục mua sắm</button>
+                <button 
+                  className="btn btn-primary"
+                  onClick={handleContinueShopping}
+                >
+                  Tiếp tục mua sắm
+                </button>
               </div>
             )}
           </div>
 
           {/* Cart Summary */}
-          {cartItems.length > 0 && (
+          {items.length > 0 && (
             <div className="cart-summary">
               <h2>Tổng giỏ hàng</h2>
               <div className="summary-row">
-                <span>Tạm tính</span>
-                <span>{subtotal.toLocaleString('vi-VN')}₫</span>
+                <span>Tạm tính ({totalItems} sản phẩm)</span>
+                <span>{totalPrice.toLocaleString('vi-VN')}₫</span>
               </div>
               <div className="summary-row">
                 <span>Phí vận chuyển</span>
-                <span>{shipping === 0 ? 'Miễn phí' : shipping.toLocaleString('vi-VN') + '₫'}</span>
+                <span>Miễn phí</span>
               </div>
               <div className="summary-row total">
                 <span>Tổng cộng</span>
-                <span>{total.toLocaleString('vi-VN')}₫</span>
+                <span>{totalPrice.toLocaleString('vi-VN')}₫</span>
               </div>
-              <button className="btn btn-primary checkout-btn">
+              <button 
+                className="btn btn-primary checkout-btn"
+                onClick={handleCheckout}
+              >
                 Tiến hành thanh toán
               </button>
               <div className="summary-footer">
