@@ -4,6 +4,7 @@ import { Mail, Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 
 interface LoginFormData {
   email: string;
@@ -20,30 +21,38 @@ const Login = () => {
     formState: { errors },
   } = useForm<LoginFormData>();
 
-  const onSubmit = async (data: LoginFormData) => {
-    try {
-      const payload = {
-        ...data,
-        email: data.email.trim().toLowerCase(),
-      };
+const { setIsLoggedIn } = useAuth();
 
-      const res = await axios.post("http://localhost:8888/api/auth/login", payload);
+const onSubmit = async (data: LoginFormData) => {
+  try {
+    const payload = {
+      ...data,
+      email: data.email.trim().toLowerCase(),
+    };
 
-      if (res.data.token) {
-        localStorage.setItem("token", res.data.token);
-        toast.success("Đăng nhập thành công!");
-        navigate("/");
-      }
-    } catch (error: any) {
-      const msg = error.response?.data?.message || "Đăng nhập thất bại";
-      toast.error(msg);
-      if (error.response?.status === 403) {
-        const email = data.email.trim().toLowerCase();
-        localStorage.setItem("emailForVerify", email);
-        navigate("/checkmail");
-      }
+    const res = await axios.post("http://localhost:8888/api/auth/login", payload);
+
+    if (res.data.token) {
+      localStorage.setItem("token", res.data.token);
+
+      // ✅ Cập nhật trạng thái đã đăng nhập
+      setIsLoggedIn(true);
+
+      toast.success("Đăng nhập thành công!");
+      navigate("/");
     }
-  };
+  } catch (error: any) {
+    const msg = error.response?.data?.message || "Đăng nhập thất bại";
+    toast.error(msg);
+
+    if (error.response?.status === 403) {
+      const email = data.email.trim().toLowerCase();
+      localStorage.setItem("emailForVerify", email);
+      navigate("/checkmail");
+    }
+  }
+};
+
 
   return (
     <form
