@@ -61,9 +61,27 @@ const HomePage: React.FC = () => {
   
   // Lấy sản phẩm
   const { data: productsData, isLoading: isLoadingProducts } = useProducts({
-    limit: 10,
+    limit: 12,
     page: 1
   });
+
+  // Lấy sản phẩm iPhone
+  const { data: iphoneProductsData, isLoading: isLoadingIphoneProducts } = useProducts({
+    limit: 20,
+    page: 1
+  });
+  const iphoneList = iphoneProductsData?.products.filter((product: any) =>
+    product.name.toLowerCase().includes('iphone')
+  );
+
+  // Lấy sản phẩm Samsung
+  const { data: samsungProductsData, isLoading: isLoadingSamsungProducts } = useProducts({
+    limit: 20,
+    page: 1
+  });
+  const samsungList = samsungProductsData?.products.filter((product: any) =>
+    product.name.toLowerCase().includes('samsung')
+  );
 
   // Lấy bài viết blog
   const { data: blogPosts, isLoading: isLoadingBlog } = useQuery({
@@ -79,7 +97,7 @@ const HomePage: React.FC = () => {
     alert('Đã sao chép mã giảm giá!');
   };
 
-  if (isLoadingProducts || isLoadingBlog) {
+  if (isLoadingProducts || isLoadingIphoneProducts || isLoadingSamsungProducts || isLoadingBlog) {
     return <div>Đang tải...</div>;
   }
 
@@ -157,6 +175,52 @@ const HomePage: React.FC = () => {
         </div>
       </div>
 
+      {/* iPhone Hot Section */}
+      <div className="products-section">
+        <div className="section-header">
+          <h2 className="section-title">
+            <span className="highlight">iPhone</span> bán chạy
+          </h2>
+          <a href="/products?brand=Apple" className="view-all">Xem tất cả</a>
+        </div>
+        <div className="products-grid">
+          {iphoneList?.length === 0 && <div>Không có sản phẩm iPhone nào.</div>}
+          {iphoneList?.map((product: any) => (
+            <div key={product.id} onClick={() => navigate(`/products/${product.slug}`)}>
+              <ProductCard 
+                name={product.name}
+                image={product.image_url}
+                price={product.base_price.toLocaleString('vi-VN') + '₫'}
+                slug={product.slug}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Samsung Hot Section */}
+      <div className="products-section">
+        <div className="section-header">
+          <h2 className="section-title">
+            <span className="highlight">Samsung</span> bán chạy
+          </h2>
+          <a href="/products?brand=Samsung" className="view-all">Xem tất cả</a>
+        </div>
+        <div className="products-grid">
+          {samsungList?.length === 0 && <div>Không có sản phẩm Samsung nào.</div>}
+          {samsungList?.map((product: any) => (
+            <div key={product.id} onClick={() => navigate(`/products/${product.slug}`)}>
+              <ProductCard 
+                name={product.name}
+                image={product.image_url}
+                price={product.base_price.toLocaleString('vi-VN') + '₫'}
+                slug={product.slug}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Price Filter Section */}
       <div className="filter-section">
         <h2 className="section-title">Giá bạn mong muốn</h2>
@@ -176,7 +240,7 @@ const HomePage: React.FC = () => {
           <h2 className="section-title">
             <span className="highlight">Tin tức</span> công nghệ
           </h2>
-          <a href="/blog" className="view-all">Xem tất cả</a>
+          <button onClick={() => navigate('/blog')} className="view-all">Xem tất cả</button>
         </div>
         <div className="blog-grid">
           {blogPosts?.slice().map((post: any) => (

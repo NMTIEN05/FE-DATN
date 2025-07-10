@@ -6,9 +6,11 @@ import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
 import './App.css';
 import axios from 'axios';
-
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
+
+import { CartProvider } from './contexts/CartContext'; // sửa đúng path nếu khác
 
 function App() {
   useEffect(() => {
@@ -26,10 +28,13 @@ function App() {
   const routing = useRoutes(routes);
 
   return (
-    <div className="App">
-      {routing}
-      <ToastContainer position="top-right" autoClose={3000} />
-    </div>
+    // ✅ Bọc toàn bộ app trong CartProvider
+    <CartProvider>
+      <div className="App">
+        {routing}
+        <ToastContainer position="top-right" autoClose={3000} />
+      </div>
+    </CartProvider>
   );
 }
 

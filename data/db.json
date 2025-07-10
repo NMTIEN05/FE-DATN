@@ -49,6 +49,14 @@
         "image_url": "https://cdn.tgdd.vn/Category/42/iphone-14-pro-max-1-200x200.png",
         "created_at": "2024-03-19T10:00:00Z",
         "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "10",
+        "name": "Laptop",
+        "description": "Các dòng laptop mới nhất",
+        "image_url": "https://cdn.tgdd.vn/Category/44/laptop-200x200.png",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
       }
     ],
     "products": [
@@ -152,6 +160,54 @@
        "image_url": "src/assets/product/s22.jpg",
         "stock_quantity": 100,
         "is_available": true,
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "100",
+        "name": "MacBook Pro 16 2023",
+        "slug": "macbook-pro-16-2023",
+        "category_id": "10",
+        "description": "MacBook Pro 16 inch 2023 với chip M2 Max mạnh mẽ",
+        "base_price": 69990000,
+        "image_url": "src/assets/product/macden.jpg",
+        "stock_quantity": 50,
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+       {
+        "id": "101",
+        "name": "MacBook Pro 16 2023",
+        "slug": "macbook-pro-16-2023",
+        "category_id": "10",
+        "description": "MacBook Pro 16 inch 2023 với chip M2 Max mạnh mẽ",
+        "base_price": 69990000,
+        "image_url": "src/assets/product/mactrang.jpg",
+        "stock_quantity": 50,
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+       {
+        "id": "102",
+        "name": "MacBook Pro 16 2023",
+        "slug": "macbook-pro-16-2023",
+        "category_id": "10",
+        "description": "MacBook Pro 16 inch 2023 với chip M2 Max mạnh mẽ",
+        "base_price": 69990000,
+        "image_url": "src/assets/product/macvang.jpg",
+        "stock_quantity": 50,
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+       {
+        "id": "103",
+        "name": "MacBook Pro 16 2023",
+        "slug": "macbook-pro-16-2023",
+        "category_id": "10",
+        "description": "MacBook Pro 16 inch 2023 với chip M2 Max mạnh mẽ",
+        "base_price": 69990000,
+        "image_url": "src/assets/product/machong.jpg",
+        "stock_quantity": 50,
         "created_at": "2024-03-19T10:00:00Z",
         "updated_at": "2024-03-19T10:00:00Z"
       }
@@ -506,6 +562,26 @@
         "price": 31990000,
         "stock_quantity": 15,
         "image_url": "https://i.pinimg.com/736x/a3/46/0b/a3460bcd21d7839f40ff99bc64c128cd.jpg",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "201",
+        "product_id": "100",
+        "storage": "16GB/512GB",
+        "color": "Xám",
+        "price": 69990000,
+        "image_url": "https://cdn.tgdd.vn/Products/Images/44/299900/macbook-pro-16-xam.jpg",
+        "created_at": "2024-03-19T10:00:00Z",
+        "updated_at": "2024-03-19T10:00:00Z"
+      },
+      {
+        "id": "202",
+        "product_id": "100",
+        "storage": "32GB/1TB",
+        "color": "Bạc",
+        "price": 79990000,
+        "image_url": "https://cdn.tgdd.vn/Products/Images/44/299900/macbook-pro-16-bac.jpg",
         "created_at": "2024-03-19T10:00:00Z",
         "updated_at": "2024-03-19T10:00:00Z"
       }

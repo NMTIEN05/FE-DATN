@@ -142,7 +142,7 @@ const Header = () => {
               <FaHeadphones className="mr-2 text-lg" />
               <span>Phụ kiện</span>
             </Link>
-            <Link to="/gioi-thieu" className="flex items-center text-gray-800 hover:text-blue-600 transition-colors duration-200 py-1 px-3 rounded-md">
+            <Link to="/about" className="flex items-center text-gray-800 hover:text-blue-600 transition-colors duration-200 py-1 px-3 rounded-md">
               <FaInfoCircle className="mr-2 text-lg" />
               <span>Về chúng tôi</span>
             </Link>
@@ -220,7 +220,7 @@ const Header = () => {
             <Link to="/phu-kien" className="w-full flex items-center hover:text-blue-600 transition-colors duration-200 py-2" onClick={() => setIsMobileMenuOpen(false)}>
               <FaHeadphones className="mr-3 text-xl" /> Phụ kiện
             </Link>
-            <Link to="/gioi-thieu" className="w-full flex items-center hover:text-blue-600 transition-colors duration-200 py-2" onClick={() => setIsMobileMenuOpen(false)}>
+            <Link to="/about" className="w-full flex items-center hover:text-blue-600 transition-colors duration-200 py-2" onClick={() => setIsMobileMenuOpen(false)}>
               <FaInfoCircle className="mr-3 text-xl" /> Về chúng tôi
             </Link>
             <Link to="/orders" className="w-full flex items-center hover:text-blue-600 transition-colors duration-200 py-2" onClick={() => setIsMobileMenuOpen(false)}>
