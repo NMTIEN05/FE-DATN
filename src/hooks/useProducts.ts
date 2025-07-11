@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ProductService } from '../services/product.service';
 import axios from '../api/axios.config';
-import product from '../types/product.type';
 
 
 interface UseProductsParams {

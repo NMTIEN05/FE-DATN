@@ -91,15 +91,6 @@
   transition: color 0.3s ease, text-shadow 0.3s ease;
 }
 
-/* Hiệu ứng nét vào (outline nhẹ và shadow) khi hover */
-.product-info h1:hover {
-  color: #007aff;
-  text-shadow:
-    0 0 6px rgba(0, 122, 255, 0.8),
-    0 0 10px rgba(0, 122, 255, 0.6),
-    0 0 20px rgba(0, 122, 255, 0.4);
-}
-
 
 .subtitle {
   color: #555;

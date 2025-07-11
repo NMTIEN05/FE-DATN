@@ -1,3 +1,4 @@
+// ✅ UPDATED: ProductDetail.tsx - gọi đúng API addToCart thật từ context
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -22,7 +23,7 @@ interface RawVariant {
   name: string;
   price: number;
   imageUrl: string[] | string;
-  stock: number; // ✅ Thêm tồn kho
+  stock: number;
 }
 
 interface ProcessedVariant extends RawVariant {
@@ -63,7 +64,6 @@ const ProductDetail: React.FC = () => {
       const storageMatch = v.name.match(/(128GB|256GB|512GB|64GB|1TB)/i);
       const color = colorMatch ? colorMatch[0] : 'Không rõ';
       const storage = storageMatch ? storageMatch[0] : 'Không rõ';
-
       return {
         ...v,
         color,
@@ -95,7 +95,7 @@ const ProductDetail: React.FC = () => {
     }
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (!product || !currentVariant) {
       toast.error('Vui lòng chọn màu sắc và phiên bản');
       return;
@@ -104,21 +104,25 @@ const ProductDetail: React.FC = () => {
       toast.error('Sản phẩm này đã hết hàng');
       return;
     }
-
-    addToCart({
-      id: product._id,
-      name: product.title,
-      price: currentVariant.price,
-      quantity: 1,
-      image: currentColorVariant?.image_url || (Array.isArray(product.imageUrl) ? product.imageUrl[0] : product.imageUrl),
-      color: selectedColor,
-      storage: selectedStorage,
-    });
-    toast.success('Đã thêm vào giỏ hàng');
+    try {
+      await addToCart({
+        productId: product._id,
+        variantId: currentVariant._id,
+        name: product.title,
+        price: currentVariant.price,
+        quantity: 1,
+        image: currentColorVariant?.image_url || '',
+        color: selectedColor,
+        storage: selectedStorage,
+      });
+      toast.success('Đã thêm vào giỏ hàng');
+    } catch (err) {
+      toast.error('Lỗi khi thêm vào giỏ');
+    }
   };
 
-  const handleBuyNow = () => {
-    handleAddToCart();
+  const handleBuyNow = async () => {
+    await handleAddToCart();
     navigate('/cart');
   };
 
@@ -155,23 +159,21 @@ const ProductDetail: React.FC = () => {
             {(currentVariant?.price || product.priceDefault || 0).toLocaleString('vi-VN')}₫
           </div>
 
-          {/* ✅ Hiển thị tồn kho */}
           {currentVariant && (
             <div
-  className={`product-stock ${
-    currentVariant?.stock === 0
-      ? 'out-of-stock'
-      : currentVariant?.stock <= 5
-      ? 'low-stock'
-      : 'in-stock'
-  }`}
->
-  <span className="product-stock-icon">📦</span>
-  {currentVariant?.stock === 0
-    ? 'Hết hàng'
-    : `Còn ${currentVariant?.stock} sản phẩm`}
-</div>
-
+              className={`product-stock ${
+                currentVariant?.stock === 0
+                  ? 'out-of-stock'
+                  : currentVariant?.stock <= 5
+                  ? 'low-stock'
+                  : 'in-stock'
+              }`}
+            >
+              <span className="product-stock-icon">📦</span>
+              {currentVariant?.stock === 0
+                ? 'Hết hàng'
+                : `Còn ${currentVariant?.stock} sản phẩm`}
+            </div>
           )}
 
           {availableStorage.length > 0 && (
@@ -208,7 +210,6 @@ const ProductDetail: React.FC = () => {
             </>
           )}
 
-          {/* ✅ Disable nếu hết hàng */}
           <button
             className="add-to-cart"
             disabled={!selectedColor || !selectedStorage || currentVariant?.stock === 0}
