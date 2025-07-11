@@ -15,12 +15,12 @@ const banners = [
   {
     id: 1,
     image: 'https://i.pinimg.com/736x/5a/7e/90/5a7e903fa4d36808abddba1d331a4a34.jpg',
-    link: 'htps://i.pinimg.com/736x/ac/a6/cd/aca6cdbfd7bacf9da83fec4d6230dae8.jpg',
+    link: 'https://i.pinimg.com/736x/ac/a6/cd/aca6cdbfd7bacf9da83fec4d6230dae8.jpg',
     title: 'iPhone 15 Pro Max'
   },
   {
     id: 2,
-    image: 'https://i.pinimg.com/736x/0b/a9/43/0ba943ea32ac6f8450ad1cae3de07b18.jpg ',
+    image: 'https://i.pinimg.com/736x/0b/a9/43/0ba943ea32ac6f8450ad1cae3de07b18.jpg',
     link: '/products/samsung-s24-ultra',
     title: 'Samsung S24 Ultra'
   },
@@ -59,14 +59,12 @@ const promotions = [
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
   
-  // Lấy sản phẩm
-  const { data: productsData, isLoading: isLoadingProducts } = useProducts({
+  const { data: productsData, isLoading: isLoadingProducts, isError: isErrorProducts } = useProducts({
     limit: 10,
     page: 1
   });
 
-  // Lấy bài viết blog
-  const { data: blogPosts, isLoading: isLoadingBlog } = useQuery({
+  const { data: blogPosts, isLoading: isLoadingBlog, isError: isErrorBlog } = useQuery({
     queryKey: ['blog_posts'],
     queryFn: async () => {
       const response = await axios.get('/blog_posts?status=published');
@@ -79,13 +77,15 @@ const HomePage: React.FC = () => {
     alert('Đã sao chép mã giảm giá!');
   };
 
+
+
   if (isLoadingProducts || isLoadingBlog) {
     return <div>Đang tải...</div>;
   }
 
   return (
     <main className="home-page">
-      {/* Banner Slider */}
+      {/* Banner */}
       <div className="banner-container">
         <Swiper
           modules={[Navigation, Pagination, Autoplay]}
@@ -93,10 +93,7 @@ const HomePage: React.FC = () => {
           slidesPerView={1}
           navigation
           pagination={{ clickable: true }}
-          autoplay={{
-            delay: 3000,
-            disableOnInteraction: false,
-          }}
+          autoplay={{ delay: 3000, disableOnInteraction: false }}
           loop={true}
           className="main-banner"
         >
@@ -135,7 +132,7 @@ const HomePage: React.FC = () => {
         </div>
       </div>
 
-      {/* Hot Sale Section */}
+      {/* Products */}
       <div className="products-section">
         <div className="section-header">
           <h2 className="section-title">
@@ -144,12 +141,12 @@ const HomePage: React.FC = () => {
           <a href="/products" className="view-all">Xem tất cả</a>
         </div>
         <div className="products-grid">
-          {productsData?.products.map((product: any) => (
-            <div key={product.id} onClick={() => navigate(`/products/${product.slug}`)}>
+          {productsData?.products?.map((product: any) => (
+            <div key={product._id} onClick={() => navigate(`/products/${product.slug}`)}>
               <ProductCard 
-                name={product.name}
-                image={product.image_url}
-                price={product.base_price.toLocaleString('vi-VN') + '₫'}
+                name={product.title}
+                image={product.imageUrl?.[0]}
+                price={product.priceDefault.toLocaleString('vi-VN') + '₫'}
                 slug={product.slug}
               />
             </div>
@@ -157,7 +154,7 @@ const HomePage: React.FC = () => {
         </div>
       </div>
 
-      {/* Price Filter Section */}
+      {/* Price Filters */}
       <div className="filter-section">
         <h2 className="section-title">Giá bạn mong muốn</h2>
         <div className="price-filter">
@@ -170,7 +167,7 @@ const HomePage: React.FC = () => {
         </div>
       </div>
 
-      {/* Blog Posts Section */}
+      {/* Blog Section */}
       <div className="blog-section">
         <div className="section-header">
           <h2 className="section-title">
@@ -179,7 +176,7 @@ const HomePage: React.FC = () => {
           <a href="/blog" className="view-all">Xem tất cả</a>
         </div>
         <div className="blog-grid">
-          {blogPosts?.slice().map((post: any) => (
+          {Array.isArray(blogPosts) && blogPosts.map((post: any) => (
             <div key={post.id} className="blog-card" onClick={() => navigate(`/blog/${post.slug}`)}>
               <div className="blog-image">
                 <img src={post.thumbnail_url} alt={post.title} />
@@ -211,4 +208,4 @@ const HomePage: React.FC = () => {
   );
 };
 
-export default HomePage; 
+export default HomePage;
