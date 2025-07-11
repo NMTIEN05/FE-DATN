@@ -1,21 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import axios from '../../api/axios.config';
 import ProductCard from '../../components/ProductCard/ProductCard';
 import './Products.css';
 import { FaFilter, FaSearch, FaSort } from 'react-icons/fa';
 import { debounce } from 'lodash';
-
-interface Product {
-  id: number;
-  name: string;
-  slug: string;
-  image_url: string;
-  base_price: number;
-  category_id: number;
-  brand: string;
-}
+import { useProducts } from '../../hooks/useProducts';
+import { useQuery } from '@tanstack/react-query';
+import axios from '../../api/axios.config';
 
 interface Category {
   id: number;
@@ -38,7 +29,7 @@ const Products = () => {
     { value: 'price-desc', label: 'Giá giảm dần' },
   ];
 
-  const defaultCategories = [
+  const defaultCategories: Category[] = [
     { id: 1, name: 'iPhone', brand: 'Apple' },
     { id: 2, name: 'Samsung Galaxy', brand: 'Samsung' },
     { id: 3, name: 'OPPO', brand: 'OPPO' },
@@ -48,84 +39,37 @@ const Products = () => {
     { id: 7, name: 'Realme', brand: 'Realme' },
     { id: 8, name: 'Nokia', brand: 'Nokia' },
     { id: 9, name: 'OnePlus', brand: 'OnePlus' },
-    { id: 10, name: 'POCO', brand: 'Xiaomi' }
+    { id: 10, name: 'POCO', brand: 'Xiaomi' },
   ];
 
-  // Lấy danh sách danh mục
+  // Lấy danh mục
   const { data: categories = defaultCategories } = useQuery<Category[]>({
     queryKey: ['categories'],
     queryFn: async () => {
       try {
-        const response = await axios.get('/categories');
-        return response.data;
-      } catch (error) {
-        // Nếu API lỗi, trả về danh sách mặc định
+        const res = await axios.get('/categories');
+        return res.data;
+      } catch {
         return defaultCategories;
       }
-    }
+    },
   });
 
-  // Lấy danh sách thương hiệu từ danh mục
-  const brands = [...new Set(categories.map(cat => cat.brand))];
+  const brands = [...new Set(categories.map((cat) => cat.brand))];
 
-  // Lấy danh sách sản phẩm với bộ lọc
-  const { data: products, isLoading } = useQuery<Product[]>({
-    queryKey: ['products', selectedCategory, selectedBrand, sortBy, searchTerm, priceRange],
-    queryFn: async () => {
-      let url = '/products?';
-      const params = new URLSearchParams();
-
-      if (selectedCategory) {
-        params.append('category_id', selectedCategory.toString());
-      }
-      
-      if (selectedBrand !== 'all') {
-        params.append('brand', selectedBrand);
-      }
-
-      if (searchTerm) {
-        params.append('q', searchTerm);
-      }
-
-      params.append('price_min', priceRange[0].toString());
-      params.append('price_max', priceRange[1].toString());
-
-      switch (sortBy) {
-        case 'newest':
-          params.append('_sort', 'created_at');
-          params.append('_order', 'desc');
-          break;
-        case 'price-asc':
-          params.append('_sort', 'base_price');
-          params.append('_order', 'asc');
-          break;
-        case 'price-desc':
-          params.append('_sort', 'base_price');
-          params.append('_order', 'desc');
-          break;
-      }
-
-      const response = await axios.get(url + params.toString());
-      return response.data;
-    }
+  const {
+    products = [],
+    total,
+    isLoading,
+  } = useProducts({
+    category_id: selectedCategory?.toString(),
+    brand: selectedBrand !== 'all' ? selectedBrand : undefined,
+    search: searchTerm,
+    price_min: priceRange[0],
+    price_max: priceRange[1],
+    sort: sortBy,
   });
-  
-  // Lọc sản phẩm: nếu là trang /dien-thoai và chưa chọn filter danh mục thì loại bỏ sản phẩm có category là 'Laptop'
-  let filteredProducts = products;
-  if (window.location.pathname === '/dien-thoai' && selectedCategory === null && categories) {
-    const laptopCategory = categories.find(c => c.name.toLowerCase().includes('laptop'));
-    if (laptopCategory) {
-      filteredProducts = products?.filter(p => p.category_id !== laptopCategory.id);
-    }
-  }
 
-  const isDienThoaiPage = window.location.pathname === '/dien-thoai';
-  // Lọc categories cho sidebar: nếu là trang /dien-thoai thì loại bỏ danh mục có tên chứa 'laptop'
-  const filteredCategories = isDienThoaiPage && categories
-    ? categories.filter(cat => !cat.name.toLowerCase().includes('laptop'))
-    : categories;
-
-  // Debounce search input
   const debouncedSearch = debounce((term: string) => {
     setSearchTerm(term);
   }, 500);
@@ -146,11 +90,10 @@ const Products = () => {
     setSearchTerm('');
   };
 
-  if (isLoading) return <div>Đang tải...</div>;
+  if (isLoading) return <div className="loading">Đang tải sản phẩm...</div>;
 
   return (
     <div className="products-page">
-      {/* Page Header */}
       <div className="page-header">
         <div className="container">
           <h1>Điện thoại</h1>
@@ -164,15 +107,11 @@ const Products = () => {
 
       <div className="container">
         <div className="products-layout">
-          {/* Filters Sidebar */}
+          {/* Bộ lọc */}
           <aside className="filters">
             <div className="filter-header">
-              <h3>
-                <FaFilter /> Bộ lọc
-              </h3>
-              <button className="btn btn-text" onClick={handleClearFilters}>
-                Xóa bộ lọc
-              </button>
+              <h3><FaFilter /> Bộ lọc</h3>
+              <button className="btn btn-text" onClick={handleClearFilters}>Xóa bộ lọc</button>
             </div>
 
             <div className="filter-section">
@@ -187,7 +126,7 @@ const Products = () => {
                   />
                   <span>Tất cả</span>
                 </label>
-                {filteredCategories?.map((category) => (
+                {categories.map((category) => (
                   <label key={category.id} className="filter-option">
                     <input
                       type="radio"
@@ -213,7 +152,7 @@ const Products = () => {
                   />
                   <span>Tất cả</span>
                 </label>
-                {brands?.map((brand) => (
+                {brands.map((brand) => (
                   <label key={brand} className="filter-option">
                     <input
                       type="radio"
@@ -256,9 +195,8 @@ const Products = () => {
             </div>
           </aside>
 
-          {/* Products Content */}
+          {/* Sản phẩm */}
           <main className="products-content">
-            {/* Toolbar */}
             <div className="products-toolbar">
               <div className="search-box">
                 <FaSearch />
@@ -281,11 +219,10 @@ const Products = () => {
               </div>
             </div>
 
-            {/* Products Grid */}
             <div className="products-grid">
-              {filteredProducts?.map((product) => (
+              {products.map((product) => (
                 <div key={product.id} onClick={() => handleProductClick(product.slug)}>
-                  <ProductCard 
+                  <ProductCard
                     name={product.name}
                     image={product.image_url}
                     price={product.base_price.toLocaleString('vi-VN') + '₫'}
@@ -293,7 +230,7 @@ const Products = () => {
                   />
                 </div>
               ))}
-              {filteredProducts?.length === 0 && (
+              {products.length === 0 && (
                 <div className="no-products">
                   Không tìm thấy sản phẩm nào phù hợp với bộ lọc
                 </div>
@@ -306,4 +243,4 @@ const Products = () => {
   );
 };
 
-export default Products; 
+export default Products;
