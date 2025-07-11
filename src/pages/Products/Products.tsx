@@ -55,10 +55,8 @@ const Products = () => {
     },
   });
 
-  // Tách brand từ danh mục
   const brands = [...new Set(categories.map((cat) => cat.brand))];
 
-  // Lấy danh sách sản phẩm qua custom hook
   const {
     products = [],
     total,

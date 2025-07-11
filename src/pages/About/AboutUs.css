@@ -1,0 +1,63 @@
+.aboutus-page {
+  background: #f9f9fb;
+  min-height: 100vh;
+  padding: 40px 0;
+}
+.aboutus-page .container {
+  background: #fff;
+  border-radius: 12px;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 32px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+}
+.aboutus-page h1 {
+  color: #2d6cdf;
+  margin-bottom: 24px;
+  font-size: 2.2rem;
+  font-weight: 700;
+}
+.aboutus-page h2 {
+  color: #333;
+  margin-top: 32px;
+  margin-bottom: 12px;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+.aboutus-page p, .aboutus-page ul {
+  color: #444;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  margin-bottom: 12px;
+}
+.aboutus-page ul {
+  padding-left: 20px;
+}
+.aboutus-page li {
+  margin-bottom: 6px;
+}
+.aboutus-services-cta {
+  margin-top: 36px;
+  text-align: center;
+}
+.aboutus-services-cta span {
+  display: block;
+  font-size: 1.08rem;
+  color: #2d6cdf;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+.aboutus-services-link .btn {
+  background: #2d6cdf;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 28px;
+  font-size: 1.08rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.aboutus-services-link .btn:hover {
+  background: #174ea6;
+} 

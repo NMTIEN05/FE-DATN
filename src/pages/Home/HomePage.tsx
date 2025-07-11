@@ -58,13 +58,24 @@ const promotions = [
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
-  
-  const { data: productsData, isLoading: isLoadingProducts, isError: isErrorProducts } = useProducts({
-    limit: 10,
-    page: 1
-  });
 
-  const { data: blogPosts, isLoading: isLoadingBlog, isError: isErrorBlog } = useQuery({
+  // Sản phẩm nổi bật
+  const { data: productsData, isLoading: isLoadingProducts } = useProducts({ limit: 10, page: 1 });
+
+  // Sản phẩm iPhone
+  const { data: iphoneProductsData, isLoading: isLoadingIphoneProducts } = useProducts({ limit: 20, page: 1 });
+  const iphoneList = iphoneProductsData?.products.filter((product: any) =>
+    product.name.toLowerCase().includes('iphone')
+  );
+
+  // Sản phẩm Samsung
+  const { data: samsungProductsData, isLoading: isLoadingSamsungProducts } = useProducts({ limit: 20, page: 1 });
+  const samsungList = samsungProductsData?.products.filter((product: any) =>
+    product.name.toLowerCase().includes('samsung')
+  );
+
+  // Blog
+  const { data: blogPosts, isLoading: isLoadingBlog } = useQuery({
     queryKey: ['blog_posts'],
     queryFn: async () => {
       const response = await axios.get('/blog_posts?status=published');
@@ -77,9 +88,12 @@ const HomePage: React.FC = () => {
     alert('Đã sao chép mã giảm giá!');
   };
 
-
-
-  if (isLoadingProducts || isLoadingBlog) {
+  if (
+    isLoadingProducts ||
+    isLoadingIphoneProducts ||
+    isLoadingSamsungProducts ||
+    isLoadingBlog
+  ) {
     return <div>Đang tải...</div>;
   }
 
@@ -132,7 +146,7 @@ const HomePage: React.FC = () => {
         </div>
       </div>
 
-      {/* Products */}
+      {/* Sản phẩm nổi bật */}
       <div className="products-section">
         <div className="section-header">
           <h2 className="section-title">
@@ -143,7 +157,7 @@ const HomePage: React.FC = () => {
         <div className="products-grid">
           {productsData?.products?.map((product: any) => (
             <div key={product._id} onClick={() => navigate(`/products/${product.slug}`)}>
-              <ProductCard 
+              <ProductCard
                 name={product.title}
                 image={product.imageUrl?.[0]}
                 price={product.priceDefault.toLocaleString('vi-VN') + '₫'}
@@ -154,7 +168,53 @@ const HomePage: React.FC = () => {
         </div>
       </div>
 
-      {/* Price Filters */}
+      {/* iPhone bán chạy */}
+      <div className="products-section">
+        <div className="section-header">
+          <h2 className="section-title">
+            <span className="highlight">iPhone</span> bán chạy
+          </h2>
+          <a href="/products?brand=Apple" className="view-all">Xem tất cả</a>
+        </div>
+        <div className="products-grid">
+          {iphoneList?.length === 0 && <div>Không có sản phẩm iPhone nào.</div>}
+          {iphoneList?.map((product: any) => (
+            <div key={product.id} onClick={() => navigate(`/products/${product.slug}`)}>
+              <ProductCard
+                name={product.name}
+                image={product.image_url}
+                price={product.base_price.toLocaleString('vi-VN') + '₫'}
+                slug={product.slug}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Samsung bán chạy */}
+      <div className="products-section">
+        <div className="section-header">
+          <h2 className="section-title">
+            <span className="highlight">Samsung</span> bán chạy
+          </h2>
+          <a href="/products?brand=Samsung" className="view-all">Xem tất cả</a>
+        </div>
+        <div className="products-grid">
+          {samsungList?.length === 0 && <div>Không có sản phẩm Samsung nào.</div>}
+          {samsungList?.map((product: any) => (
+            <div key={product.id} onClick={() => navigate(`/products/${product.slug}`)}>
+              <ProductCard
+                name={product.name}
+                image={product.image_url}
+                price={product.base_price.toLocaleString('vi-VN') + '₫'}
+                slug={product.slug}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Lọc theo giá */}
       <div className="filter-section">
         <h2 className="section-title">Giá bạn mong muốn</h2>
         <div className="price-filter">
@@ -167,13 +227,13 @@ const HomePage: React.FC = () => {
         </div>
       </div>
 
-      {/* Blog Section */}
+      {/* Tin tức công nghệ */}
       <div className="blog-section">
         <div className="section-header">
           <h2 className="section-title">
             <span className="highlight">Tin tức</span> công nghệ
           </h2>
-          <a href="/blog" className="view-all">Xem tất cả</a>
+          <button onClick={() => navigate('/blog')} className="view-all">Xem tất cả</button>
         </div>
         <div className="blog-grid">
           {Array.isArray(blogPosts) && blogPosts.map((post: any) => (
@@ -192,7 +252,7 @@ const HomePage: React.FC = () => {
         </div>
       </div>
 
-      {/* Chat Icons */}
+      {/* Chat Support */}
       <div className="chat-icons">
         <a href="https://wa.me/1234567890" target="_blank" rel="noopener noreferrer" className="chat-icon whatsapp">
           <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/WhatsApp.svg/2560px-WhatsApp.svg.png" alt="WhatsApp" />

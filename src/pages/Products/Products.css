@@ -409,4 +409,45 @@
   .page-numbers {
     display: none;
   }
+}
+
+/* Laptops page custom style */
+.laptops-page .products-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.laptops-page .products-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.5rem;
+}
+.laptops-page .products-subtitle {
+  font-size: 1.1rem;
+  color: #6b7280;
+  max-width: 600px;
+  margin: 0 auto 2rem auto;
+}
+.laptops-page .products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 2rem;
+}
+.laptops-page .no-products {
+  text-align: center;
+  color: #888;
+  font-size: 1.2rem;
+  padding: 2rem 0;
+}
+@media (max-width: 768px) {
+  .laptops-page .products-title {
+    font-size: 2rem;
+  }
+  .laptops-page .products-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
 } 

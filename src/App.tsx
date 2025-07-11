@@ -3,12 +3,11 @@ import React, { useEffect } from 'react';
 import { useRoutes } from 'react-router-dom';
 import { routes } from './router';
 import './App.css';
-
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-// 👇 Thêm dòng này
+// 👇 Thêm dòng này theo dev
 import { CartProvider } from './contexts/CartContext';
 
 function App() {
