@@ -65,13 +65,13 @@ const HomePage: React.FC = () => {
   // Sản phẩm iPhone
   const { data: iphoneProductsData, isLoading: isLoadingIphoneProducts } = useProducts({ limit: 20, page: 1 });
   const iphoneList = iphoneProductsData?.products.filter((product: any) =>
-    product.name.toLowerCase().includes('iphone')
+    product?.name?.toLowerCase?.().includes('iphone')
   );
 
   // Sản phẩm Samsung
   const { data: samsungProductsData, isLoading: isLoadingSamsungProducts } = useProducts({ limit: 20, page: 1 });
   const samsungList = samsungProductsData?.products.filter((product: any) =>
-    product.name.toLowerCase().includes('samsung')
+    product?.name?.toLowerCase?.().includes('samsung')
   );
 
   // Blog
@@ -160,7 +160,7 @@ const HomePage: React.FC = () => {
               <ProductCard
                 name={product.title}
                 image={product.imageUrl?.[0]}
-                price={product.priceDefault.toLocaleString('vi-VN') + '₫'}
+                price={product.priceDefault?.toLocaleString('vi-VN') + '₫'}
                 slug={product.slug}
               />
             </div>
@@ -183,7 +183,7 @@ const HomePage: React.FC = () => {
               <ProductCard
                 name={product.name}
                 image={product.image_url}
-                price={product.base_price.toLocaleString('vi-VN') + '₫'}
+                price={product.base_price?.toLocaleString('vi-VN') + '₫'}
                 slug={product.slug}
               />
             </div>
@@ -206,7 +206,7 @@ const HomePage: React.FC = () => {
               <ProductCard
                 name={product.name}
                 image={product.image_url}
-                price={product.base_price.toLocaleString('vi-VN') + '₫'}
+                price={product.base_price?.toLocaleString('vi-VN') + '₫'}
                 slug={product.slug}
               />
             </div>
