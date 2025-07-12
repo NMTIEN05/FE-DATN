@@ -311,10 +311,11 @@ a:hover {
 main {
   flex: 1;
   width: 100%;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: var(--space-md);
+  padding: 0 16px; /* padding trái/phải để không sát mép */
 }
+
 
 .container {
   width: 100%;
