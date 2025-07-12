@@ -27,7 +27,7 @@ export const useProducts = ({
   return useQuery({
     queryKey: ['products', { limit, page, sort, category_id, group_id, search, deleted }],
     queryFn: async () => {
-      let url = `/products?limit=${limit}&offset=${offset}`;
+      let url = `/product?limit=${limit}&offset=${offset}`;
 
       if (category_id) url += `&categoryId=${category_id}`;
       if (group_id) url += `&groupId=${group_id}`;

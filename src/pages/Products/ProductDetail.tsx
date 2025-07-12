@@ -43,7 +43,7 @@ const ProductDetail: React.FC = () => {
   const { data: product, isLoading } = useQuery<Product>({
     queryKey: ['product', slug],
     queryFn: async () => {
-      const res = await axios.get(`/products/slug/${slug}`);
+      const res = await axios.get(`/product/slug/${slug}`);
       return res.data;
     },
     enabled: !!slug,
@@ -52,7 +52,7 @@ const ProductDetail: React.FC = () => {
   const { data: variantsRaw } = useQuery<RawVariant[]>({
     queryKey: ['variants', product?._id],
     queryFn: async () => {
-      const res = await axios.get(`/products/${product?._id}/variant`);
+      const res = await axios.get(`/product/${product?._id}/variant`);
       return res.data;
     },
     enabled: !!product?._id,
