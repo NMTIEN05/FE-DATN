@@ -4,7 +4,7 @@ import { Navigate, RouteObject } from 'react-router-dom';
 
 import HomePage from '../pages/Home/HomePage';
 import Products from '../pages/Products/Products';
-import ProductDetail from '../pages/Products/ProductDetail';
+// import ProductDetail from '../pages/Products/ProductDetail';
 import Services from '../pages/Services/Services';
 import Contact from '../pages/Contact/Contact';
 import Cart from '../pages/Cart/Cart';
@@ -17,6 +17,8 @@ import EmailVerificationUI from '../pages/auth/CheckMail';
 import ForgotPassword from '../pages/auth/ForgotPassWord';
 import ResetPassword from '../pages/auth/ResetPass';
 import ChangePasswordForm from '../pages/auth/Changepassword';
+import ProductDetail from '../pages/Products/ProductDetail';
+import Deteil from '../pages/Products/DeteilProduct/Deteil';
 
 const token = localStorage.getItem("token");
 
@@ -28,7 +30,7 @@ export const routes: RouteObject[] = [
       { index: true, element: <HomePage /> },
       { path: 'products', element: <Products /> },
       { path: 'dien-thoai', element: <Products /> },
-      { path: 'product/:slug', element: <ProductDetail /> },
+      { path: 'product/:id', element: <Deteil /> },
       { path: 'services', element: <Services /> },
       { path: 'contact', element: <Contact /> },
       { path: 'cart', element: <Cart /> },
