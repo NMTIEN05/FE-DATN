@@ -28,7 +28,7 @@ export const routes: RouteObject[] = [
       { index: true, element: <HomePage /> },
       { path: 'products', element: <Products /> },
       { path: 'dien-thoai', element: <Products /> },
-      { path: 'products/:slug', element: <ProductDetail /> },
+      { path: 'product/:slug', element: <ProductDetail /> },
       { path: 'services', element: <Services /> },
       { path: 'contact', element: <Contact /> },
       { path: 'cart', element: <Cart /> },

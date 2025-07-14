@@ -1,4 +1,3 @@
-// ✅ UPDATED: ProductDetail.tsx - gọi đúng API addToCart thật từ context
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -40,10 +39,14 @@ const ProductDetail: React.FC = () => {
   const [selectedColor, setSelectedColor] = useState('');
   const [selectedStorage, setSelectedStorage] = useState('');
 
-  const { data: product, isLoading } = useQuery<Product>({
+  if (!slug) {
+    return <div>❌ Không có thông tin sản phẩm</div>;
+  }
+
+  const { data: product, isLoading: productLoading } = useQuery<Product>({
     queryKey: ['product', slug],
     queryFn: async () => {
-      const res = await axios.get(`/product/slug/${slug}`);
+      const res = await axios.get(`/product/${slug}`); // 🔁 Đã đổi sang /product/:id
       return res.data;
     },
     enabled: !!slug,
@@ -78,8 +81,14 @@ const ProductDetail: React.FC = () => {
   const currentVariant = processedVariants.find(
     (v) => v.color === selectedColor && v.storage === selectedStorage
   );
-
   const currentColorVariant = processedVariants.find((v) => v.color === selectedColor);
+
+  useEffect(() => {
+    if (processedVariants.length > 0) {
+      if (!selectedStorage) setSelectedStorage(availableStorage[0]);
+      if (!selectedColor) setSelectedColor(availableColors[0]);
+    }
+  }, [variantsRaw]);
 
   const handleColorSelect = (color: string) => {
     setSelectedColor(color);
@@ -126,29 +135,20 @@ const ProductDetail: React.FC = () => {
     navigate('/cart');
   };
 
-  useEffect(() => {
-    if (processedVariants.length > 0) {
-      if (!selectedStorage) setSelectedStorage(availableStorage[0]);
-      if (!selectedColor) setSelectedColor(availableColors[0]);
-    }
-  }, [variantsRaw]);
+  if (productLoading) return <div>⏳ Đang tải sản phẩm...</div>;
+  if (!product) return <div>❌ Không tìm thấy sản phẩm</div>;
 
-  if (isLoading) return <div>Đang tải sản phẩm...</div>;
-  if (!product) return <div>Không tìm thấy sản phẩm</div>;
+  const productImage =
+    currentColorVariant?.image_url ||
+    (Array.isArray(product.imageUrl) ? product.imageUrl[0] : product.imageUrl) ||
+    '/fallback.jpg';
 
   return (
     <div className="product-detail">
       <ToastContainer position="top-right" autoClose={3000} />
       <div className="product-content">
         <div className="product-images">
-          <img
-            src={
-              currentColorVariant?.image_url ||
-              (Array.isArray(product.imageUrl) ? product.imageUrl[0] : product.imageUrl)
-            }
-            alt={product.title}
-            className="main-image"
-          />
+          <img src={productImage} alt={product.title} className="main-image" />
         </div>
 
         <div className="product-info">
@@ -162,17 +162,17 @@ const ProductDetail: React.FC = () => {
           {currentVariant && (
             <div
               className={`product-stock ${
-                currentVariant?.stock === 0
+                currentVariant.stock === 0
                   ? 'out-of-stock'
-                  : currentVariant?.stock <= 5
+                  : currentVariant.stock <= 5
                   ? 'low-stock'
                   : 'in-stock'
               }`}
             >
               <span className="product-stock-icon">📦</span>
-              {currentVariant?.stock === 0
+              {currentVariant.stock === 0
                 ? 'Hết hàng'
-                : `Còn ${currentVariant?.stock} sản phẩm`}
+                : `Còn ${currentVariant.stock} sản phẩm`}
             </div>
           )}
 
