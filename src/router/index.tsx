@@ -10,15 +10,14 @@ import Contact from '../pages/Contact/Contact';
 import Cart from '../pages/Cart/Cart';
 import Shipping from '../pages/Shipping/Shipping';
 import MainLayout from '../components/Layouts/MainLayout';
-
 import Login from '../pages/auth/login';
 import Register from '../pages/auth/register';
 import EmailVerificationUI from '../pages/auth/CheckMail';
 import ForgotPassword from '../pages/auth/ForgotPassWord';
 import ResetPassword from '../pages/auth/ResetPass';
 import ChangePasswordForm from '../pages/auth/Changepassword';
-import ProductDetail from '../pages/Products/ProductDetail';
-import Deteil from '../pages/Products/DeteilProduct/Deteil';
+import OrderDetail from '../pages/order/OrderDetail';
+import Checkout from '../pages/Cart/checkout';
 
 const token = localStorage.getItem("token");
 
@@ -27,6 +26,8 @@ export const routes: RouteObject[] = [
     path: '/',
     element: <MainLayout />,
     children: [
+      { path: 'checkout', element: <Checkout /> },
+
       { index: true, element: <HomePage /> },
       { path: 'products', element: <Products /> },
       { path: 'dien-thoai', element: <Products /> },
@@ -36,6 +37,8 @@ export const routes: RouteObject[] = [
       { path: 'cart', element: <Cart /> },
       { path: 'shipping', element: <Shipping /> },
       { path: 'change-password', element: <ChangePasswordForm /> },
+      { path: 'orders/:id', element: <OrderDetail /> },
+
     ],
   },
   // Auth routes (không có layout)
