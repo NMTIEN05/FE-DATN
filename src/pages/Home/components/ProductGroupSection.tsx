@@ -56,7 +56,7 @@ const CategoryWithProducts: React.FC = () => {
       ) : (
         categories.map((category) => (
           <CategorySection key={category._id} category={category} />
-        ))
+        ))  
       )}
     </div>
   );
