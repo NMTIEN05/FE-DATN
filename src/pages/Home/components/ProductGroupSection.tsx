@@ -48,15 +48,16 @@ const CategoryWithProducts: React.FC = () => {
 
   return (
     <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-10 min-h-screen">
-      {categories?.length === 0 ? (
-        <div className="text-center py-16">
-          <p className="text-xl text-gray-500">Không có danh mục nào để hiển thị.</p>
-        </div>
-      ) : (
-        categories.map((category) => (
-          <CategorySection key={category._id} category={category} />
-        ))
-      )}
+    {Array.isArray(categories) && categories.length > 0 ? (
+  categories.map((category) => (
+    <CategorySection key={category._id} category={category} />
+  ))
+) : (
+  <div className="text-center py-16">
+    <p className="text-xl text-gray-500">Không có danh mục nào để hiển thị.</p>
+  </div>
+)}
+
     </div>
   );
 };
