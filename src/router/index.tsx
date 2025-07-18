@@ -18,6 +18,7 @@ import ResetPassword from '../pages/auth/ResetPass';
 import ChangePasswordForm from '../pages/auth/Changepassword';
 import OrderDetail from '../pages/order/OrderDetail';
 import Checkout from '../pages/Cart/checkout';
+import Deteil from '../pages/Products/DeteilProduct/Deteil';
 
 const token = localStorage.getItem("token");
 
