@@ -16,9 +16,13 @@ import EmailVerificationUI from '../pages/auth/CheckMail';
 import ForgotPassword from '../pages/auth/ForgotPassWord';
 import ResetPassword from '../pages/auth/ResetPass';
 import ChangePasswordForm from '../pages/auth/Changepassword';
+
+import ProductDetail from '../pages/Products/ProductDetail';
+import Deteil from '../pages/Products/DeteilProduct/Deteil';
+
 import OrderDetail from '../pages/order/OrderDetail';
 import Checkout from '../pages/Cart/checkout';
-import Deteil from '../pages/Products/DeteilProduct/Deteil';
+
 
 const token = localStorage.getItem("token");
 
