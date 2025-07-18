@@ -7,24 +7,27 @@ import './Checkout.css';
 
 const Checkout: React.FC = () => {
   const { items, totalPrice, clearCart } = useCart();
-  const [shippingAddress, setShippingAddress] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState('COD');
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('COD');
   const navigate = useNavigate();
 
   const handleSubmit = async () => {
-    if (!shippingAddress || !fullName || !phone) {
+    if (!fullName || !phone || !address) {
       toast.error('Vui lòng nhập đầy đủ thông tin');
       return;
     }
 
     try {
       const payload = {
-        shippingAddress: `${fullName} - ${phone} - ${shippingAddress}`,
+        shippingInfo: {
+          fullName,
+          phone,
+          address,
+        },
         paymentMethod,
         totalAmount: totalPrice,
-        // ❌ Không gửi items vì BE không chấp nhận field này
       };
 
       const res = await axios.post('/orders', payload);
@@ -59,8 +62,8 @@ const Checkout: React.FC = () => {
             />
             <textarea
               placeholder="Địa chỉ cụ thể"
-              value={shippingAddress}
-              onChange={(e) => setShippingAddress(e.target.value)}
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
             />
 
             <h3>Phương thức thanh toán</h3>

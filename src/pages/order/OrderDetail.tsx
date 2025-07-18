@@ -17,30 +17,29 @@ const OrderDetail: React.FC = () => {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
- useEffect(() => {
-  const fetchData = async () => {
-    try {
-      const [orderRes, itemRes] = await Promise.all([
-        axios.get(`/orders/${id}`),
-        axios.get(`/orderitem/order/${id}`)  // GỌI ĐÚNG route backend rồi
-      ]);
-      setOrder(orderRes.data);
-      setItems(itemRes.data);
-    } catch (err) {
-      console.error('❌ Lỗi khi tải chi tiết đơn hàng:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [orderRes, itemRes] = await Promise.all([
+          axios.get(`/orders/${id}`),
+          axios.get(`/orderitem/order/${id}`)
+        ]);
+        setOrder(orderRes.data);
+        setItems(itemRes.data);
+      } catch (err) {
+        console.error('❌ Lỗi khi tải chi tiết đơn hàng:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  if (id) fetchData();
-}, [id]);
-
+    if (id) fetchData();
+  }, [id]);
 
   if (loading) return <div>Đang tải đơn hàng...</div>;
   if (!order) return <div>Không tìm thấy đơn hàng</div>;
 
-  const { shippingAddress, paymentMethod, status, totalAmount, createdAt } = order;
+  const { shippingInfo, paymentMethod, status, totalAmount, createdAt } = order;
 
   return (
     <div className="order-detail-page">
@@ -54,7 +53,9 @@ const OrderDetail: React.FC = () => {
           <span className={statusColors[status]}>{status}</span>
         </p>
         <p><strong>Phương thức thanh toán:</strong> {paymentMethod}</p>
-        <p><strong>Địa chỉ giao hàng:</strong> {shippingAddress}</p>
+        <p><strong>Người nhận:</strong> {shippingInfo?.fullName}</p>
+        <p><strong>SĐT:</strong> {shippingInfo?.phone}</p>
+        <p><strong>Địa chỉ:</strong> {shippingInfo?.address}</p>
       </div>
 
       <div className="order-items">
@@ -63,7 +64,6 @@ const OrderDetail: React.FC = () => {
           <p>Không có sản phẩm</p>
         ) : (
           items.map((item, index) => {
-            // Kiểm tra xem variantId, productId có phải object đã populate không
             const variant =
               typeof item.variantId === 'object' && item.variantId !== null
                 ? item.variantId
@@ -73,11 +73,9 @@ const OrderDetail: React.FC = () => {
                 ? item.productId
                 : null;
 
-            // Lấy tên ưu tiên variant.name, sau đó product.title
             const name =
               variant?.name || product?.title || 'Sản phẩm không rõ';
 
-            // Lấy ảnh: nếu imageUrl là mảng, lấy phần tử đầu, nếu là chuỗi thì lấy luôn
             const getFirstImage = (imgField: any) => {
               if (!imgField) return null;
               if (Array.isArray(imgField) && imgField.length > 0) return imgField[0];

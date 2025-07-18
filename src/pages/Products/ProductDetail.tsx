@@ -51,6 +51,36 @@ const ProductDetaill = () => {
     };
     fetchGroup();
   }, [product]);
+const handleAddToCart = async () => {
+  try {
+    const variant = product.variants?.[selectedColor];
+    if (!variant) return;
+
+    const userToken = localStorage.getItem("token");
+    if (!userToken) {
+      return alert("Bạn cần đăng nhập để thêm vào giỏ hàng");
+    }
+
+    await axios.post(
+      "http://localhost:8888/api/cart/add",
+      {
+        productId: product._id,
+        variantId: variant._id,
+        quantity: 1,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      }
+    );
+
+    alert("Đã thêm vào giỏ hàng");
+  } catch (error: any) {
+    console.error("Lỗi thêm giỏ hàng:", error);
+    alert("Thêm vào giỏ hàng thất bại");
+  }
+};
 
   return (
     <div className="min-h-screen mt-10 mb-10 p-4">
@@ -199,13 +229,15 @@ const ProductDetaill = () => {
 
             {/* Hành động */}
             <div className="flex flex-wrap gap-4 mt-6">
-              <Button
-                type="primary"
-                icon={<ShoppingCartOutlined />}
-                className="h-12 px-6 text-base bg-blue-600 hover:bg-blue-700 border-none shadow-md"
-              >
-                Thêm vào giỏ hàng
-              </Button>
+             <Button
+  type="primary"
+  icon={<ShoppingCartOutlined />}
+  onClick={handleAddToCart}
+  className="h-12 px-6 text-base bg-blue-600 hover:bg-blue-700 border-none shadow-md"
+>
+  Thêm vào giỏ hàng
+</Button>
+
 
               <Button
                 type="default"

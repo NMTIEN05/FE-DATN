@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../contexts/CartContext';
 import { FaTrash } from 'react-icons/fa';
 import './Cart.css';
 
 const Cart: React.FC = () => {
-  const { items, updateQuantity, removeFromCart, totalPrice } = useCart();
+  const { items, updateQuantity, removeFromCart, totalPrice, fetchCart} = useCart();
   const navigate = useNavigate();
+  useEffect(() => {
+    fetchCart();
+  }, []);
 
   const handleQuantityChange = (itemId: string, type: 'increase' | 'decrease', current: number) => {
     const newQuantity = type === 'increase' ? current + 1 : Math.max(current - 1, 1);
@@ -84,3 +87,5 @@ const Cart: React.FC = () => {
 };
 
 export default Cart;
+
+
