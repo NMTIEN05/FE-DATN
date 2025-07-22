@@ -1,18 +1,41 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import ProductCard from "../../components/ProductCard/ProductCard";
 import "./Products.css";
 import { FaChevronDown, FaChevronUp, FaTimes, FaSearch } from "react-icons/fa";
 import { debounce } from "lodash";
-import { useProducts } from "../../hooks/useProducts";
 import { useQuery } from "@tanstack/react-query";
 import axios from "../../api/axios.config";
+import ProductList from "./ProductList";
+import { IProduct } from "../../types/product";
 
 interface Category {
     id: number;
     name: string;
     brand: string;
 }
+
+interface ProductQueryParams {
+    searchTerm?: string;
+    brands?: string[];
+    priceRange?: string | null;
+    sortBy?: string;
+}
+
+const fetchProducts = async (
+    params: ProductQueryParams
+): Promise<IProduct[]> => {
+    const queryParams = new URLSearchParams();
+
+    if (params.searchTerm) queryParams.append("search", params.searchTerm);
+    if (params.brands && params.brands.length > 0) {
+        queryParams.append("brands", params.brands.join(","));
+    }
+    if (params.priceRange) queryParams.append("priceRange", params.priceRange);
+    if (params.sortBy) queryParams.append("sort", params.sortBy);
+
+    const res = await axios.get(`/product?${queryParams.toString()}`);
+    return res.data.data;
+};
 
 const Products = () => {
     const navigate = useNavigate();
@@ -42,131 +65,8 @@ const Products = () => {
             "https://tse1.mm.bing.net/th/id/OIP.xkwoJdnVFLi2Ib9RIZ0ewQHaCX?pid=Api&P=0&h=180",
         ],
     ];
-    const featuredProducts = [
-        {
-            _id: "featured1",
-            name: "iPhone 15 Pro Max",
-            image_url:
-                "https://cdn.tgdd.vn/Products/Images/42/305658/iphone-15-pro-max-blue-thumbnew-600x600.jpg",
-            base_price: 33990000,
-            specs: ['6.7"', "A17 Pro", "256GB"],
-        },
-        {
-            _id: "featured2",
-            name: "Samsung Galaxy S23 Ultra",
-            image_url:
-                "https://cdn.tgdd.vn/Products/Images/42/249948/samsung-galaxy-s23-ultra-600x600.jpg",
-            base_price: 30990000,
-            specs: ['6.8"', "Snapdragon 8 Gen 2", "256GB"],
-        },
-        {
-            _id: "featured3",
-            name: "Xiaomi 14 Pro",
-            image_url:
-                "https://cdn.tgdd.vn/Products/Images/42/328269/xiaomi-14-pro-black-thumb-600x600.jpg",
-            base_price: 23990000,
-            specs: ['6.73"', "Snapdragon 8 Gen 3", "512GB"],
-        },
-        {
-            _id: "featured4",
-            name: "OPPO Find X5 Pro",
-            image_url:
-                "https://cdn.tgdd.vn/Products/Images/42/250622/oppo-find-x5-pro-trang-thumb-600x600.jpg",
-            base_price: 21990000,
-            specs: ['6.7"', "Snapdragon 8 Gen 1", "256GB"],
-        },
-        {
-            _id: "featured5",
-            name: "Vivo X90 Pro",
-            image_url:
-                "https://cdn.tgdd.vn/Products/Images/42/303925/vivo-x90-pro-den-thumb-600x600.jpg",
-            base_price: 26990000,
-            specs: ['6.78"', "Dimensity 9200", "256GB"],
-        },
-        {
-            _id: "featured1",
-            name: "iPhone 15 Pro Max",
-            image_url:
-                "https://cdn.tgdd.vn/Products/Images/42/305658/iphone-15-pro-max-blue-thumbnew-600x600.jpg",
-            base_price: 33990000,
-            specs: ['6.7"', "A17 Pro", "256GB"],
-        },
-        {
-            _id: "featured2",
-            name: "Samsung Galaxy S23 Ultra",
-            image_url:
-                "https://cdn.tgdd.vn/Products/Images/42/249948/samsung-galaxy-s23-ultra-600x600.jpg",
-            base_price: 30990000,
-            specs: ['6.8"', "Snapdragon 8 Gen 2", "256GB"],
-        },
-        {
-            _id: "featured3",
-            name: "Xiaomi 14 Pro",
-            image_url:
-                "https://cdn.tgdd.vn/Products/Images/42/328269/xiaomi-14-pro-black-thumb-600x600.jpg",
-            base_price: 23990000,
-            specs: ['6.73"', "Snapdragon 8 Gen 3", "512GB"],
-        },
-        {
-            _id: "featured4",
-            name: "OPPO Find X5 Pro",
-            image_url:
-                "https://cdn.tgdd.vn/Products/Images/42/250622/oppo-find-x5-pro-trang-thumb-600x600.jpg",
-            base_price: 21990000,
-            specs: ['6.7"', "Snapdragon 8 Gen 1", "256GB"],
-        },
-        {
-            _id: "featured5",
-            name: "Vivo X90 Pro",
-            image_url:
-                "https://cdn.tgdd.vn/Products/Images/42/303925/vivo-x90-pro-den-thumb-600x600.jpg",
-            base_price: 26990000,
-            specs: ['6.78"', "Dimensity 9200", "256GB"],
-        },
-        {
-            _id: "featured1",
-            name: "iPhone 15 Pro Max",
-            image_url:
-                "https://cdn.tgdd.vn/Products/Images/42/305658/iphone-15-pro-max-blue-thumbnew-600x600.jpg",
-            base_price: 33990000,
-            specs: ['6.7"', "A17 Pro", "256GB"],
-        },
-        {
-            _id: "featured2",
-            name: "Samsung Galaxy S23 Ultra",
-            image_url:
-                "https://cdn.tgdd.vn/Products/Images/42/249948/samsung-galaxy-s23-ultra-600x600.jpg",
-            base_price: 30990000,
-            specs: ['6.8"', "Snapdragon 8 Gen 2", "256GB"],
-        },
-        {
-            _id: "featured3",
-            name: "Xiaomi 14 Pro",
-            image_url:
-                "https://cdn.tgdd.vn/Products/Images/42/328269/xiaomi-14-pro-black-thumb-600x600.jpg",
-            base_price: 23990000,
-            specs: ['6.73"', "Snapdragon 8 Gen 3", "512GB"],
-        },
-        {
-            _id: "featured4",
-            name: "OPPO Find X5 Pro",
-            image_url:
-                "https://cdn.tgdd.vn/Products/Images/42/250622/oppo-find-x5-pro-trang-thumb-600x600.jpg",
-            base_price: 21990000,
-            specs: ['6.7"', "Snapdragon 8 Gen 1", "256GB"],
-        },
-        {
-            _id: "featured5",
-            name: "Vivo X90 Pro",
-            image_url:
-                "https://cdn.tgdd.vn/Products/Images/42/303925/vivo-x90-pro-den-thumb-600x600.jpg",
-            base_price: 26990000,
-            specs: ['6.78"', "Dimensity 9200", "256GB"],
-        },
-    ];
 
     useEffect(() => {
-        // Preload images với callback
         const loadImage = (src: string) => {
             return new Promise((resolve) => {
                 const img = new Image();
@@ -176,17 +76,14 @@ const Products = () => {
             });
         };
 
-        // Tải tất cả ảnh trước khi hiển thị slider
         Promise.all(bannerPairs.flat().map(loadImage)).then(() => {
             setIsTransitioning(false);
         });
 
         const interval = setInterval(() => {
             setIsTransitioning(true);
-            // Sử dụng requestAnimationFrame để đồng bộ với trình duyệt
             requestAnimationFrame(() => {
                 setCurrentSlide((prev) => (prev + 1) % bannerPairs.length);
-                // Thêm delay nhỏ trước khi kết thúc transition
                 setTimeout(() => setIsTransitioning(false), 50);
             });
         }, 5000);
@@ -252,6 +149,21 @@ const Products = () => {
         },
     });
 
+    const {
+        data: products,
+        isLoading,
+        isError,
+    } = useQuery<IProduct[], Error>({
+        queryKey: ["products", searchTerm, selectedBrands, priceRange, sortBy],
+        queryFn: () =>
+            fetchProducts({
+                searchTerm,
+                brands: selectedBrands,
+                priceRange,
+                sortBy,
+            }),
+    });
+
     const brands = [...new Set(categories.map((cat) => cat.brand))];
     const priceRanges = [
         "Dưới 5 triệu",
@@ -261,22 +173,12 @@ const Products = () => {
         "Trên 20 triệu",
     ];
 
-    const { products = [], isLoading } = useProducts({
-        brand: selectedBrands.length > 0 ? selectedBrands.join(",") : undefined,
-        search: searchTerm,
-        sort: sortBy,
-    });
-
     const debouncedSearch = debounce((term: string) => {
         setSearchTerm(term);
     }, 500);
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         debouncedSearch(e.target.value);
-    };
-
-    const handleProductClick = (id: string) => {
-        navigate(`/products/${id}`);
     };
 
     const handleClearFilters = () => {
@@ -298,11 +200,8 @@ const Products = () => {
         );
     };
 
-    if (isLoading) return <div className="loading">Đang tải sản phẩm...</div>;
-
     return (
         <div className="mobile-store-page">
-            {/* Thêm breadcrumb và tổng số sản phẩm */}
             <div className="breadcrumb-container">
                 <div className="breadcrumb">
                     <span
@@ -313,12 +212,10 @@ const Products = () => {
                         Trang chủ
                     </span>
                     <span className="breadcrumb-separator">›</span>
-                    <span className="breadcrumb-item active">
-                        {products.length} Sản Phẩm
-                    </span>
+                    <span className="breadcrumb-item active">Sản Phẩm</span>
                 </div>
             </div>
-            {/* Banner slider với 2 ảnh mỗi slide */}
+
             <div className="banner-slider">
                 <div
                     className="slider-container"
@@ -378,7 +275,6 @@ const Products = () => {
                 </div>
             </div>
 
-            {/* Phần còn lại giữ nguyên */}
             <div className="quick-filter-bar">
                 <h2>Thương Hiệu:</h2>
                 {brands.slice(0, 8).map((brand) => (
@@ -530,61 +426,31 @@ const Products = () => {
                 <span className="promo-tag">Sản phẩm bán chạy</span>
             </div>
 
-            {/* Hàng sản phẩm nổi bật */}
-            <div className="featured-section">
-                <h2 className="section-title">Sản phẩm nổi bật</h2>
-                <div className="featured-products">
-                    {featuredProducts.map((product) => (
-                        <div
-                            key={product._id}
-                            className="featured-product-card"
-                            onClick={() => handleProductClick(product._id)}
-                        >
-                            <img
-                                src={product.image_url}
-                                alt={product.name}
-                                className="featured-product-image"
-                            />
-                            <h3 className="featured-product-name">
-                                {product.name}
-                            </h3>
-                            <div className="product-specs">
-                                {product.specs.map((spec, index) => (
-                                    <span key={index}>{spec}</span>
-                                ))}
+            {/* Phần hiển thị sản phẩm */}
+            <div className="products-container max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                {isLoading ? (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
+                        {[...Array(5)].map((_, index) => (
+                            <div
+                                key={index}
+                                className="rounded-lg overflow-hidden bg-gray-100 p-4 animate-pulse"
+                            >
+                                <div className="bg-gray-200 rounded-lg h-56 mb-4"></div>
+                                <div className="bg-gray-200 h-5 rounded mb-2"></div>
+                                <div className="bg-gray-200 h-4 rounded w-3/4"></div>
                             </div>
-                            <div className="featured-product-price">
-                                {product.base_price.toLocaleString("vi-VN")}₫
-                            </div>
-                            <button className="buy-now-btn">Mua ngay</button>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            <div className="product-grid">
-                {products.map((product) => (
-                    <div
-                        key={product._id}
-                        className="product-card"
-                        onClick={() => handleProductClick(product._id)}
-                    >
-                        <div className="product-badge">Giảm giá</div>
-                        <img
-                            src={product.image_url}
-                            alt={product.name}
-                            className="product-image"
-                        />
-                        <h3 className="product-name">{product.name}</h3>
-                        <div className="product-price">
-                            {product.base_price.toLocaleString("vi-VN")}₫
-                        </div>
-                        <div className="product-promos">
-                            <div className="promo-item">0% LÃI SUẤT</div>
-                            <div className="promo-item">Tặng PMH 500K</div>
-                        </div>
+                        ))}
                     </div>
-                ))}
+                ) : isError ? (
+                    <div className="text-center py-12 bg-red-50 rounded-lg">
+                        <p className="text-red-600">
+                            Đã xảy ra lỗi khi tải sản phẩm. Vui lòng thử lại
+                            sau.
+                        </p>
+                    </div>
+                ) : (
+                    <ProductList products={products || []} />
+                )}
             </div>
         </div>
     );
