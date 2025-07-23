@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const instance = axios.create({
     baseURL: 'http://localhost:8888/api',  // json-server chạy trên port 3000
-    timeout: 5000,  // Timeout 5 giây
+    timeout: 50000,  // Timeout 5 giây
     headers: {
         'Content-Type': 'application/json'
     }

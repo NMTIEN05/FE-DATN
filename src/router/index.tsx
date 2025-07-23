@@ -22,6 +22,7 @@ import Deteil from '../pages/Products/DeteilProduct/Deteil';
 
 import OrderDetail from '../pages/order/OrderDetail';
 import Checkout from '../pages/Cart/checkout';
+import PaymentResult from '../pages/Cart/PaymentResult';
 
 
 const token = localStorage.getItem("token");
@@ -43,6 +44,8 @@ export const routes: RouteObject[] = [
       { path: 'shipping', element: <Shipping /> },
       { path: 'change-password', element: <ChangePasswordForm /> },
       { path: 'orders/:id', element: <OrderDetail /> },
+      { path: 'payment-result', element: <PaymentResult /> },
+
 
     ],
   },
