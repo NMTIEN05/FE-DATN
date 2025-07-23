@@ -1,114 +1,212 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import axios from '../../api/axios.config';
-import './OrderDetail.css';
+import { Button, Modal, Form, Input, message } from 'antd';
+import { toast } from 'react-toastify';
 
-const statusColors: Record<string, string> = {
-  pending: 'text-yellow-600',
-  confirmed: 'text-blue-600',
-  shipping: 'text-purple-600',
-  delivered: 'text-green-600',
-  cancelled: 'text-red-600',
+const statusLabels: Record<string, string> = {
+  pending: 'Chờ xác nhận',
+  confirmed: 'Đã xác nhận',
+  shipping: 'Đang giao hàng',
+  delivered: 'Đã giao hàng',
+  cancelled: 'Đã hủy',
+  processing: 'Đang xử lý',
+};
+
+const statusClasses: Record<string, string> = {
+  pending: 'bg-yellow-100 text-yellow-800',
+  confirmed: 'bg-blue-100 text-blue-800',
+  shipping: 'bg-purple-100 text-purple-800',
+  delivered: 'bg-green-100 text-green-800',
+  cancelled: 'bg-red-100 text-red-800',
+  processing: 'bg-orange-100 text-orange-800',
 };
 
 const OrderDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [order, setOrder] = useState<any>(null);
-  const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [form] = Form.useForm();
+
+  const fetchOrder = async () => {
+    try {
+      const res = await axios.get(`/orders/${id}`);
+      setOrder(res.data);
+    } catch (err) {
+      console.error('Lỗi khi tải đơn hàng:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [orderRes, itemRes] = await Promise.all([
-          axios.get(`/orders/${id}`),
-          axios.get(`/orderitem/order/${id}`)
-        ]);
-        setOrder(orderRes.data);
-        setItems(itemRes.data);
-      } catch (err) {
-        console.error('❌ Lỗi khi tải chi tiết đơn hàng:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (id) fetchData();
+    if (id) fetchOrder();
   }, [id]);
 
-  if (loading) return <div>Đang tải đơn hàng...</div>;
-  if (!order) return <div>Không tìm thấy đơn hàng</div>;
+const handleCancelOrder = async () => {
+  Modal.confirm({
+    title: 'Xác nhận huỷ đơn hàng',
+    content: 'Bạn có chắc muốn huỷ đơn hàng này không? Hành động này không thể hoàn tác.',
+    okText: 'Xác nhận',
+    cancelText: 'Hủy',
+    onOk: async () => {
+      try {
+        await axios.put(`/orders/${id}/cancel`);
+        message.success('Đã huỷ đơn hàng thành công');
+        fetchOrder(); // reload
+      } catch (err) {
+        toast.error('Lỗi khi huỷ đơn hàng');
+        console.error('Lỗi khi huỷ đơn hàng:', err);
+      }
+    },
+  });
+};
 
-  const { shippingInfo, paymentMethod, status, totalAmount, createdAt } = order;
+
+
+  const getImage = (img: any) => {
+    if (Array.isArray(img) && img.length > 0) return img[0];
+    if (typeof img === 'string' && img.trim() !== '') return img;
+    return 'https://via.placeholder.com/150?text=No+Image';
+  };
+
+  const showEditModal = () => {
+    form.setFieldsValue(order?.shippingInfo);
+    setIsModalOpen(true);
+  };
+
+  const handleUpdateShipping = async () => {
+    try {
+      const values = await form.validateFields();
+      await axios.put(`/orders/${id}/shipping-info`, values);
+      message.success('Cập nhật thông tin giao hàng thành công');
+      setIsModalOpen(false);
+      fetchOrder();
+    } catch (err) {
+      message.error('Cập nhật thất bại');
+    }
+  };
+
+  if (loading) return <div className="p-10 text-center">Đang tải...</div>;
+  if (!order) return <div className="p-10 text-center text-red-500">Không tìm thấy đơn hàng</div>;
+
+  const {
+    _id,
+    shippingInfo,
+    paymentMethod,
+    status,
+    paymentStatus,
+    totalAmount,
+    items,
+  } = order;
 
   return (
-    <div className="order-detail-page">
-      <h2>Chi tiết đơn hàng</h2>
+    <div className="max-w-6xl mx-auto px-4 py-10">
+      <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">
+        Chi tiết đơn hàng <span className="text-blue-600">#{_id.slice(-8).toUpperCase()}</span>
+      </h1>
 
-      <div className="order-info">
-        <p><strong>Mã đơn:</strong> {order._id}</p>
-        <p><strong>Ngày tạo:</strong> {new Date(createdAt).toLocaleString('vi-VN')}</p>
-        <p>
-          <strong>Trạng thái:</strong>{' '}
-          <span className={statusColors[status]}>{status}</span>
-        </p>
-        <p><strong>Phương thức thanh toán:</strong> {paymentMethod}</p>
-        <p><strong>Người nhận:</strong> {shippingInfo?.fullName}</p>
-        <p><strong>SĐT:</strong> {shippingInfo?.phone}</p>
-        <p><strong>Địa chỉ:</strong> {shippingInfo?.address}</p>
+      <div className="grid grid-cols-1 md:grid-cols-10 gap-6">
+        {/* Trái - 80% */}
+        <div className="col-span-10 md:col-span-8 space-y-6">
+          {/* Box Thông tin giao hàng */}
+          <div className="bg-white shadow-md rounded-xl p-6 border border-gray-200 space-y-2 relative">
+            <div className="flex justify-between items-center mb-2">
+              <h2 className="text-xl font-semibold text-gray-700">Thông tin giao hàng</h2>
+              <Button type="primary" ghost onClick={showEditModal}>Chỉnh sửa</Button>
+            </div>
+            <p><b>👤 Họ tên:</b> {shippingInfo?.fullName}</p>
+            <p><b>📞 SĐT:</b> {shippingInfo?.phone}</p>
+            <p><b>📍 Địa chỉ:</b> {shippingInfo?.address}</p>
+            <p><b>💳 Thanh toán:</b> {paymentMethod === 'cod' ? 'COD' : paymentMethod}</p>
+          </div>
+
+          {/* Box Sản phẩm */}
+          <div className="bg-white shadow-md rounded-xl p-6 border border-gray-200 space-y-4">
+            <h2 className="text-lg font-semibold text-gray-700 border-b pb-2">Sản phẩm trong đơn</h2>
+            {items.map((item: any, idx: number) => {
+              const variant = item.variantId;
+              const image = getImage(variant?.imageUrl);
+              const name = variant?.name || 'Không rõ';
+              const price = variant?.price || 0;
+
+              return (
+                <Link
+                  to={`/product/${item.productId}`}
+                  key={idx}
+                  className="flex gap-4 border-b pb-4 rounded-lg cursor-pointer"
+                >
+                  <img src={image} alt={name} className="w-20 h-20 object-cover rounded-lg border" />
+                  <div className="flex-1 flex flex-col justify-between">
+                    <p className="text-gray-800 font-semibold text-base">{name}</p>
+                    <div className="flex justify-between text-sm text-gray-600 mt-1">
+                      <div>
+                        {variant?.options && (
+                          <p>{Object.entries(variant.options).map(([k, v]) => `${k}: ${v}`).join(', ')}</p>
+                        )}
+                        <p>Số lượng: {item.quantity}</p>
+                      </div>
+                      <div className="text-right whitespace-nowrap">
+                        <p className="font-bold text-gray-800">
+                          {(price * item.quantity).toLocaleString('vi-VN')}₫
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          {price.toLocaleString('vi-VN')}₫ / món
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Phải - 20% */}
+        <div className="col-span-10 md:col-span-2 h-fit bg-white shadow-md rounded-xl p-4 border border-gray-200 space-y-4">
+          <h2 className="text-lg font-semibold text-gray-700">Tóm tắt</h2>
+          <p><b>Trạng thái:</b></p>
+          <span className={`px-3 py-1 rounded-full text-xs font-bold ${statusClasses[status]}`}>{statusLabels[status]}</span>
+
+          <p><b>Thanh toán:</b></p>
+          <span className={`px-3 py-1 rounded-full text-xs font-medium ${paymentStatus === 'paid' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+            {paymentStatus === 'paid' ? 'Đã thanh toán' : 'Chưa thanh toán'}
+          </span>
+
+          <p><b>Tổng tiền:</b></p>
+          <span className="text-blue-700 font-bold text-base">{totalAmount.toLocaleString('vi-VN')}₫</span>
+
+         {!['cancelled', 'delivered', 'shipping'].includes(status) && (
+  <Button danger type="primary" block onClick={handleCancelOrder}>
+    Hủy đơn hàng
+  </Button>
+)}
+
+        </div>
       </div>
 
-      <div className="order-items">
-        <h3>Sản phẩm</h3>
-        {items.length === 0 ? (
-          <p>Không có sản phẩm</p>
-        ) : (
-          items.map((item, index) => {
-            const variant =
-              typeof item.variantId === 'object' && item.variantId !== null
-                ? item.variantId
-                : null;
-            const product =
-              typeof item.productId === 'object' && item.productId !== null
-                ? item.productId
-                : null;
-
-            const name =
-              variant?.name || product?.title || 'Sản phẩm không rõ';
-
-            const getFirstImage = (imgField: any) => {
-              if (!imgField) return null;
-              if (Array.isArray(imgField) && imgField.length > 0) return imgField[0];
-              if (typeof imgField === 'string') return imgField;
-              return null;
-            };
-
-            const image =
-              getFirstImage(variant?.imageUrl) ||
-              getFirstImage(product?.imageUrl) ||
-              '/placeholder.jpg';
-
-            const price = item.price || variant?.price || 0;
-
-            return (
-              <div key={index} className="order-item">
-                <img src={image} alt={name} className="order-item-image" />
-                <div>
-                  <p>{name}</p>
-                  <small>
-                    {item.quantity} x {price.toLocaleString('vi-VN')}₫
-                  </small>
-                </div>
-              </div>
-            );
-          })
-        )}
-      </div>
-
-      <div className="order-total">
-        <strong>Tổng cộng: </strong>
-        <span>{totalAmount.toLocaleString('vi-VN')}₫</span>
-      </div>
+      {/* Modal chỉnh sửa thông tin giao hàng */}
+      <Modal
+        title="Chỉnh sửa thông tin giao hàng"
+        open={isModalOpen}
+        onOk={handleUpdateShipping}
+        onCancel={() => setIsModalOpen(false)}
+        okText="Lưu"
+        cancelText="Hủy"
+      >
+        <Form layout="vertical" form={form}>
+          <Form.Item name="fullName" label="Họ tên" rules={[{ required: true, message: 'Vui lòng nhập họ tên' }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="phone" label="Số điện thoại" rules={[{ required: true, message: 'Vui lòng nhập SĐT' }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="address" label="Địa chỉ" rules={[{ required: true, message: 'Vui lòng nhập địa chỉ' }]}>
+            <Input />
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };
