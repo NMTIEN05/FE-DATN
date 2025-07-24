@@ -1,41 +1,54 @@
-import React, { useState, useEffect } from 'react';
-import { useCart } from '../../contexts/CartContext';
-import { useNavigate } from 'react-router-dom';
-import axios from '../../api/axios.config';
-import { toast } from 'react-toastify';
-import {
-  FaUser,
-  FaPhone,
-  FaMapMarkerAlt,
-  FaMoneyCheckAlt,
-  FaBoxOpen,
-  FaAngleDown,
-} from 'react-icons/fa';
-import './Checkout.css';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import axios from "../../api/axios.config";
+import { useCart } from "../../contexts/CartContext";
+import { FaUser, FaPhone, FaMapMarkerAlt, FaMoneyCheckAlt, FaBoxOpen, FaAngleDown } from "react-icons/fa";
+import { jwtDecode } from "jwt-decode";
+import "./Checkout.css";
 
-const Checkout: React.FC = () => {
-  const { items, totalPrice, clearCart } = useCart();
-  const [fullName, setFullName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [address, setAddress] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState('COD');
-  const [userId, setUserId] = useState('');
+const Checkout = () => {
+  const { clearCart } = useCart();
   const navigate = useNavigate();
 
-  // ✅ Lấy userId từ localStorage
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("COD");
+  const [selectedItems, setSelectedItems] = useState<any[]>([]);
+  const [userId, setUserId] = useState("");
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    if (user?._id) setUserId(user._id);
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decoded: any = jwtDecode(token);
+        if (decoded?.id) setUserId(decoded.id);
+      } catch (err) {
+        console.error("Lỗi khi giải mã token:", err);
+      }
+    }
   }, []);
+
+  useEffect(() => {
+    const selected = JSON.parse(localStorage.getItem("selectedCheckoutItems") || "[]");
+    setSelectedItems(selected);
+  }, []);
+
+  const totalPrice = selectedItems.reduce(
+    (acc, item) => acc + (item.price || item.variantId?.price || 0) * item.quantity,
+    0
+  );
 
   const handleSubmit = async () => {
     if (!fullName || !phone || !address) {
-      toast.error('Vui lòng nhập đầy đủ thông tin');
+      toast.error("Vui lòng điền đầy đủ thông tin.");
       return;
     }
 
     if (!userId) {
-      toast.error('Không tìm thấy người dùng');
+      toast.error("Không tìm thấy người dùng.");
       return;
     }
 
@@ -44,39 +57,40 @@ const Checkout: React.FC = () => {
       shippingInfo: { fullName, phone, address },
       paymentMethod,
       totalAmount: totalPrice,
-      items: items.map((item: any) => ({
+      items: selectedItems.map((item) => ({
         productId: item.productId?._id || item.productId,
         variantId: item.variantId?._id || item.variantId,
         quantity: item.quantity,
         price: item.price || item.variantId?.price || 0,
-        name: item.name || item.productId?.title || 'Sản phẩm',
-        image:
-          item.image ||
-          item.variantId?.imageUrl?.[0] ||
-          item.productId?.imageUrl?.[0] ||
-          '/placeholder.jpg',
+        name: item.name || item.productId?.title || "Sản phẩm",
+        image: item.image || item.variantId?.imageUrl?.[0] || item.productId?.imageUrl?.[0] || "/placeholder.jpg",
       })),
     };
 
     try {
-      const orderRes = await axios.post('/orders', payload);
-      const orderId = orderRes.data._id;
+      setLoading(true);
+      const res = await axios.post("/orders", payload);
+      const orderId = res.data._id;
 
-      if (paymentMethod === 'VNPay') {
-        const paymentRes = await axios.get('/payment/create_payment', {
+      if (paymentMethod === "VNPay") {
+        const paymentRes = await axios.get("/payment/create_payment", {
           params: { amount: totalPrice, orderId },
         });
 
-        window.location.href = paymentRes.data.paymentUrl;
+        const paymentUrl = paymentRes.data.paymentUrl;
+        window.location.href = paymentUrl;
         return;
       }
 
-      toast.success('✅ Đặt hàng thành công!');
+      toast.success("Đặt hàng thành công!");
       clearCart();
+      localStorage.removeItem("selectedCheckoutItems");
       navigate(`/orders/${orderId}`);
     } catch (err: any) {
-      console.error('❌ Lỗi gửi đơn hàng:', err.response?.data || err);
-      toast.error(err.response?.data?.message || '❌ Lỗi đặt hàng');
+      console.error("Lỗi khi đặt hàng:", err.response?.data || err);
+      toast.error(err.response?.data?.message || "Lỗi khi đặt hàng");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -90,7 +104,6 @@ const Checkout: React.FC = () => {
         <div className="checkout-left">
           <div className="checkout-form">
             <h3>Thông tin giao hàng</h3>
-
             <div className="input-group">
               <FaUser />
               <input
@@ -136,36 +149,40 @@ const Checkout: React.FC = () => {
         <div className="checkout-right">
           <h3>Sản phẩm</h3>
           <div className="cart-items">
-            {items.map((item: any) => {
-              const name = item.name || item.productId?.title || 'Sản phẩm';
-              const image =
-                item.image ||
-                item.variantId?.imageUrl?.[0] ||
-                item.productId?.imageUrl?.[0] ||
-                '/placeholder.jpg';
-              const price = item.price || item.variantId?.price || 0;
+            {selectedItems.length > 0 ? (
+              selectedItems.map((item: any) => {
+                const name = item.name || item.productId?.title || "Sản phẩm";
+                const image =
+                  item.image ||
+                  item.variantId?.imageUrl?.[0] ||
+                  item.productId?.imageUrl?.[0] ||
+                  "/placeholder.jpg";
+                const price = item.price || item.variantId?.price || 0;
 
-              return (
-                <div className="cart-item" key={item._id}>
-                  <img src={image} alt={name} className="cart-item-image" />
-                  <div>
-                    <p>{name}</p>
-                    <small>
-                      {item.quantity} x {price.toLocaleString('vi-VN')}₫
-                    </small>
+                return (
+                  <div className="cart-item" key={item._id || item.variantId?._id}>
+                    <img src={image} alt={name} className="cart-item-image" />
+                    <div>
+                      <p>{name}</p>
+                      <small>
+                        {item.quantity} x {price.toLocaleString("vi-VN")}₫
+                      </small>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })
+            ) : (
+              <p>Không có sản phẩm nào được chọn.</p>
+            )}
           </div>
 
           <div className="total-price">
             <strong>Tổng tiền: </strong>
-            <span>{totalPrice.toLocaleString('vi-VN')}₫</span>
+            <span>{totalPrice.toLocaleString("vi-VN")}₫</span>
           </div>
 
-          <button className="checkout-btn" onClick={handleSubmit}>
-            Đặt hàng
+          <button className="checkout-btn" onClick={handleSubmit} disabled={loading}>
+            {loading ? "Đang xử lý..." : "Đặt hàng"}
           </button>
         </div>
       </div>
@@ -174,4 +191,3 @@ const Checkout: React.FC = () => {
 };
 
 export default Checkout;
-//asduuuuuuuuuuuuubc
