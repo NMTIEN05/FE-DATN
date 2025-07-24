@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Products.css";
-import { FaChevronDown, FaChevronUp, FaTimes, FaSearch } from "react-icons/fa";
-import { debounce } from "lodash";
+import { FaChevronDown, FaChevronUp, FaTimes, FaFilter } from "react-icons/fa";
 import { useQuery } from "@tanstack/react-query";
 import axios from "../../api/axios.config";
 import ProductList from "./ProductList";
@@ -15,7 +14,6 @@ interface Category {
 }
 
 interface ProductQueryParams {
-    searchTerm?: string;
     brands?: string[];
     priceRange?: string | null;
     sortBy?: string;
@@ -26,7 +24,6 @@ const fetchProducts = async (
 ): Promise<IProduct[]> => {
     const queryParams = new URLSearchParams();
 
-    if (params.searchTerm) queryParams.append("search", params.searchTerm);
     if (params.brands && params.brands.length > 0) {
         queryParams.append("brands", params.brands.join(","));
     }
@@ -37,15 +34,29 @@ const fetchProducts = async (
     return res.data.data;
 };
 
+const defaultCategories: Category[] = [
+    { id: 1, name: "iPhone", brand: "Apple" },
+    { id: 2, name: "Galaxy Z Fold", brand: "Samsung" },
+    { id: 3, name: "Galaxy Z Flip", brand: "Samsung" },
+    { id: 4, name: "OPPO", brand: "OPPO" },
+    { id: 5, name: "Xiaomi", brand: "Xiaomi" },
+    { id: 6, name: "Vivo", brand: "Vivo" },
+    { id: 7, name: "Realme", brand: "Realme" },
+    { id: 8, name: "HONOR", brand: "HONOR" },
+    { id: 9, name: "NOKIA", brand: "NOKIA" },
+    { id: 10, name: "Pin >5000mAh", brand: "Battery" },
+];
+
 const Products = () => {
     const navigate = useNavigate();
-    const [searchTerm, setSearchTerm] = useState("");
     const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
     const [priceRange, setPriceRange] = useState<string | null>(null);
     const [sortBy, setSortBy] = useState("popular");
     const [openFilter, setOpenFilter] = useState<string | null>(null);
     const [currentSlide, setCurrentSlide] = useState(0);
     const [isTransitioning, setIsTransitioning] = useState(false);
+    const [activeFiltersCount, setActiveFiltersCount] = useState(0);
+    const [isFilterApplied, setIsFilterApplied] = useState(false);
 
     const bannerPairs = [
         [
@@ -91,31 +102,12 @@ const Products = () => {
         return () => clearInterval(interval);
     }, [bannerPairs.length]);
 
-    const goToSlide = (index: number) => {
-        setIsTransitioning(true);
-        requestAnimationFrame(() => {
-            setCurrentSlide(index);
-            setTimeout(() => setIsTransitioning(false), 50);
-        });
-    };
-
-    const nextSlide = () => {
-        setIsTransitioning(true);
-        requestAnimationFrame(() => {
-            setCurrentSlide((prev) => (prev + 1) % bannerPairs.length);
-            setTimeout(() => setIsTransitioning(false), 50);
-        });
-    };
-
-    const prevSlide = () => {
-        setIsTransitioning(true);
-        requestAnimationFrame(() => {
-            setCurrentSlide(
-                (prev) => (prev - 1 + bannerPairs.length) % bannerPairs.length
-            );
-            setTimeout(() => setIsTransitioning(false), 50);
-        });
-    };
+    // Update active filters count whenever filters change
+    useEffect(() => {
+        let count = selectedBrands.length;
+        if (priceRange) count += 1;
+        setActiveFiltersCount(count);
+    }, [selectedBrands, priceRange]);
 
     const sortOptions = [
         { value: "popular", label: "Nổi bật" },
@@ -124,17 +116,12 @@ const Products = () => {
         { value: "price-desc", label: "Giá giảm dần" },
     ];
 
-    const defaultCategories: Category[] = [
-        { id: 1, name: "iPhone", brand: "Apple" },
-        { id: 2, name: "Galaxy Z Fold", brand: "Samsung" },
-        { id: 3, name: "Galaxy Z Flip", brand: "Samsung" },
-        { id: 4, name: "OPPO", brand: "OPPO" },
-        { id: 5, name: "Xiaomi", brand: "Xiaomi" },
-        { id: 6, name: "Vivo", brand: "Vivo" },
-        { id: 7, name: "Realme", brand: "Realme" },
-        { id: 8, name: "HONOR", brand: "HONOR" },
-        { id: 9, name: "NOKIA", brand: "NOKIA" },
-        { id: 10, name: "Pin >5000mAh", brand: "Battery" },
+    const priceRanges = [
+        { label: "Dưới 5 triệu", value: "0-5000000" },
+        { label: "5 - 10 triệu", value: "5000000-10000000" },
+        { label: "10 - 15 triệu", value: "10000000-15000000" },
+        { label: "15 - 20 triệu", value: "15000000-20000000" },
+        { label: "Trên 20 triệu", value: "20000000-999999999" },
     ];
 
     const { data: categories = defaultCategories } = useQuery<Category[]>({
@@ -142,7 +129,7 @@ const Products = () => {
         queryFn: async () => {
             try {
                 const res = await axios.get("/categories");
-                return res.data;
+                return res.data.data;
             } catch {
                 return defaultCategories;
             }
@@ -154,10 +141,9 @@ const Products = () => {
         isLoading,
         isError,
     } = useQuery<IProduct[], Error>({
-        queryKey: ["products", searchTerm, selectedBrands, priceRange, sortBy],
+        queryKey: ["products", selectedBrands, priceRange, sortBy],
         queryFn: () =>
             fetchProducts({
-                searchTerm,
                 brands: selectedBrands,
                 priceRange,
                 sortBy,
@@ -165,27 +151,12 @@ const Products = () => {
     });
 
     const brands = [...new Set(categories.map((cat) => cat.brand))];
-    const priceRanges = [
-        "Dưới 5 triệu",
-        "5 - 10 triệu",
-        "10 - 15 triệu",
-        "15 - 20 triệu",
-        "Trên 20 triệu",
-    ];
-
-    const debouncedSearch = debounce((term: string) => {
-        setSearchTerm(term);
-    }, 500);
-
-    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        debouncedSearch(e.target.value);
-    };
 
     const handleClearFilters = () => {
         setSelectedBrands([]);
         setPriceRange(null);
         setSortBy("popular");
-        setSearchTerm("");
+        setIsFilterApplied(false);
     };
 
     const toggleFilter = (filterName: string) => {
@@ -200,86 +171,25 @@ const Products = () => {
         );
     };
 
+    const handlePriceRangeChange = (range: string) => {
+        setPriceRange(range === priceRange ? null : range);
+    };
+
+    const applyFilters = () => {
+        setIsFilterApplied(true);
+        setOpenFilter(null);
+    };
+
+    const hasActiveFilters = selectedBrands.length > 0 || priceRange;
+    const noProductsFound = isFilterApplied && products?.length === 0;
+
     return (
         <div className="mobile-store-page">
-            <div className="breadcrumb-container">
-                <div className="breadcrumb">
-                    <span
-                        className="breadcrumb-item"
-                        onClick={() => navigate("/")}
-                        style={{ cursor: "pointer" }}
-                    >
-                        Trang chủ
-                    </span>
-                    <span className="breadcrumb-separator">›</span>
-                    <span className="breadcrumb-item active">Sản Phẩm</span>
-                </div>
-            </div>
-
-            <div className="banner-slider">
-                <div
-                    className="slider-container"
-                    style={{
-                        transform: `translate3d(-${currentSlide * 100}%, 0, 0)`,
-                        transition: isTransitioning
-                            ? "transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1)"
-                            : "none",
-                    }}
-                    key={`slider-${currentSlide}`}
-                >
-                    {bannerPairs.map((pair, index) => (
-                        <div key={index} className="slide">
-                            <div className="banner-pair">
-                                <img
-                                    src={pair[0]}
-                                    alt={`Banner ${index + 1}-1`}
-                                    className="banner-image"
-                                    style={{ transform: "translateZ(0)" }}
-                                    onError={(e) => {
-                                        (e.target as HTMLImageElement).src =
-                                            "https://via.placeholder.com/600x200?text=Banner+Error";
-                                    }}
-                                />
-                                <img
-                                    src={pair[1]}
-                                    alt={`Banner ${index + 1}-2`}
-                                    className="banner-image"
-                                    style={{ transform: "translateZ(0)" }}
-                                    onError={(e) => {
-                                        (e.target as HTMLImageElement).src =
-                                            "https://via.placeholder.com/600x200?text=Banner+Error";
-                                    }}
-                                />
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-                <button className="slider-nav prev" onClick={prevSlide}>
-                    &lt;
-                </button>
-                <button className="slider-nav next" onClick={nextSlide}>
-                    &gt;
-                </button>
-
-                <div className="slider-dots">
-                    {bannerPairs.map((_, index) => (
-                        <button
-                            key={index}
-                            className={`dot ${
-                                index === currentSlide ? "active" : ""
-                            }`}
-                            onClick={() => goToSlide(index)}
-                        />
-                    ))}
-                </div>
-            </div>
-
             <div className="quick-filter-bar">
                 <h2>Thương Hiệu:</h2>
                 {brands.slice(0, 8).map((brand) => (
                     <button
-                        key={brand}
+                        key={`quick-${brand}`}
                         className={`brand-tag ${
                             selectedBrands.includes(brand) ? "active" : ""
                         }`}
@@ -295,11 +205,17 @@ const Products = () => {
                     className="filter-section"
                     onClick={() => toggleFilter("main")}
                 >
-                    <span>Lọc</span>
+                    <FaFilter className="filter-icon" />
+                    <span>Bộ lọc</span>
                     {openFilter === "main" ? (
-                        <FaChevronUp />
+                        <FaChevronUp className="filter-arrow" />
                     ) : (
-                        <FaChevronDown />
+                        <FaChevronDown className="filter-arrow" />
+                    )}
+                    {activeFiltersCount > 0 && (
+                        <span className="filter-badge">
+                            {activeFiltersCount}
+                        </span>
                     )}
                 </div>
 
@@ -307,6 +223,7 @@ const Products = () => {
                     <select
                         value={sortBy}
                         onChange={(e) => setSortBy(e.target.value)}
+                        className="sort-select"
                     >
                         {sortOptions.map((option) => (
                             <option key={option.value} value={option.value}>
@@ -328,7 +245,7 @@ const Products = () => {
                                         .slice(0, Math.ceil(brands.length / 2))
                                         .map((brand) => (
                                             <label
-                                                key={brand}
+                                                key={`brand-${brand}`}
                                                 className="brand-option"
                                             >
                                                 <input
@@ -357,7 +274,7 @@ const Products = () => {
                                         .slice(Math.ceil(brands.length / 2))
                                         .map((brand) => (
                                             <label
-                                                key={brand}
+                                                key={`brand2-${brand}`}
                                                 className="brand-option"
                                             >
                                                 <input
@@ -382,20 +299,24 @@ const Products = () => {
                                 <div className="price-options">
                                     {priceRanges.map((range) => (
                                         <label
-                                            key={range}
+                                            key={range.value}
                                             className="price-option"
                                         >
                                             <input
                                                 type="radio"
                                                 name="price"
                                                 className="styled-radio"
-                                                checked={priceRange === range}
+                                                checked={
+                                                    priceRange === range.value
+                                                }
                                                 onChange={() =>
-                                                    setPriceRange(range)
+                                                    handlePriceRangeChange(
+                                                        range.value
+                                                    )
                                                 }
                                             />
                                             <span className="radiomark"></span>
-                                            {range}
+                                            {range.label}
                                         </label>
                                     ))}
                                 </div>
@@ -410,29 +331,61 @@ const Products = () => {
                         >
                             <FaTimes /> Xóa bộ lọc
                         </button>
-                        <button
-                            className="apply-btn"
-                            onClick={() => setOpenFilter(null)}
-                        >
+                        <button className="apply-btn" onClick={applyFilters}>
                             Áp dụng
                         </button>
                     </div>
                 </div>
             )}
 
-            <div className="promo-tags">
-                <span className="promo-tag">Giảm giá</span>
-                <span className="promo-tag">Mới nhất</span>
-                <span className="promo-tag">Sản phẩm bán chạy</span>
-            </div>
+            {hasActiveFilters && (
+                <div className="active-filters">
+                    <div className="active-filters-container">
+                        {selectedBrands.map((brand) => (
+                            <span
+                                key={`active-${brand}`}
+                                className="active-filter-tag"
+                            >
+                                {brand}
+                                <button
+                                    onClick={() => toggleBrand(brand)}
+                                    className="remove-filter"
+                                >
+                                    ×
+                                </button>
+                            </span>
+                        ))}
+                        {priceRange && (
+                            <span className="active-filter-tag">
+                                {
+                                    priceRanges.find(
+                                        (r) => r.value === priceRange
+                                    )?.label
+                                }
+                                <button
+                                    onClick={() => setPriceRange(null)}
+                                    className="remove-filter"
+                                >
+                                    ×
+                                </button>
+                            </span>
+                        )}
+                        <button
+                            className="clear-all-filters"
+                            onClick={handleClearFilters}
+                        >
+                            Xóa tất cả
+                        </button>
+                    </div>
+                </div>
+            )}
 
-            {/* Phần hiển thị sản phẩm */}
             <div className="products-container max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                 {isLoading ? (
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
                         {[...Array(5)].map((_, index) => (
                             <div
-                                key={index}
+                                key={`skeleton-${index}`}
                                 className="rounded-lg overflow-hidden bg-gray-100 p-4 animate-pulse"
                             >
                                 <div className="bg-gray-200 rounded-lg h-56 mb-4"></div>
@@ -448,8 +401,34 @@ const Products = () => {
                             sau.
                         </p>
                     </div>
+                ) : noProductsFound ? (
+                    <div className="no-products-found">
+                        <div className="no-products-content">
+                            <img
+                                src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png"
+                                alt="No products found"
+                                className="no-products-image"
+                            />
+                            <h3>Không tìm thấy sản phẩm phù hợp</h3>
+                            <p>
+                                Không có sản phẩm nào phù hợp với bộ lọc hiện
+                                tại. Vui lòng thử lại với tiêu chí khác.
+                            </p>
+                            <button
+                                className="reset-filters-btn"
+                                onClick={handleClearFilters}
+                            >
+                                Xóa bộ lọc
+                            </button>
+                        </div>
+                    </div>
                 ) : (
-                    <ProductList products={products || []} />
+                    <ProductList
+                        products={products || []}
+                        onProductClick={(productId) =>
+                            navigate(`/product/${productId}`)
+                        }
+                    />
                 )}
             </div>
         </div>

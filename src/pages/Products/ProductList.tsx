@@ -1,12 +1,17 @@
 import React from "react";
 import { FaRegHeart, FaHeart, FaEye, FaShoppingCart } from "react-icons/fa";
 import { IProduct } from "../../../types/product";
+import { useNavigate } from "react-router-dom";
 
 interface ProductListProps {
     products: IProduct[];
+    onProductClick: (productId: string) => void;
 }
 
-const ProductList: React.FC<ProductListProps> = ({ products }) => {
+const ProductList: React.FC<ProductListProps> = ({
+    products,
+    onProductClick,
+}) => {
     if (!products || products.length === 0) {
         return (
             <div className="text-center py-12">
@@ -46,9 +51,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
                 return (
                     <div
                         key={product._id}
-                        onClick={() =>
-                            (window.location.href = `/product/${product._id}`)
-                        }
+                        onClick={() => onProductClick(product._id)}
                         className="group rounded-xl shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer overflow-hidden relative bg-white border border-gray-100"
                     >
                         {/* Badges */}
