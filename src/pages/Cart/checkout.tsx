@@ -3,7 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "../../api/axios.config";
 import { useCart } from "../../contexts/CartContext";
-import { FaUser, FaPhone, FaMapMarkerAlt, FaMoneyCheckAlt, FaBoxOpen, FaAngleDown } from "react-icons/fa";
+import {
+  FaUser,
+  FaPhone,
+  FaMapMarkerAlt,
+  FaMoneyCheckAlt,
+  FaBoxOpen,
+  FaAngleDown,
+} from "react-icons/fa";
 import { jwtDecode } from "jwt-decode";
 import "./Checkout.css";
 
@@ -32,12 +39,15 @@ const Checkout = () => {
   }, []);
 
   useEffect(() => {
-    const selected = JSON.parse(localStorage.getItem("selectedCheckoutItems") || "[]");
+    const selected = JSON.parse(
+      localStorage.getItem("selectedCheckoutItems") || "[]"
+    );
     setSelectedItems(selected);
   }, []);
 
   const totalPrice = selectedItems.reduce(
-    (acc, item) => acc + (item.price || item.variantId?.price || 0) * item.quantity,
+    (acc, item) =>
+      acc + (item.price || item.variantId?.price || 0) * item.quantity,
     0
   );
 
@@ -63,7 +73,11 @@ const Checkout = () => {
         quantity: item.quantity,
         price: item.price || item.variantId?.price || 0,
         name: item.name || item.productId?.title || "Sản phẩm",
-        image: item.image || item.variantId?.imageUrl?.[0] || item.productId?.imageUrl?.[0] || "/placeholder.jpg",
+        image:
+          item.image ||
+          item.variantId?.imageUrl?.[0] ||
+          item.productId?.imageUrl?.[0] ||
+          "/placeholder.jpg",
       })),
     };
 
@@ -76,7 +90,6 @@ const Checkout = () => {
         const paymentRes = await axios.get("/payment/create_payment", {
           params: { amount: totalPrice, orderId },
         });
-
         const paymentUrl = paymentRes.data.paymentUrl;
         window.location.href = paymentUrl;
         return;
@@ -101,9 +114,11 @@ const Checkout = () => {
       </h2>
 
       <div className="checkout-content">
+        {/* Bên trái: Form thông tin */}
         <div className="checkout-left">
           <div className="checkout-form">
             <h3>Thông tin giao hàng</h3>
+
             <div className="input-group">
               <FaUser />
               <input
@@ -135,7 +150,10 @@ const Checkout = () => {
 
             <div className="input-group select-wrapper">
               <FaMoneyCheckAlt className="icon" />
-              <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}>
+              <select
+                value={paymentMethod}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+              >
                 <option value="COD">Thanh toán khi nhận hàng</option>
                 <option value="VNPay">Thanh toán VNPay</option>
                 <option value="Stripe">Thanh toán Stripe</option>
@@ -146,6 +164,7 @@ const Checkout = () => {
           </div>
         </div>
 
+        {/* Bên phải: Danh sách sản phẩm và nút đặt hàng */}
         <div className="checkout-right">
           <h3>Sản phẩm</h3>
           <div className="cart-items">
@@ -160,8 +179,15 @@ const Checkout = () => {
                 const price = item.price || item.variantId?.price || 0;
 
                 return (
-                  <div className="cart-item" key={item._id || item.variantId?._id}>
-                    <img src={image} alt={name} className="cart-item-image" />
+                  <div
+                    className="cart-item"
+                    key={item._id || item.variantId?._id}
+                  >
+                    <img
+                      src={image}
+                      alt={name}
+                      className="cart-item-image"
+                    />
                     <div>
                       <p>{name}</p>
                       <small>
@@ -172,7 +198,7 @@ const Checkout = () => {
                 );
               })
             ) : (
-              <p>Không có sản phẩm nào được chọn.</p>
+              <p>Không có sản phẩm được chọn.</p>
             )}
           </div>
 
@@ -181,7 +207,11 @@ const Checkout = () => {
             <span>{totalPrice.toLocaleString("vi-VN")}₫</span>
           </div>
 
-          <button className="checkout-btn" onClick={handleSubmit} disabled={loading}>
+          <button
+            className="checkout-btn"
+            onClick={handleSubmit}
+            disabled={loading}
+          >
             {loading ? "Đang xử lý..." : "Đặt hàng"}
           </button>
         </div>
