@@ -1,33 +1,48 @@
 // src/components/Home/BannerSection.tsx
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
+import axios from '../../../api/axios.config';
 
-const banners = [
-  {
-    id: 1,
-    image: 'https://i.pinimg.com/736x/5a/7e/90/5a7e903fa4d36808abddba1d331a4a34.jpg',
-    link: '#',
-    title: 'iPhone 15 Pro Max',
-  },
-  {
-    id: 2,
-    image: 'https://i.pinimg.com/736x/0b/a9/43/0ba943ea32ac6f8450ad1cae3de07b18.jpg',
-    link: '#',
-    title: 'Samsung S24 Ultra',
-  },
-  {
-    id: 3,
-    image: 'https://i.pinimg.com/736x/33/3f/b1/333fb13a2a0e48edc138b24b18af9b28.jpg',
-    link: '#',
-    title: 'Xiaomi 14 Ultra',
-  },
-];
+interface BannerType {
+  id?: string;
+  _id?: string;
+  image: string;
+  link?: string;
+  title?: string;
+  description?: string;
+}
 
 const BannerSection: React.FC = () => {
+  const [banners, setBanners] = useState<BannerType[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchBanners = async () => {
+      try {
+        const res = await axios.get('/banners');
+        // Nếu backend trả về { data: [...] }
+        const data = res.data.data || res.data;
+        setBanners(data.map((b: any) => ({
+          ...b,
+          image: b.image?.startsWith('http') ? b.image : `http://localhost:8888${b.image}`,
+          id: b._id || b.id,
+        })));
+      } catch (err) {
+        setBanners([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBanners();
+  }, []);
+
+  if (loading) return <div>Đang tải banner...</div>;
+  if (!banners.length) return <div>Không có banner nào!</div>;
+
   return (
     <div style={{ width: '100%', borderRadius: 8, overflow: 'hidden', marginBottom: 32 }}>
       <Swiper
@@ -42,10 +57,10 @@ const BannerSection: React.FC = () => {
       >
         {banners.map((banner) => (
           <SwiperSlide key={banner.id}>
-            <a href={banner.link}>
+            <a href={banner.link || '#'}>
               <img
                 src={banner.image}
-                alt={banner.title}
+                alt={banner.title || ''}
                 style={{ width: '100%', height: 'auto', objectFit: 'cover', display: 'block' }}
               />
             </a>
