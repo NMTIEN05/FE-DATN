@@ -24,6 +24,7 @@ import OrderDetail from '../pages/order/OrderDetail';
 import Checkout from '../pages/Cart/checkout';
 import PaymentResult from '../pages/Cart/PaymentResult';
 import SearchResultPage from '../components/Header/SearchResultPage';
+import OrderManagement from '../pages/order/Listorder';
 
 
 const token = localStorage.getItem("token");
@@ -47,6 +48,8 @@ export const routes: RouteObject[] = [
       { path: 'orders/:id', element: <OrderDetail /> },
       { path: 'payment-result', element: <PaymentResult /> },
       { path: 'search', element: <SearchResultPage  /> },
+      { path: 'orders', element: <OrderManagement  /> },
+
 
 
 

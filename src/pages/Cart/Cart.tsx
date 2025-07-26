@@ -68,80 +68,62 @@ const Cart: React.FC = () => {
           ) : (
             <>
               {items.map((item) => {
-                const product = (item as any).productId;
-                const variant = (item as any).variantId;
-                const name = item.name || product?.title || 'Sản phẩm';
-                const image =
-                  item.image ||
-                  variant?.imageUrl?.[0] ||
-                  product?.imageUrl?.[0] ||
-                  '/placeholder.jpg';
-                const price = item.price || variant?.price || 0;
-                const oldPrice = price + 3400000;
-                const color =
-                  item.color ||
-                  variant?.attributes?.find((a: any) =>
-                    a.attributeId?.name?.toLowerCase().includes('màu')
-                  )?.attributeValueId?.value;
+  const product = (item as any).productId;
+  const variant = (item as any).variantId;
+  const capacity = product?.capacity;
 
-                return (
-                  <div
-                    key={item._id}
-                    className={`flex items-center gap-4 py-4 px-2 border rounded-md mb-4 transition-all duration-200 ${
-                      isChecked(item._id!) ? 'border' : 'border-gray-200'
-                    } hover:shadow-sm`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={isChecked(item._id!)}
-                      onChange={() => toggleSelectItem(item._id!)}
-                      className="w-5 h-5 rounded-full accent-blue-600"
-                    />
-                    <img
-                      src={image}
-                      alt={name}
-                      className="w-20 h-20 rounded border object-cover transition-transform duration-200 hover:scale-105"
-                    />
-                    <div className="flex flex-col flex-1">
-                      <h3 className="font-medium text-base">{name}</h3>
-                      {color && <p className="text-sm text-gray-500 mt-1">Màu: {color}</p>}
-                      <div className="flex items-baseline gap-2 mt-1">
-                        <span className="text-red-600 font-semibold text-lg">
-                          {price.toLocaleString('vi-VN')}₫
-                        </span>
-                        <span className="line-through text-sm text-gray-400">
-                          {oldPrice.toLocaleString('vi-VN')}₫
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() =>
-                          handleQuantityChange(item._id!, 'decrease', item.quantity)
-                        }
-                        className="w-8 h-8 border rounded text-lg flex items-center justify-center hover:bg-gray-100"
-                      >
-                        -
-                      </button>
-                      <span className="w-8 text-center">{item.quantity}</span>
-                      <button
-                        onClick={() =>
-                          handleQuantityChange(item._id!, 'increase', item.quantity)
-                        }
-                        className="w-8 h-8 border rounded text-lg flex items-center justify-center hover:bg-gray-100"
-                      >
-                        +
-                      </button>
-                    </div>
-                    <button
-                      onClick={() => removeFromCart(item._id!)}
-                      className="ml-3 text-gray-500 hover:text-red-500 transition-colors"
-                    >
-                      <FaTrash />
-                    </button>
-                  </div>
-                );
-              })}
+  const color =
+    item.color ||
+    variant?.attributes?.find((a: any) =>
+      a.attributeId?.name?.toLowerCase().includes('màu')
+    )?.attributeValueId?.value;
+
+  const name = item.name || product?.title || 'Sản phẩm';
+  const image =
+    item.image ||
+    variant?.imageUrl?.[0] ||
+    product?.imageUrl?.[0] ||
+    '/placeholder.jpg';
+  const price = item.price || variant?.price || 0;
+  const oldPrice = price + 3400000;
+
+  return (
+    <div
+      key={item._id}
+      className={`flex items-center gap-4 py-4 px-2 border rounded-md mb-4 transition-all duration-200 ${
+        isChecked(item._id!) ? 'border' : 'border-gray-200'
+      } hover:shadow-sm`}
+    >
+      <input
+        type="checkbox"
+        checked={isChecked(item._id!)}
+        onChange={() => toggleSelectItem(item._id!)}
+        className="w-5 h-5 rounded-full accent-blue-600"
+      />
+      <img
+        src={image}
+        alt={name}
+        className="w-20 h-20 rounded border object-cover transition-transform duration-200 hover:scale-105"
+      />
+      <div className="flex flex-col flex-1">
+        <h3 className="font-medium text-base">{name}</h3>
+        {capacity && <p className="text-xs text-gray-500">Dung lượng: {capacity}</p>}
+        {color && <p className="text-xs text-gray-500">Màu: {color}</p>}
+
+        <div className="flex items-baseline gap-2 mt-1">
+          <span className="text-red-600 font-semibold text-lg">
+            {price.toLocaleString('vi-VN')}₫
+          </span>
+          <span className="line-through text-sm text-gray-400">
+            {oldPrice.toLocaleString('vi-VN')}₫
+          </span>
+        </div>
+      </div>
+      ...
+    </div>
+  );
+})}
+
             </>
           )}
         </div>

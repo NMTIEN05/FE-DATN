@@ -23,7 +23,7 @@ import axios from 'axios';
 import './Header.css'; // CSS animation marquee
 
 const Header = () => {
-  const topHeaderHeight = 30;   // Thanh vàng
+ 
   const mainHeaderHeight = 75;  // Thanh đỏ
 
   const [scrollY, setScrollY] = useState(0);
@@ -101,30 +101,14 @@ const Header = () => {
 
   return (
     <div className='mb-20'>
-      {/* Thanh vàng chạy chữ - chỉ hiển thị khi scroll ở top */}
-      {scrollY === 0 && (
-        <div
-          className="fixed top-0 left-0 w-full bg-[#f85959] text-black font-semibold z-50 overflow-hidden py-2"
-          style={{ height: topHeaderHeight }}
-        >
-          <div className="whitespace-nowrap animate-marquee px-4">
-            🚚 Miễn phí vận chuyển toàn quốc &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
-            🛠️ Bảo hành lên đến 4 tháng &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
-            🔄 Đổi trả trong 7 ngày &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
-            💥 Giảm giá sốc đến 50% &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
-            ⚡ Mua ngay - Nhận hàng nhanh chóng &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
-            📱 Hàng chính hãng 100% &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;
-            🔋 Pin bền – Máy mượt – Giá tốt!
-          </div>
-        </div>
-      )}
+     
 
       {/* Thanh đỏ chính */}
       <div
         className="fixed left-0 w-full bg-[#f85959] text-white z-40 flex items-center transition-all duration-300"
         style={{
           height: mainHeaderHeight,
-          top: scrollY === 0 ? topHeaderHeight : 0,
+          
         }}
       >
         <div className="container mx-auto px-10 flex items-center justify-between flex-wrap gap-y-2">

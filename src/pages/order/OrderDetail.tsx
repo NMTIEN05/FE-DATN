@@ -44,26 +44,24 @@ const OrderDetail: React.FC = () => {
     if (id) fetchOrder();
   }, [id]);
 
-const handleCancelOrder = async () => {
-  Modal.confirm({
-    title: 'Xác nhận huỷ đơn hàng',
-    content: 'Bạn có chắc muốn huỷ đơn hàng này không? Hành động này không thể hoàn tác.',
-    okText: 'Xác nhận',
-    cancelText: 'Hủy',
-    onOk: async () => {
-      try {
-        await axios.put(`/orders/${id}/cancel`);
-        message.success('Đã huỷ đơn hàng thành công');
-        fetchOrder(); // reload
-      } catch (err) {
-        toast.error('Lỗi khi huỷ đơn hàng');
-        console.error('Lỗi khi huỷ đơn hàng:', err);
-      }
-    },
-  });
-};
-
-
+  const handleCancelOrder = async () => {
+    Modal.confirm({
+      title: 'Xác nhận huỷ đơn hàng',
+      content: 'Bạn có chắc muốn huỷ đơn hàng này không? Hành động này không thể hoàn tác.',
+      okText: 'Xác nhận',
+      cancelText: 'Hủy',
+      onOk: async () => {
+        try {
+          await axios.put(`/orders/${id}/cancel`);
+          message.success('Đã huỷ đơn hàng thành công');
+          fetchOrder(); // reload
+        } catch (err) {
+          toast.error('Lỗi khi huỷ đơn hàng');
+          console.error('Lỗi khi huỷ đơn hàng:', err);
+        }
+      },
+    });
+  };
 
   const getImage = (img: any) => {
     if (Array.isArray(img) && img.length > 0) return img[0];
@@ -125,41 +123,51 @@ const handleCancelOrder = async () => {
           {/* Box Sản phẩm */}
           <div className="bg-white shadow-md rounded-xl p-6 border border-gray-200 space-y-4">
             <h2 className="text-lg font-semibold text-gray-700 border-b pb-2">Sản phẩm trong đơn</h2>
-            {items.map((item: any, idx: number) => {
-              const variant = item.variantId;
-              const image = getImage(variant?.imageUrl);
-              const name = variant?.name || 'Không rõ';
-              const price = variant?.price || 0;
+           {items.map((item: any, idx: number) => {
+  const variant = item.variantId;
+  const product = item.productId;
 
-              return (
-                <Link
-                  to={`/product/${item.productId}`}
-                  key={idx}
-                  className="flex gap-4 border-b pb-4 rounded-lg cursor-pointer"
-                >
-                  <img src={image} alt={name} className="w-20 h-20 object-cover rounded-lg border" />
-                  <div className="flex-1 flex flex-col justify-between">
-                    <p className="text-gray-800 font-semibold text-base">{name}</p>
-                    <div className="flex justify-between text-sm text-gray-600 mt-1">
-                      <div>
-                        {variant?.options && (
-                          <p>{Object.entries(variant.options).map(([k, v]) => `${k}: ${v}`).join(', ')}</p>
-                        )}
-                        <p>Số lượng: {item.quantity}</p>
-                      </div>
-                      <div className="text-right whitespace-nowrap">
-                        <p className="font-bold text-gray-800">
-                          {(price * item.quantity).toLocaleString('vi-VN')}₫
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          {price.toLocaleString('vi-VN')}₫ / món
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
+  console.log("🧩 Variant:", variant);
+  console.log("🎨 Attributes:", variant?.attributes);
+
+  const image = getImage(variant?.imageUrl);
+  const name = variant?.name || 'Không rõ';
+  const price = variant?.price || 0;
+
+  const capacity = product?.capacity || variant?.capacity || "Không rõ";
+  const color = variant?.attributes?.find((a: any) =>
+    a.attributeId?.name?.toLowerCase().includes("màu")
+  )?.attributeValueId?.value || "Không rõ";
+
+  return (
+    <Link
+      to={`/product/${item.productId}`}
+      key={idx}
+      className="flex gap-4 border-b pb-4 rounded-lg cursor-pointer"
+    >
+      <img src={image} alt={name} className="w-20 h-20 object-cover rounded-lg border" />
+      <div className="flex-1 flex flex-col justify-between">
+        <p className="text-gray-800 font-semibold text-base">{name}</p>
+        <div className="flex justify-between text-sm text-gray-600 mt-1">
+          <div>
+            <p>Dung lượng: {capacity}</p>
+            <p>Màu: {color}</p>
+            <p>Số lượng: {item.quantity}</p>
+          </div>
+          <div className="text-right whitespace-nowrap">
+            <p className="font-bold text-gray-800">
+              {(price * item.quantity).toLocaleString('vi-VN')}₫
+            </p>
+            <p className="text-sm text-gray-500">
+              {price.toLocaleString('vi-VN')}₫ / món
+            </p>
+          </div>
+        </div>
+      </div>
+    </Link>
+  );
+})}
+
           </div>
         </div>
 
@@ -177,12 +185,11 @@ const handleCancelOrder = async () => {
           <p><b>Tổng tiền:</b></p>
           <span className="text-blue-700 font-bold text-base">{totalAmount.toLocaleString('vi-VN')}₫</span>
 
-         {!['cancelled', 'delivered', 'shipping'].includes(status) && (
-  <Button danger type="primary" block onClick={handleCancelOrder}>
-    Hủy đơn hàng
-  </Button>
-)}
-
+          {!['cancelled', 'delivered', 'shipping'].includes(status) && (
+            <Button danger type="primary" block onClick={handleCancelOrder}>
+              Hủy đơn hàng
+            </Button>
+          )}
         </div>
       </div>
 
