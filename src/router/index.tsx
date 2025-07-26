@@ -19,12 +19,12 @@ import ChangePasswordForm from "../pages/auth/Changepassword";
 
 import ProductDetail from "../pages/Products/ProductDetail";
 import Deteil from "../pages/Products/DeteilProduct/Deteil";
-
+// Thêm vào phần imports
+import BrandProductsPage from "../pages/BrandProductsPage";
 import OrderDetail from "../pages/order/OrderDetail";
 import Checkout from "../pages/Cart/checkout";
 import PaymentResult from "../pages/Cart/PaymentResult";
 import SearchResultPage from "../components/Header/SearchResultPage";
-
 const token = localStorage.getItem("token");
 
 export const routes: RouteObject[] = [
@@ -34,6 +34,9 @@ export const routes: RouteObject[] = [
         children: [
             { path: "checkout", element: <Checkout /> },
             { path: "search", element: <SearchResultPage /> },
+            // Thêm route mới cho sản phẩm theo thương hiệu
+            { path: "thuong-hieu/:brand", element: <BrandProductsPage /> },
+            { index: true, element: <HomePage /> },
             { index: true, element: <HomePage /> },
             { path: "products", element: <Products /> },
             { path: "dien-thoai", element: <Products /> },
