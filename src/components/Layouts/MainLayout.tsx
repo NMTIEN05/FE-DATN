@@ -6,7 +6,7 @@ import Footer from '../Footer/Footer';
 const MainLayout: React.FC = () => {
   return (
     <div className="main-layout">
-      <Header />
+      <Header   />
       <main style={{ minHeight: '80vh' }}>
         <Outlet />
       </main>

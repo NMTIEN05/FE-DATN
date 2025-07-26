@@ -1,255 +1,31 @@
-/* ======= Reset & Base ======= */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-:root {
-  --primary-color: #76a0ea;
-  --secondary-color: #8e49e8;
-  --accent-color: #ffcc00;
-  --text-color: #ffffff;
-  --bg-light: #f5f7fa;
-  --text-dark: #222;
-  --hover-bg: rgba(255, 255, 255, 0.1);
-  --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  --transition: all 0.3s ease;
-}
-
-/* ======= Header Wrapper ======= */
-.header {
-  width: 100%;
-  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  box-shadow: var(--shadow);
-  color: var(--text-color);
-  font-family: "Segoe UI", "Roboto", sans-serif;
-}
-
-/* ======= Container ======= */
+/* Header.css */
 .header-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 12px 16px;
-}
-
-/* ======= Top Bar ======= */
-.header-top {
+  background-color: #f85959;
+  height: 76px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 12px;
+  padding: 0 20px;
+  position: relative;
+  z-index: 50;
 }
 
-/* ======= Logo ======= */
 .logo {
   font-size: 24px;
-  font-weight: 700;
-  text-decoration: none;
-  color: var(--text-color);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.logo:hover {
-  color: var(--accent-color);
-}
-
-/* ======= Search Box ======= */
-.search-box {
-  flex: 1;
-  max-width: 640px;
-  position: relative;
- 
-}
-
-.search-box input {
-  width: 100%;
-  height: 40px;
-  border-radius: 20px;
-  padding: 0 48px 0 16px;
-  border: none;
-  background: rgba(255, 255, 255, 0.15);
-  color: var(--text-color);
-  font-size: 14px;
-  transition: var(--transition);
-}
-
-.search-box input::placeholder {
-  color: rgba(209, 86, 180, 0.7);
-}
-
-.search-box input:focus {
-  background: white;
-  color: var(--text-dark);
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.2);
-}
-
-.search-box button {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: rgba(11, 6, 6, 0.8);
-  cursor: pointer;
-  font-size: 18px;
-  transition: var(--transition);
-}
-
-.search-box button:hover {
-  color: var(--accent-color);
-}
-
-/* ======= Functions ======= */
-.header-functions {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.function-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--text-color);
-  text-decoration: none;
-  padding: 8px 12px;
-  border-radius: 8px;
-  transition: var(--transition);
-}
-
-.function-item:hover {
-  background: var(--hover-bg);
-  color: var(--accent-color);
-}
-
-/* ======= Navigation ======= */
-.header-nav {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-}
-
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  text-decoration: none;
-  color: rgba(255, 255, 255, 0.9);
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-weight: 500;
-  transition: var(--transition);
-}
-
-.nav-item:hover {
-  background: var(--hover-bg);
-  color: var(--accent-color);
-}
-
-/* ======= Dropdown ======= */
-.dropdown {
-  position: relative;
-}
-
-.dropdown-menu {
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 0;
-  background: white;
-  min-width: 220px;
-  border-radius: 12px;
-  box-shadow: var(--shadow);
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-10px);
-  transition: var(--transition);
-  z-index: 10;
-}
-
-.dropdown:hover .dropdown-menu {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-}
-
-.dropdown-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  text-decoration: none;
-  color: var(--text-dark);
-  border-bottom: 1px solid #eee;
-  transition: var(--transition);
-}
-
-.dropdown-item:last-child {
-  border-bottom: none;
-}
-
-.dropdown-item:hover {
-  background: var(--bg-light);
-  color: var(--primary-color);
-}
-
-/* ======= Cart Badge ======= */
-.cart-badge {
-  position: relative;
-}
-
-.cart-count {
-  position: absolute;
-  top: -6px;
-  right: -8px;
-  background: var(--accent-color);
-  color: white;
-  font-size: 11px;
-  padding: 2px 6px;
-  border-radius: 50%;
   font-weight: bold;
+  color: white;
 }
 
-/* ======= Responsive ======= */
-@media (max-width: 992px) {
-  .header-functions {
-    gap: 12px;
-  }
-
-  .nav-item span,
-  .function-item span {
-    display: none;
-  }
-
-  .search-box {
-    display: none;
-  }
+/* 👇 Marquee animation */
+@keyframes marquee {
+  0%   { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
 }
 
-@media (max-width: 768px) {
-  .header-top {
-    flex-direction: row;
-    justify-content: space-between;
-  }
-
-  .header-nav {
-    display: none;
-  }
-
-  .mobile-menu-btn {
-    display: block;
-    background: none;
-    border: none;
-    color: var(--text-color);
-    font-size: 24px;
-    cursor: pointer;
-  }
+.animate-marquee {
+  display: inline-block;
+  min-width: 100%;
+  white-space: nowrap;
+  animation: marquee 20s linear infinite;
+  color: white;
+  font-weight: 300;
 }
