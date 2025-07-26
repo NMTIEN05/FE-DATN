@@ -23,7 +23,8 @@ import Deteil from '../pages/Products/DeteilProduct/Deteil';
 import OrderDetail from '../pages/order/OrderDetail';
 import Checkout from '../pages/Cart/checkout';
 import PaymentResult from '../pages/Cart/PaymentResult';
-import OrderTabs from '../pages/order/OrderTabs';
+import SearchResultPage from '../components/Header/SearchResultPage';
+
 
 const token = localStorage.getItem("token");
 
@@ -45,7 +46,11 @@ export const routes: RouteObject[] = [
       { path: 'change-password', element: <ChangePasswordForm /> },
       { path: 'orders/:id', element: <OrderDetail /> },
       { path: 'payment-result', element: <PaymentResult /> },
-      { path: 'orders', element: <OrderTabs /> },
+      { path: 'search', element: <SearchResultPage  /> },
+
+
+
+
     ],
   },
   // Auth routes (không có layout)

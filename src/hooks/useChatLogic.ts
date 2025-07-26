@@ -1,4 +1,3 @@
-// components/useChatLogic.ts
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { marked } from "marked";
@@ -42,18 +41,22 @@ const useChatLogic = () => {
   const handleSend = async () => {
     if (!message.trim()) return;
 
+    console.log("📝 Người dùng nhập:", message);
+    setLoading(true);
+
     const userMessage: Message = { sender: "user", text: message };
     setConversation((prev) => [...prev, userMessage]);
     setMessage("");
-    setLoading(true);
 
     const thinkingMessage: Message = { sender: "ai", text: "Đang tư vấn..." };
     setConversation((prev) => [...prev, thinkingMessage]);
 
     try {
+      console.log("📡 Gửi yêu cầu tới GPT API:", { message });
       const res = await axios.post("http://localhost:8888/api/chat/tuvan", { message });
+
       const aiText = res.data.reply || "❌ Không có phản hồi từ GPT";
-      console.log("✅ GPT reply:", aiText);
+      console.log("✅ GPT phản hồi:", aiText);
 
       const aiReply: Message = { sender: "ai", text: aiText };
       setConversation((prev) => {
@@ -62,14 +65,18 @@ const useChatLogic = () => {
         return conv;
       });
     } catch (err) {
-      console.error("❌ GPT error:", err);
+      console.error("❌ Lỗi khi gọi GPT:", err);
       setConversation((prev) => {
         const conv = [...prev];
-        conv[conv.length - 1] = { sender: "ai", text: "❌ Có lỗi xảy ra. Vui lòng thử lại." };
+        conv[conv.length - 1] = {
+          sender: "ai",
+          text: "❌ Có lỗi xảy ra. Vui lòng thử lại.",
+        };
         return conv;
       });
     } finally {
       setLoading(false);
+      console.log("📥 Đã xử lý xong phản hồi GPT");
     }
   };
 
