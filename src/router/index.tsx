@@ -4,7 +4,6 @@ import { Navigate, RouteObject } from 'react-router-dom';
 
 import HomePage from '../pages/Home/HomePage';
 import Products from '../pages/Products/Products';
-// import ProductDetail from '../pages/Products/ProductDetail';
 import Services from '../pages/Services/Services';
 import Contact from '../pages/Contact/Contact';
 import Cart from '../pages/Cart/Cart';
@@ -19,11 +18,11 @@ import ChangePasswordForm from '../pages/auth/Changepassword';
 
 import ProductDetail from '../pages/Products/ProductDetail';
 import Deteil from '../pages/Products/DeteilProduct/Deteil';
+import ReviewProduct from '../pages/Products/ReviewProduct'; // Import ReviewProduct
 
 import OrderDetail from '../pages/order/OrderDetail';
 import Checkout from '../pages/Cart/checkout';
 import PaymentResult from '../pages/Cart/PaymentResult';
-
 
 const token = localStorage.getItem("token");
 
@@ -33,11 +32,11 @@ export const routes: RouteObject[] = [
     element: <MainLayout />,
     children: [
       { path: 'checkout', element: <Checkout /> },
-
       { index: true, element: <HomePage /> },
       { path: 'products', element: <Products /> },
       { path: 'dien-thoai', element: <Products /> },
       { path: 'product/:id', element: <Deteil /> },
+      { path: 'product/:id/review', element: <ReviewProduct /> },  // Thêm route ReviewProduct
       { path: 'services', element: <Services /> },
       { path: 'contact', element: <Contact /> },
       { path: 'cart', element: <Cart /> },
@@ -45,8 +44,6 @@ export const routes: RouteObject[] = [
       { path: 'change-password', element: <ChangePasswordForm /> },
       { path: 'orders/:id', element: <OrderDetail /> },
       { path: 'payment-result', element: <PaymentResult /> },
-
-
     ],
   },
   // Auth routes (không có layout)
