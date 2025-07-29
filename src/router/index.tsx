@@ -25,6 +25,7 @@ import Checkout from '../pages/Cart/checkout';
 import PaymentResult from '../pages/Cart/PaymentResult';
 import SearchResultPage from '../components/Header/SearchResultPage';
 import OrderManagement from '../pages/order/Listorder';
+import Account from '../pages/auth/account';
 
 
 const token = localStorage.getItem("token");
@@ -35,7 +36,7 @@ export const routes: RouteObject[] = [
     element: <MainLayout />,
     children: [
       { path: 'checkout', element: <Checkout /> },
-
+ { path: 'account', element: <Account /> },
       { index: true, element: <HomePage /> },
       { path: 'products', element: <Products /> },
       { path: 'dien-thoai', element: <Products /> },
