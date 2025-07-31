@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+update trang detel import { useEffect, useState } from "react";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeftOutlined,
   StarFilled,
@@ -9,11 +9,11 @@ import {
   ReloadOutlined,
   ShoppingCartOutlined,
   CheckOutlined,
+  CheckCircleOutlined,
 } from "@ant-design/icons";
-import { Button } from "antd";
+import { Button, message } from "antd";
 import axios from "axios";
 import "./ProductDetail.css";
-import { useNavigate } from "react-router-dom";
 
 const formatPrice = (price: number) =>
   price.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
@@ -24,6 +24,8 @@ const ProductDetaill = () => {
   const [group, setGroup] = useState<any[]>([]);
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedColor, setSelectedColor] = useState(0);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -36,46 +38,6 @@ const ProductDetaill = () => {
     };
     fetchProduct();
   }, [id]);
-const navigate = useNavigate();
-
-const handleBuyNow = async () => {
-  try {
-    const variant = product.variants?.[selectedColor];
-    if (!variant) return;
-
-    const token = localStorage.getItem("token");
-    if (!token) return alert("Bạn cần đăng nhập để mua hàng");
-
-    // Lưu sản phẩm vào localStorage để trang Checkout đọc được
-    const selectedItem = {
-      productId: product._id,
-      variantId: variant._id,
-      quantity: 1,
-      price: variant.price,
-      name: product.title,
-      image: variant.imageUrl?.[0],
-    };
-    localStorage.setItem("selectedCheckoutItems", JSON.stringify([selectedItem]));
-
-    // (Tùy chọn) Gọi API thêm vào giỏ nếu bạn vẫn muốn giữ chức năng này
-    await axios.post(
-      "http://localhost:8888/api/cart/add",
-      {
-        productId: product._id,
-        variantId: variant._id,
-        quantity: 1,
-      },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-
-    navigate("/checkout");
-  } catch (error) {
-    console.error("Lỗi mua ngay:", error);
-    alert("Mua ngay thất bại");
-  }
-};
 
   useEffect(() => {
     const fetchGroup = async () => {
@@ -93,13 +55,77 @@ const handleBuyNow = async () => {
     fetchGroup();
   }, [product]);
 
-  const handleAddToCart = async () => {
-    try {
-      const variant = product.variants?.[selectedColor];
-      if (!variant) return;
+  const variant = product?.variants?.[selectedColor];
 
+ const handleAddToCart = async () => {
+  try {
+    if (!variant || variant.stock === 0) return;
+
+    const token = localStorage.getItem("token");
+    if (!token) return alert("Bạn cần đăng nhập để thêm vào giỏ hàng");
+
+    // 1. Lấy giỏ hàng để kiểm tra số lượng hiện tại
+    const res = await axios.get("http://localhost:8888/api/cart", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    const existingItem = res.data.find(
+      (item: any) => item.variantId?._id === variant._id
+    );
+
+    const existingQuantity = existingItem?.quantity || 0;
+
+    if (existingQuantity >= variant.stock) {
+      alert(`⚠️ Sản phẩm chỉ còn ${variant.stock} cái và bạn đã thêm hết vào giỏ hàng.`);
+      return;
+    }
+
+    // 2. Gọi API thêm 1 cái nữa
+    await axios.post(
+      "http://localhost:8888/api/cart/add",
+      {
+        productId: product._id,
+        variantId: variant._id,
+        quantity: 1,
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    message.open({
+  type: 'success',
+  content: 'Đã thêm vào giỏ hàng!',
+  icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
+  duration: 2,
+  style: {
+    marginTop: '20vh',
+    textAlign: 'center',
+    fontSize: '16px',
+  },
+});
+  } catch (error) {
+    console.error("Lỗi thêm giỏ hàng:", error);
+alert("❌ Thêm vào giỏ hàng thất bại");
+  }
+};
+
+
+  const handleBuyNow = async () => {
+    try {
+      if (!variant || variant.stock === 0) return;
       const token = localStorage.getItem("token");
-      if (!token) return alert("Bạn cần đăng nhập để thêm vào giỏ hàng");
+      if (!token) return alert("Bạn cần đăng nhập để mua hàng");
+
+      const selectedItem = {
+        productId: product._id,
+        variantId: variant._id,
+        quantity: 1,
+        price: variant.price,
+        name: product.title,
+        image: variant.imageUrl?.[0],
+      };
+      localStorage.setItem("selectedCheckoutItems", JSON.stringify([selectedItem]));
 
       await axios.post(
         "http://localhost:8888/api/cart/add",
@@ -112,21 +138,18 @@ const handleBuyNow = async () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      alert("Đã thêm vào giỏ hàng");
+
+      navigate("/checkout");
     } catch (error) {
-      console.error("Lỗi thêm giỏ hàng:", error);
-      alert("Thêm vào giỏ hàng thất bại");
+      console.error("Lỗi mua ngay:", error);
+      alert("Mua ngay thất bại");
     }
   };
 
   if (!product) return <div className="p-10 text-center text-gray-500">Loading...</div>;
 
-  const variant = product.variants?.[selectedColor];
-
   return (
     <div className="max-w-[1200px] mx-auto px-4 py-10">
-    
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
         {/* Ảnh */}
         <div className="bg-white p-4 rounded-xl shadow-md">
@@ -155,9 +178,7 @@ const handleBuyNow = async () => {
 
         {/* Thông tin */}
         <div className="space-y-4">
-          <h1 className="text-3xl font-bold text-gray-900 leading-snug">
-            {product.title}
-          </h1>
+          <h1 className="text-3xl font-bold text-gray-900 leading-snug">{product.title}</h1>
 
           <div className="flex items-center gap-1">
             {[...Array(5)].map((_, i) =>
@@ -170,29 +191,26 @@ const handleBuyNow = async () => {
             <span className="text-sm text-gray-600 ml-2">(214 đánh giá)</span>
           </div>
 
-         {/* Giá sản phẩm chính */}
-<div className="flex items-center gap-3 mt-1">
-  {variant?.oldPrice && variant.oldPrice > variant.price ? (
-    <>
-      <span className="line-through text-gray-400 text-lg">
-        {formatPrice(variant.oldPrice)}
-      </span>
-      <span className="text-red-600 text-3xl font-bold">
-        {formatPrice(variant.price)}
-      </span>
-      <span className="bg-red-100 text-red-600 px-2 py-1 text-sm rounded-full font-medium">
-        Giảm {Math.round(((variant.oldPrice - variant.price) / variant.oldPrice) * 100)}%
-      </span>
-    </>
-  ) : (
-    <span className="text-red-600 text-3xl font-bold">
-      {formatPrice(variant.price)}
-    </span>
-  )}
-</div>
+          {/* Giá */}
+          <div className="flex items-center gap-3 mt-1">
+            {variant?.oldPrice && variant.oldPrice > variant.price ? (
+              <>
+<span className="line-through text-gray-400 text-lg">
+                  {formatPrice(variant.oldPrice)}
+                </span>
+                <span className="text-red-600 text-3xl font-bold">
+                  {formatPrice(variant.price)}
+                </span>
+                <span className="bg-red-100 text-red-600 px-2 py-1 text-sm rounded-full font-medium">
+                  Giảm {Math.round(((variant.oldPrice - variant.price) / variant.oldPrice) * 100)}%
+                </span>
+              </>
+            ) : (
+              <span className="text-red-600 text-3xl font-bold">{formatPrice(variant.price)}</span>
+            )}
+          </div>
 
-
-          {/* Group capacity */}
+          {/* Dung lượng / phiên bản */}
           {group.length > 1 && (
             <div>
               <h3 className="font-medium text-gray-800 mb-2">Dung lượng/phiên bản:</h3>
@@ -214,7 +232,7 @@ const handleBuyNow = async () => {
             </div>
           )}
 
-          {/* Biến thể màu */}
+          {/* Màu sắc / biến thể */}
           <div>
             <h3 className="font-medium text-gray-800 mb-2">Chọn màu:</h3>
             <div className="flex flex-wrap gap-4">
@@ -226,7 +244,7 @@ const handleBuyNow = async () => {
                     selectedColor === idx
                       ? "border-[#0066cc] bg-[#f0f8ff] shadow-lg scale-105"
                       : "border-gray-300 hover:border-[#999] hover:shadow bg-white"
-                  }`}
+                  } ${v.stock === 0 ? "opacity-50" : ""}`}
                 >
                   <img
                     src={v.imageUrl?.[0]}
@@ -240,11 +258,24 @@ const handleBuyNow = async () => {
                     {v.oldPrice && v.oldPrice > v.price && (
                       <div className="text-xs text-gray-400 line-through">
                         {formatPrice(v.oldPrice)}
-                      </div>
+</div>
                     )}
                     <div className="text-sm text-red-600 font-semibold">
-                       {formatPrice(v.price)}
-</div>
+                      {formatPrice(v.price)}
+                    </div>
+                   {v.stock === 0 && (
+  <div className="text-xs text-gray-500 font-medium mt-1">Hết hàng</div>
+)}
+{v.stock > 0 && v.stock <= 5 && (
+  <div className="text-xs text-orange-500 font-medium mt-1">
+    Chỉ còn {v.stock} sản phẩm
+  </div>
+)}
+{v.stock > 5 && (
+  <div className="text-xs text-green-600 font-medium mt-1">
+    Còn {v.stock} sản phẩm
+  </div>
+)}
 
                   </div>
                   {selectedColor === idx && (
@@ -255,25 +286,28 @@ const handleBuyNow = async () => {
             </div>
           </div>
 
+          {/* Nút mua */}
           <div className="flex flex-wrap gap-4 mt-6">
             <Button
               type="primary"
               icon={<ShoppingCartOutlined />}
               onClick={handleAddToCart}
               className="h-12 px-6 text-base bg-[#0066cc] hover:bg-blue-700 border-none shadow rounded-xl"
+              disabled={variant?.stock === 0}
             >
               Thêm vào giỏ hàng
             </Button>
- <Button
-        type="default"
-  onClick={handleBuyNow}
-  className="h-12 px-6 text-base bg-[#004a99] text-white border-none hover:opacity-90 shadow rounded-xl"
->
-  Mua ngay
-</Button>
-
+            <Button
+              type="default"
+              onClick={handleBuyNow}
+              className="h-12 px-6 text-base bg-[#004a99] text-white border-none hover:opacity-90 shadow rounded-xl"
+              disabled={variant?.stock === 0}
+            >
+              Mua ngay
+            </Button>
           </div>
 
+          {/* Chính sách */}
           <div className="grid grid-cols-3 gap-4 mt-8 text-sm text-center text-gray-700">
             <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
               <CarOutlined className="text-blue-500 text-2xl" />
