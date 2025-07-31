@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+update carrt import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../contexts/CartContext';
 import { FaTrash } from 'react-icons/fa';
@@ -28,9 +28,15 @@ const Cart: React.FC = () => {
   const handleQuantityChange = (
     itemId: string,
     type: 'increase' | 'decrease',
-    current: number
+    current: number,
+    stock: number
   ) => {
-    const newQuantity = type === 'increase' ? current + 1 : Math.max(current - 1, 1);
+    let newQuantity = type === 'increase' ? current + 1 : current - 1;
+    if (newQuantity < 1) newQuantity = 1;
+    if (newQuantity > stock) {
+      alert(`Chỉ còn tối đa ${stock} sản phẩm trong kho`);
+      return;
+    }
     updateQuantity(itemId, newQuantity);
   };
 
@@ -51,7 +57,6 @@ const Cart: React.FC = () => {
 
   return (
     <>
-      {/* Tiêu đề căn giữa, thêm khoảng cách phía dưới */}
       <h1 className="text-3xl font-bold text-center mt-6 mb-8">🛒 Giỏ hàng</h1>
 
       <div className="flex flex-col lg:flex-row gap-4 p-4 bg-gray-50 min-h-screen">
@@ -70,7 +75,13 @@ const Cart: React.FC = () => {
               {items.map((item) => {
                 const product = (item as any).productId;
                 const variant = (item as any).variantId;
-                const name = item.name || product?.title || 'Sản phẩm';
+                const capacity = product?.capacity;
+                const color =
+                  item.color ||
+                  variant?.attributes?.find((a: any) =>
+                    a.attributeId?.name?.toLowerCase().includes('màu')
+                  )?.attributeValueId?.value;
+const name = item.name || product?.title || 'Sản phẩm';
                 const image =
                   item.image ||
                   variant?.imageUrl?.[0] ||
@@ -78,11 +89,6 @@ const Cart: React.FC = () => {
                   '/placeholder.jpg';
                 const price = item.price || variant?.price || 0;
                 const oldPrice = price + 3400000;
-                const color =
-                  item.color ||
-                  variant?.attributes?.find((a: any) =>
-                    a.attributeId?.name?.toLowerCase().includes('màu')
-                  )?.attributeValueId?.value;
 
                 return (
                   <div
@@ -104,7 +110,9 @@ const Cart: React.FC = () => {
                     />
                     <div className="flex flex-col flex-1">
                       <h3 className="font-medium text-base">{name}</h3>
-                      {color && <p className="text-sm text-gray-500 mt-1">Màu: {color}</p>}
+                      {capacity && <p className="text-xs text-gray-500">Dung lượng: {capacity}</p>}
+                      {color && <p className="text-xs text-gray-500">Màu: {color}</p>}
+
                       <div className="flex items-baseline gap-2 mt-1">
                         <span className="text-red-600 font-semibold text-lg">
                           {price.toLocaleString('vi-VN')}₫
@@ -113,32 +121,51 @@ const Cart: React.FC = () => {
                           {oldPrice.toLocaleString('vi-VN')}₫
                         </span>
                       </div>
+
+                      {/* Số lượng + - */}
+                      <div className="flex items-center mt-2 gap-2">
+                        <button
+                          className="px-2 py-1 text-base font-bold bg-gray-100 rounded hover:bg-gray-200"
+                          onClick={() =>
+                            handleQuantityChange(
+                              item._id!,
+                              'decrease',
+                              item.quantity,
+                              variant?.stock || 1
+                            )
+                          }
+                        >
+                          -
+                        </button>
+                        <span className="min-w-[24px] text-center">{item.quantity}</span>
+                        <button
+                          className="px-2 py-1 text-base font-bold bg-gray-100 rounded hover:bg-gray-200"
+                          onClick={() =>
+                            handleQuantityChange(
+item._id!,
+                              'increase',
+                              item.quantity,
+                              variant?.stock || 1
+                            )
+                          }
+                        >
+                          +
+                        </button>
+                        <span className="text-xs text-gray-400 ml-2">
+                          Còn lại: {variant?.stock || 0}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
+
+                    {/* Nút xóa */}
+                    <div>
                       <button
-                        onClick={() =>
-                          handleQuantityChange(item._id!, 'decrease', item.quantity)
-                        }
-                        className="w-8 h-8 border rounded text-lg flex items-center justify-center hover:bg-gray-100"
+                        onClick={() => removeFromCart(item._id!)}
+                        className="text-red-600 hover:text-red-800 text-sm"
                       >
-                        -
-                      </button>
-                      <span className="w-8 text-center">{item.quantity}</span>
-                      <button
-                        onClick={() =>
-                          handleQuantityChange(item._id!, 'increase', item.quantity)
-                        }
-                        className="w-8 h-8 border rounded text-lg flex items-center justify-center hover:bg-gray-100"
-                      >
-                        +
+                        <FaTrash />
                       </button>
                     </div>
-                    <button
-                      onClick={() => removeFromCart(item._id!)}
-                      className="ml-3 text-gray-500 hover:text-red-500 transition-colors"
-                    >
-                      <FaTrash />
-                    </button>
                   </div>
                 );
               })}
@@ -175,10 +202,7 @@ const Cart: React.FC = () => {
               const selectedCartData = items.filter((item) =>
                 selectedItems.includes(item._id!)
               );
-              localStorage.setItem(
-                'selectedCheckoutItems',
-                JSON.stringify(selectedCartData)
-              );
+              localStorage.setItem('selectedCheckoutItems', JSON.stringify(selectedCartData));
               navigate('/checkout');
             }}
           >
