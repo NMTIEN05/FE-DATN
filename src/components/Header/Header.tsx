@@ -21,6 +21,7 @@ import { SiSamsung, SiXiaomi, SiOppo } from 'react-icons/si';
 import { TagFilled } from '@ant-design/icons';
 import axios from 'axios';
 import './Header.css'; // CSS animation marquee
+import logo from './img/Screenshot_2025-08-01_195447-removebg-preview.png'
 
 const Header = () => {
  
@@ -124,7 +125,8 @@ const Header = () => {
 
           <div className="order-2 md:order-1 flex items-center">
             <Link to="/" className="text-2xl font-extrabold ">
-              E<span className="text-blue-600">Shop</span>
+            <img src={logo} alt="Logo" className="w-70 h-20" />
+
             </Link>
           </div>
 

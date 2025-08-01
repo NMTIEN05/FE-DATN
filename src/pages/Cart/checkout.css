@@ -169,3 +169,14 @@ select {
   font-size: 18px;
   color: #999;
 }
+.checkout-right {
+  flex: 1;
+  min-width: 320px;
+}
+
+.total-price span {
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

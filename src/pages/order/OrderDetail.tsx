@@ -181,9 +181,32 @@ const OrderDetail: React.FC = () => {
           <span className={`px-3 py-1 rounded-full text-xs font-medium ${paymentStatus === 'paid' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
             {paymentStatus === 'paid' ? 'Đã thanh toán' : 'Chưa thanh toán'}
           </span>
+<p><b>Tổng tiền:</b></p>
 
-          <p><b>Tổng tiền:</b></p>
-          <span className="text-blue-700 font-bold text-base">{totalAmount.toLocaleString('vi-VN')}₫</span>
+<div className="space-y-1 text-sm">
+  {/* Giá gốc */}
+  <div className="flex justify-between text-gray-600 line-through">
+    <span>Giá gốc:</span>
+    <span>{(order.totalAmount + (order.discount || 0)).toLocaleString("vi-VN")}₫</span>
+  </div>
+
+  {/* Mã giảm giá */}
+  {order.discount > 0 && (
+    <div className="flex justify-between text-red-600">
+      <span>Mã giảm giá:</span>
+      <span>-{order.discount.toLocaleString("vi-VN")}₫</span>
+    </div>
+  )}
+
+  {/* Tổng tiền thanh toán */}
+  <div className="flex justify-between text-base font-bold text-blue-700 border-t pt-2 mt-2">
+    <span>Tổng tiền:  </span>
+    <span>{order.totalAmount.toLocaleString("vi-VN")}₫</span>
+  </div>
+</div>
+
+
+
 
           {!['cancelled', 'delivered', 'shipping'].includes(status) && (
             <Button danger type="primary" block onClick={handleCancelOrder}>

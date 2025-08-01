@@ -29,6 +29,8 @@ import OrderManagement from '../pages/order/Listorder';
 
 import MyAccount from '../pages/auth/Account';
 import Account from '../pages/auth/Account';
+import LuckyWheel from '../pages/voucher/VoucherAdd';
+import VoucherList from '../pages/voucher/VoucherAdd';
 
 
 
@@ -55,6 +57,8 @@ export const routes: RouteObject[] = [
       { path: 'search', element: <SearchResultPage  /> },
       { path: 'orders', element: <OrderManagement  /> },
       { path: 'account', element: <MyAccount  /> },
+      { path: 'vouchers', element: <VoucherList  /> },
+      
       
 
 
