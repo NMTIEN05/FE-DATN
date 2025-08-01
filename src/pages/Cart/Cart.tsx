@@ -1,4 +1,4 @@
-update carrt import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../contexts/CartContext';
 import { FaTrash } from 'react-icons/fa';
@@ -81,7 +81,8 @@ const Cart: React.FC = () => {
                   variant?.attributes?.find((a: any) =>
                     a.attributeId?.name?.toLowerCase().includes('màu')
                   )?.attributeValueId?.value;
-const name = item.name || product?.title || 'Sản phẩm';
+
+                const name = item.name || product?.title || 'Sản phẩm';
                 const image =
                   item.image ||
                   variant?.imageUrl?.[0] ||
@@ -142,7 +143,7 @@ const name = item.name || product?.title || 'Sản phẩm';
                           className="px-2 py-1 text-base font-bold bg-gray-100 rounded hover:bg-gray-200"
                           onClick={() =>
                             handleQuantityChange(
-item._id!,
+                              item._id!,
                               'increase',
                               item.quantity,
                               variant?.stock || 1

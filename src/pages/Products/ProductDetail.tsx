@@ -1,4 +1,4 @@
-update trang detel import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeftOutlined,
@@ -106,7 +106,7 @@ const ProductDetaill = () => {
 });
   } catch (error) {
     console.error("Lỗi thêm giỏ hàng:", error);
-alert("❌ Thêm vào giỏ hàng thất bại");
+    alert("❌ Thêm vào giỏ hàng thất bại");
   }
 };
 
@@ -195,7 +195,7 @@ alert("❌ Thêm vào giỏ hàng thất bại");
           <div className="flex items-center gap-3 mt-1">
             {variant?.oldPrice && variant.oldPrice > variant.price ? (
               <>
-<span className="line-through text-gray-400 text-lg">
+                <span className="line-through text-gray-400 text-lg">
                   {formatPrice(variant.oldPrice)}
                 </span>
                 <span className="text-red-600 text-3xl font-bold">
@@ -258,7 +258,7 @@ alert("❌ Thêm vào giỏ hàng thất bại");
                     {v.oldPrice && v.oldPrice > v.price && (
                       <div className="text-xs text-gray-400 line-through">
                         {formatPrice(v.oldPrice)}
-</div>
+                      </div>
                     )}
                     <div className="text-sm text-red-600 font-semibold">
                       {formatPrice(v.price)}
