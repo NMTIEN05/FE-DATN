@@ -37,6 +37,11 @@ interface Order {
   paymentMethod: string;
   paymentStatus: string;
   createdAt: string;
+  returnRequest?: {
+    reason?: string;
+    status?: string;
+    requestedAt?: string;
+  };
 }
 
 const statusLabels: Record<string, string> = {
@@ -47,6 +52,7 @@ const statusLabels: Record<string, string> = {
   delivered: "Đã giao",
   return_requested: "Yêu cầu trả hàng",
   returned: "Đã hoàn trả",
+  rejected: "Từ chối hoàn trả",
   cancelled: "Đã huỷ",
 };
 
@@ -66,6 +72,8 @@ const getStatusStyle = (status: string) => {
       return "bg-orange-100 text-orange-800";
     case "returned":
       return "bg-teal-100 text-teal-800";
+    case "rejected":
+      return "bg-pink-100 text-pink-800";
     case "cancelled":
       return "bg-red-100 text-red-800";
     default:
@@ -85,7 +93,7 @@ const OrderManagement = () => {
     try {
       const res = await axios.get("http://localhost:8888/api/orders", {
         headers: { Authorization: `Bearer ${token}` },
-        params: { limit : 99999, page },
+        params: { limit: 99999, page },
       });
       setOrders(res.data.data);
       setTotal(res.data.total || 0);
@@ -99,11 +107,16 @@ const OrderManagement = () => {
   }, [page]);
 
   const handleCancelOrder = async (orderId: string) => {
-    if (!window.confirm("Bạn chắc chắn muốn huỷ đơn hàng này?")) return;
+    const reason = prompt("Vui lòng nhập lý do huỷ đơn hàng:");
+    if (!reason || reason.trim() === "") {
+      alert("Lý do không được để trống");
+      return;
+    }
+
     try {
       await axios.patch(
         `http://localhost:8888/api/orders/${orderId}/cancel`,
-        {},
+        { reason },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       fetchOrders();
@@ -113,16 +126,23 @@ const OrderManagement = () => {
   };
 
   const handleReturnRequest = async (orderId: string) => {
-    if (!window.confirm("Bạn muốn yêu cầu trả hàng?")) return;
+    const reason = prompt("Vui lòng nhập lý do trả hàng:");
+    if (!reason || reason.trim() === "") {
+      alert("Lý do không được để trống");
+      return;
+    }
+
     try {
       await axios.post(
         `http://localhost:8888/api/orders/${orderId}/return-request`,
-        {},
+        { reason },
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      alert("Đã gửi yêu cầu trả hàng thành công");
       fetchOrders();
-    } catch (err) {
-      alert("Không thể gửi yêu cầu trả hàng.");
+    } catch (err: any) {
+      alert(err.response?.data?.message || "Không thể gửi yêu cầu trả hàng.");
+      console.error(err);
     }
   };
 
@@ -163,11 +183,10 @@ const OrderManagement = () => {
               <button
                 key={i}
                 onClick={() => setSelectedStatus(s.value)}
-                className={`px-4 py-3 text-sm font-medium ${
-                  selectedStatus === s.value
+                className={`px-4 py-3 text-sm font-medium ${selectedStatus === s.value
                     ? "text-blue-600 border-b-2 border-blue-600"
                     : "text-gray-600 hover:text-blue-600"
-                }`}
+                  }`}
               >
                 {s.label}
               </button>
@@ -200,20 +219,28 @@ const OrderManagement = () => {
                           <div className={`mt-1 px-2 py-0.5 rounded-full inline-block ${getStatusStyle(order.status)}`}>
                             {statusLabels[order.status] || order.status}
                           </div>
+                          {/* ✅ Hiện lý do từ chối nếu bị rejected */}
+                          {["rejected", "return_requested"].includes(order.status) &&
+                            order.returnRequest?.reason && (
+                              <div className="text-red-600 text-xs mt-1">
+                                <strong>
+                                  {order.status === "rejected"
+                                    ? "Lý do từ chối:"
+                                    : "Lý do yêu cầu trả hàng:"}
+                                </strong>{" "}
+                                {order.returnRequest.reason}
+                              </div>
+                            )}
+
                         </div>
                       </div>
                       <p className="text-xs text-gray-600">SL: x{item.quantity}</p>
                       <p className="text-xs text-gray-500">Dung lượng: {product?.capacity}</p>
                       <p className="text-xs text-gray-500">Màu: {color}</p>
-                     <p>Giá: {item.price !== undefined ? item.price.toLocaleString("vi-VN") + '₫' : "N/A"}</p>
-
+                      <p>Giá: {item.price?.toLocaleString("vi-VN") || "N/A"}₫</p>
                       <p>
-  Tổng: 
-  {item?.price !== undefined && item?.quantity !== undefined
-    ? (item.price * item.quantity).toLocaleString("vi-VN") + "₫"
-    : "N/A"}
-</p>
-
+                        Tổng: {(item.price * item.quantity)?.toLocaleString("vi-VN")}₫
+                      </p>
                     </div>
                   </div>
                 );
@@ -268,16 +295,14 @@ const OrderManagement = () => {
           )}
         </div>
 
-        {/* Phân trang */}
         {totalPages > 1 && (
           <div className="flex justify-center mt-6 space-x-2">
             {Array.from({ length: totalPages }, (_, i) => (
               <button
                 key={i}
                 onClick={() => setPage(i + 1)}
-                className={`px-3 py-1 rounded ${
-                  page === i + 1 ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-800"
-                }`}
+                className={`px-3 py-1 rounded ${page === i + 1 ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-800"
+                  }`}
               >
                 {i + 1}
               </button>
