@@ -141,7 +141,7 @@ const OrderDetail: React.FC = () => {
 
   return (
     <Link
-      to={`/product/${item.productId}`}
+      to={`/product/${product?._id}`}
       key={idx}
       className="flex gap-4 border-b pb-4 rounded-lg cursor-pointer"
     >
