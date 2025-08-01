@@ -25,7 +25,11 @@ import Checkout from '../pages/Cart/checkout';
 import PaymentResult from '../pages/Cart/PaymentResult';
 import SearchResultPage from '../components/Header/SearchResultPage';
 import OrderManagement from '../pages/order/Listorder';
-import Account from '../pages/auth/account';
+
+
+import MyAccount from '../pages/auth/Account';
+import Account from '../pages/auth/Account';
+
 
 
 const token = localStorage.getItem("token");
@@ -50,6 +54,9 @@ export const routes: RouteObject[] = [
       { path: 'payment-result', element: <PaymentResult /> },
       { path: 'search', element: <SearchResultPage  /> },
       { path: 'orders', element: <OrderManagement  /> },
+      { path: 'account', element: <MyAccount  /> },
+      
+
 
 
 

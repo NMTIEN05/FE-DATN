@@ -4,7 +4,7 @@ import { Smartphone, Mail, User, Lock, Eye, EyeOff } from "lucide-react";
 import { FormData } from "../../types/User";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -191,12 +191,12 @@ const Register = () => {
           <div className="text-center pt-3">
             <p className="text-gray-700 text-sm">
               Bạn đã có tài khoản?{" "}
-              <button
-                type="button"
-                className="text-blue-600 hover:text-blue-700 font-semibold transition-colors duration-200"
-              >
-                Đăng nhập ngay
-              </button>
+              <Link
+  to="/login"
+  className="text-blue-600 hover:text-blue-700 font-semibold transition-colors duration-200"
+>
+  Đăng nhập ngay
+</Link>
             </p>
           </div>
         </div>

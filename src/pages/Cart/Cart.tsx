@@ -28,9 +28,15 @@ const Cart: React.FC = () => {
   const handleQuantityChange = (
     itemId: string,
     type: 'increase' | 'decrease',
-    current: number
+    current: number,
+    stock: number
   ) => {
-    const newQuantity = type === 'increase' ? current + 1 : Math.max(current - 1, 1);
+    let newQuantity = type === 'increase' ? current + 1 : current - 1;
+    if (newQuantity < 1) newQuantity = 1;
+    if (newQuantity > stock) {
+      alert(`Chỉ còn tối đa ${stock} sản phẩm trong kho`);
+      return;
+    }
     updateQuantity(itemId, newQuantity);
   };
 
@@ -51,7 +57,6 @@ const Cart: React.FC = () => {
 
   return (
     <>
-      {/* Tiêu đề căn giữa, thêm khoảng cách phía dưới */}
       <h1 className="text-3xl font-bold text-center mt-6 mb-8">🛒 Giỏ hàng</h1>
 
       <div className="flex flex-col lg:flex-row gap-4 p-4 bg-gray-50 min-h-screen">
@@ -68,62 +73,103 @@ const Cart: React.FC = () => {
           ) : (
             <>
               {items.map((item) => {
-  const product = (item as any).productId;
-  const variant = (item as any).variantId;
-  const capacity = product?.capacity;
+                const product = (item as any).productId;
+                const variant = (item as any).variantId;
+                const capacity = product?.capacity;
+                const color =
+                  item.color ||
+                  variant?.attributes?.find((a: any) =>
+                    a.attributeId?.name?.toLowerCase().includes('màu')
+                  )?.attributeValueId?.value;
 
-  const color =
-    item.color ||
-    variant?.attributes?.find((a: any) =>
-      a.attributeId?.name?.toLowerCase().includes('màu')
-    )?.attributeValueId?.value;
+                const name = item.name || product?.title || 'Sản phẩm';
+                const image =
+                  item.image ||
+                  variant?.imageUrl?.[0] ||
+                  product?.imageUrl?.[0] ||
+                  '/placeholder.jpg';
+                const price = item.price || variant?.price || 0;
+                const oldPrice = price + 3400000;
 
-  const name = item.name || product?.title || 'Sản phẩm';
-  const image =
-    item.image ||
-    variant?.imageUrl?.[0] ||
-    product?.imageUrl?.[0] ||
-    '/placeholder.jpg';
-  const price = item.price || variant?.price || 0;
-  const oldPrice = price + 3400000;
+                return (
+                  <div
+                    key={item._id}
+                    className={`flex items-center gap-4 py-4 px-2 border rounded-md mb-4 transition-all duration-200 ${
+                      isChecked(item._id!) ? 'border' : 'border-gray-200'
+                    } hover:shadow-sm`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isChecked(item._id!)}
+                      onChange={() => toggleSelectItem(item._id!)}
+                      className="w-5 h-5 rounded-full accent-blue-600"
+                    />
+                    <img
+                      src={image}
+                      alt={name}
+                      className="w-20 h-20 rounded border object-cover transition-transform duration-200 hover:scale-105"
+                    />
+                    <div className="flex flex-col flex-1">
+                      <h3 className="font-medium text-base">{name}</h3>
+                      {capacity && <p className="text-xs text-gray-500">Dung lượng: {capacity}</p>}
+                      {color && <p className="text-xs text-gray-500">Màu: {color}</p>}
 
-  return (
-    <div
-      key={item._id}
-      className={`flex items-center gap-4 py-4 px-2 border rounded-md mb-4 transition-all duration-200 ${
-        isChecked(item._id!) ? 'border' : 'border-gray-200'
-      } hover:shadow-sm`}
-    >
-      <input
-        type="checkbox"
-        checked={isChecked(item._id!)}
-        onChange={() => toggleSelectItem(item._id!)}
-        className="w-5 h-5 rounded-full accent-blue-600"
-      />
-      <img
-        src={image}
-        alt={name}
-        className="w-20 h-20 rounded border object-cover transition-transform duration-200 hover:scale-105"
-      />
-      <div className="flex flex-col flex-1">
-        <h3 className="font-medium text-base">{name}</h3>
-        {capacity && <p className="text-xs text-gray-500">Dung lượng: {capacity}</p>}
-        {color && <p className="text-xs text-gray-500">Màu: {color}</p>}
+                      <div className="flex items-baseline gap-2 mt-1">
+                        <span className="text-red-600 font-semibold text-lg">
+                          {price.toLocaleString('vi-VN')}₫
+                        </span>
+                        <span className="line-through text-sm text-gray-400">
+                          {oldPrice.toLocaleString('vi-VN')}₫
+                        </span>
+                      </div>
 
-        <div className="flex items-baseline gap-2 mt-1">
-          <span className="text-red-600 font-semibold text-lg">
-            {price.toLocaleString('vi-VN')}₫
-          </span>
-          <span className="line-through text-sm text-gray-400">
-            {oldPrice.toLocaleString('vi-VN')}₫
-          </span>
-        </div>
-      </div>
-      ...
-    </div>
-  );
-})}
+                      {/* Số lượng + - */}
+                      <div className="flex items-center mt-2 gap-2">
+                        <button
+                          className="px-2 py-1 text-base font-bold bg-gray-100 rounded hover:bg-gray-200"
+                          onClick={() =>
+                            handleQuantityChange(
+                              item._id!,
+                              'decrease',
+                              item.quantity,
+                              variant?.stock || 1
+                            )
+                          }
+                        >
+                          -
+                        </button>
+                        <span className="min-w-[24px] text-center">{item.quantity}</span>
+                        <button
+                          className="px-2 py-1 text-base font-bold bg-gray-100 rounded hover:bg-gray-200"
+                          onClick={() =>
+                            handleQuantityChange(
+                              item._id!,
+                              'increase',
+                              item.quantity,
+                              variant?.stock || 1
+                            )
+                          }
+                        >
+                          +
+                        </button>
+                        <span className="text-xs text-gray-400 ml-2">
+                          Còn lại: {variant?.stock || 0}
+                        </span>
+                      </div>
+                    </div>
 
+                    {/* Nút xóa */}
+                    <div>
+                      <button
+                        onClick={() => removeFromCart(item._id!)}
+                        className="text-red-600 hover:text-red-800 text-sm"
+                      >
+                        <FaTrash />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
             </>
           )}
         </div>
@@ -157,10 +203,7 @@ const Cart: React.FC = () => {
               const selectedCartData = items.filter((item) =>
                 selectedItems.includes(item._id!)
               );
-              localStorage.setItem(
-                'selectedCheckoutItems',
-                JSON.stringify(selectedCartData)
-              );
+              localStorage.setItem('selectedCheckoutItems', JSON.stringify(selectedCartData));
               navigate('/checkout');
             }}
           >

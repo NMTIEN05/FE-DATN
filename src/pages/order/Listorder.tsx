@@ -56,7 +56,7 @@ const OrderManagement = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        
+
         console.log("✅ Orders fetched:", res.data.data);
         setOrders(res.data.data);
       } catch (error) {
@@ -66,44 +66,52 @@ const OrderManagement = () => {
     fetchOrders();
   }, []);
 
-useEffect(() => {
-  if (orders.length) {
-    console.log("🧾 Full Orders data:");
-    console.dir(orders, { depth: null });
+  useEffect(() => {
+    if (orders.length) {
+      console.log("🧾 Full Orders data:");
+      console.dir(orders, { depth: null });
 
-    // ✅ Log sâu từng order item để kiểm tra attributes
-    orders.forEach((order, i) => {
-      console.log(`📦 Order ${i + 1}: ID ${order._id}`);
-      order.items.forEach((item, j) => {
-        console.log(`🧩 Item ${j + 1} - Variant name: ${item.variantId?.name}`);
-        console.log(`🧾 Product name: ${item.productId?.name}`);
-        console.log("🎨 Attributes:", item.variantId?.attributes);
+      // ✅ Log sâu từng order item để kiểm tra attributes
+      orders.forEach((order, i) => {
+        console.log(`📦 Order ${i + 1}: ID ${order._id}`);
+        order.items.forEach((item, j) => {
+          console.log(`🧩 Item ${j + 1} - Variant name: ${item.variantId?.name}`);
+          console.log(`🧾 Product name: ${item.productId?.name}`);
+          console.log("🎨 Attributes:", item.variantId?.attributes);
 
-        item.variantId?.attributes?.forEach((attr, k) => {
-          console.log(
-            `  🔹 Attribute ${k + 1}:`,
-            attr.attributeId?.name,
-            "-",
-            attr.attributeValueId?.value
-          );
+          item.variantId?.attributes?.forEach((attr, k) => {
+            console.log(
+              `  🔹 Attribute ${k + 1}:`,
+              attr.attributeId?.name,
+              "-",
+              attr.attributeValueId?.value
+            );
+          });
         });
       });
-    });
-  }
-}, [orders]);
-
+    }
+  }, [orders]);
 
   const getStatusStyle = (status: string) => {
     switch (status) {
-      case "pending": return "bg-yellow-100 text-yellow-800";
-      case "processing": return "bg-blue-100 text-blue-800";
-      case "ready_to_ship": return "bg-indigo-100 text-indigo-800";
-      case "shipped": return "bg-purple-100 text-purple-800";
-      case "delivered": return "bg-emerald-100 text-emerald-800";
-      case "return_requested": return "bg-orange-100 text-orange-800";
-      case "returned": return "bg-teal-100 text-teal-800";
-      case "cancelled": return "bg-red-100 text-red-800";
-      default: return "bg-gray-100 text-gray-800";
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "processing":
+        return "bg-blue-100 text-blue-800";
+      case "ready_to_ship":
+        return "bg-indigo-100 text-indigo-800";
+      case "shipped":
+        return "bg-purple-100 text-purple-800";
+      case "delivered":
+        return "bg-emerald-100 text-emerald-800";
+      case "return_requested":
+        return "bg-orange-100 text-orange-800";
+      case "returned":
+        return "bg-teal-100 text-teal-800";
+      case "cancelled":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -115,9 +123,13 @@ useEffect(() => {
     const confirm = window.confirm("Bạn có chắc muốn huỷ đơn này?");
     if (!confirm) return;
     try {
-      await axios.patch(`http://localhost:8888/api/orders/${orderId}/cancel`, {}, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.patch(
+        `http://localhost:8888/api/orders/${orderId}/cancel`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       setOrders((prev) =>
         prev.map((o) => (o._id === orderId ? { ...o, status: "cancelled" } : o))
       );
@@ -126,23 +138,25 @@ useEffect(() => {
     }
   };
 
-  const handleReturnRequest = async (orderId: string) => {
-    if (!window.confirm("Bạn có chắc muốn yêu cầu trả hàng?")) return;
-    try {
-      await axios.patch(
-        `http://localhost:8888/api/orders/${orderId}/request-return`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setOrders((prev) =>
-        prev.map((o) => (o._id === orderId ? { ...o, status: "return_requested" } : o))
-      );
-      alert("Đã gửi yêu cầu trả hàng.");
-    } catch (error) {
-      console.error("❌ Lỗi khi yêu cầu trả hàng:", error);
-      alert("Không thể gửi yêu cầu trả hàng.");
-    }
-  };
+const handleReturnRequest = async (orderId: string) => {
+  if (!window.confirm("Bạn có chắc muốn yêu cầu trả hàng?")) return;
+  try {
+    await axios.post(
+      `http://localhost:8888/api/orders/${orderId}/return-request`, // ✅ Đúng method + URL
+      {},
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    setOrders((prev) =>
+      prev.map((o) =>
+        o._id === orderId ? { ...o, status: "return_requested" } : o
+      )
+    );
+    alert("Đã gửi yêu cầu trả hàng.");
+  } catch (error) {
+    console.error("❌ Lỗi khi yêu cầu trả hàng:", error);
+    alert("Không thể gửi yêu cầu trả hàng.");
+  }
+};
 
   const handlePayment = async (orderId: string, amount: number) => {
     try {
@@ -224,7 +238,10 @@ useEffect(() => {
                   )?.attributeValueId?.value || "Không rõ";
 
                 return (
-                  <div key={item._id} className="flex gap-4 items-start p-4 bg-gray-50 rounded mb-4">
+                  <div
+                    key={item._id}
+                    className="flex gap-4 items-start p-4 bg-gray-50 rounded mb-4"
+                  >
                     <img
                       src={variant?.imageUrl?.[0] || "/placeholder.jpg"}
                       className="w-16 h-16 object-cover rounded"
@@ -234,10 +251,18 @@ useEffect(() => {
                       <div className="flex justify-between">
                         <p className="text-sm font-medium">{variant?.name}</p>
                         <div className="text-xs text-gray-500 text-right">
-                          {new Date(order.createdAt).toLocaleTimeString("vi-VN")}{" "}
-                          {new Date(order.createdAt).toLocaleDateString("vi-VN")}
+                          {order.createdAt ? (
+                            <>
+                              {new Date(order.createdAt).toLocaleTimeString("vi-VN")}{" "}
+                              {new Date(order.createdAt).toLocaleDateString("vi-VN")}
+                            </>
+                          ) : (
+                            "Chưa có thời gian"
+                          )}
                           <div
-                            className={`text-xs mt-1 px-2 py-0.5 rounded-full inline-block ${getStatusStyle(order.status)}`}
+                            className={`text-xs mt-1 px-2 py-0.5 rounded-full inline-block ${getStatusStyle(
+                              order.status
+                            )}`}
                           >
                             {order.status}
                           </div>
@@ -248,15 +273,21 @@ useEffect(() => {
                       {capacity && (
                         <p className="text-xs text-gray-500">Dung lượng: {capacity}</p>
                       )}
-                      {color && (
-                        <p className="text-xs text-gray-500">Màu: {color}</p>
-                      )}
+                      {color && <p className="text-xs text-gray-500">Màu: {color}</p>}
 
                       <p className="text-sm font-medium">
-                        Giá SP: {item.price.toLocaleString("vi-VN")}₫
+                        Giá SP:{" "}
+                        {item.price !== undefined
+                          ? item.price.toLocaleString("vi-VN")
+                          : "N/A"}
+                        ₫
                       </p>
                       <p className="text-sm font-medium">
-                        Tổng: {(item.price * item.quantity).toLocaleString("vi-VN")}₫
+                        Tổng:{" "}
+                        {item.price !== undefined && item.quantity !== undefined
+                          ? (item.price * item.quantity).toLocaleString("vi-VN")
+                          : "N/A"}
+                        ₫
                       </p>
                     </div>
                   </div>
@@ -264,7 +295,11 @@ useEffect(() => {
               })}
 
               <div className="text-right font-bold text-red-600 text-lg mt-2">
-                Tổng đơn: {order.totalAmount.toLocaleString("vi-VN")}₫
+                Tổng đơn:{" "}
+                {order.totalAmount !== undefined
+                  ? order.totalAmount.toLocaleString("vi-VN")
+                  : "N/A"}
+                ₫
               </div>
 
               <div className="mt-2 text-right space-x-2">
