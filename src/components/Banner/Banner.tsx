@@ -1,3 +1,4 @@
+// BannerSection.tsx
 import React, { useRef, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
@@ -61,10 +62,8 @@ const BannerSection: React.FC = () => {
   return (
     <div className="w-full mb-8">
       <div className="grid grid-cols-12 gap-4">
-        {/* BANNER TRÁI */}
         <div className="col-span-12 md:col-span-9">
           <div className="h-[500px] flex flex-col overflow-hidden rounded-xl shadow">
-            {/* Swiper banner chính */}
             <div className="h-[450px]">
               <Swiper
                 modules={[Navigation, Pagination, Autoplay]}
@@ -91,8 +90,6 @@ const BannerSection: React.FC = () => {
                 ))}
               </Swiper>
             </div>
-
-            {/* Dòng tiêu đề banner */}
             <div className="h-[50px] bg-gray-50 px-4 py-2 border-t border-gray-200 relative">
               <div className="grid grid-cols-4 text-center h-full items-center">
                 {banners.map((banner, index) => (
@@ -105,8 +102,6 @@ const BannerSection: React.FC = () => {
                   </button>
                 ))}
               </div>
-
-              {/* Thanh gạch đỏ active */}
               <div
                 className="absolute bottom-0 left-0 h-[3px] bg-red-500 rounded-t-full transition-all duration-300"
                 style={{
@@ -118,7 +113,6 @@ const BannerSection: React.FC = () => {
           </div>
         </div>
 
-        {/* BANNER PHẢI */}
         <div className="col-span-12 md:col-span-3">
           <div className="h-[500px] flex flex-col gap-3">
             {sideBanners.map((banner) => (
