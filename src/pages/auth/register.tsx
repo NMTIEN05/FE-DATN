@@ -14,6 +14,7 @@ const Register = () => {
   const [districts, setDistricts] = useState<District[]>([]);
   const [wards, setWards] = useState<Ward[]>([]);
   const [loading, setLoading] = useState(false);
+  const [locationLoading, setLocationLoading] = useState(false);
   
   const nav = useNavigate();
   const {
@@ -31,10 +32,16 @@ const Register = () => {
   useEffect(() => {
     const loadProvinces = async () => {
       try {
+        setLocationLoading(true);
+        console.log('Loading provinces...');
         const provincesData = await locationService.getProvinces();
+        console.log('Provinces loaded:', provincesData);
         setProvinces(provincesData);
       } catch (error) {
         console.error('Error loading provinces:', error);
+        toast.error('Không thể tải danh sách tỉnh/thành phố');
+      } finally {
+        setLocationLoading(false);
       }
     };
     loadProvinces();
@@ -45,13 +52,19 @@ const Register = () => {
     if (watchProvince) {
       const loadDistricts = async () => {
         try {
+          setLocationLoading(true);
+          console.log('Loading districts for province:', watchProvince);
           const districtsData = await locationService.getDistricts(watchProvince);
+          console.log('Districts loaded:', districtsData);
           setDistricts(districtsData);
           setWards([]); // Reset wards
           setValue("district", "");
           setValue("ward", "");
         } catch (error) {
           console.error('Error loading districts:', error);
+          toast.error('Không thể tải danh sách quận/huyện');
+        } finally {
+          setLocationLoading(false);
         }
       };
       loadDistricts();
@@ -66,11 +79,17 @@ const Register = () => {
     if (watchDistrict) {
       const loadWards = async () => {
         try {
+          setLocationLoading(true);
+          console.log('Loading wards for district:', watchDistrict);
           const wardsData = await locationService.getWards(watchDistrict);
+          console.log('Wards loaded:', wardsData);
           setWards(wardsData);
           setValue("ward", "");
         } catch (error) {
           console.error('Error loading wards:', error);
+          toast.error('Không thể tải danh sách phường/xã');
+        } finally {
+          setLocationLoading(false);
         }
       };
       loadWards();
@@ -120,6 +139,24 @@ const Register = () => {
           <p className="text-gray-600 text-sm font-medium">
             Đăng ký để khám phá thế giới công nghệ
           </p>
+          {/* Debug button */}
+          <button
+            type="button"
+            onClick={async () => {
+              try {
+                console.log('Testing API...');
+                const provinces = await locationService.getProvinces();
+                console.log('API Test Result:', provinces);
+                toast.success(`Loaded ${provinces.length} provinces`);
+              } catch (error) {
+                console.error('API Test Failed:', error);
+                toast.error('API test failed');
+              }
+            }}
+            className="mt-2 px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Test API
+          </button>
         </div>
 
         <div className="space-y-3 flex-grow overflow-y-auto px-2 -mx-2 custom-scrollbar pb-2">
@@ -293,19 +330,34 @@ const Register = () => {
               <select
                 id="province"
                 {...register("province")}
-                className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 text-gray-800 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all shadow-sm appearance-none"
+                disabled={locationLoading}
+                className={`w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 text-gray-800 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-all shadow-sm appearance-none ${
+                  locationLoading ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
               >
-                <option value="">Chọn tỉnh/thành phố</option>
-                {provinces.map((province) => (
-                  <option key={province.code} value={province.code}>
-                    {province.name}
+                <option value="">
+                  {locationLoading ? 'Đang tải...' : 'Chọn tỉnh/thành phố'}
+                </option>
+                {provinces.length > 0 ? (
+                  provinces.map((province) => (
+                    <option key={province.code} value={province.code}>
+                      {province.name}
+                    </option>
+                  ))
+                ) : (
+                  <option value="" disabled>
+                    Không có dữ liệu
                   </option>
-                ))}
+                )}
               </select>
               <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
+                {locationLoading ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                ) : (
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                )}
               </div>
             </div>
           </div>
