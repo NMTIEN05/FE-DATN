@@ -323,7 +323,8 @@ const ProductDetaill = () => {
             </div>
           </div>
         </div>
-      </div>
+        
+      </div>  
     </div>
   );
 };
