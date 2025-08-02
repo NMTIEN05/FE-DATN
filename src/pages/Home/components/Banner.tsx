@@ -1,56 +1,48 @@
-import React, { useRef, useState } from "react";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination, Autoplay } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
+import React, { useRef, useState } from 'react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination, Autoplay } from 'swiper/modules';
+import {
+  FaMobileAlt, FaTags, FaEnvelope, FaStore, FaBuilding, FaRegNewspaper,
+  FaSyncAlt, FaBolt, FaHome, FaChevronRight
+} from 'react-icons/fa';
+
+interface BannerSectionProps {
+  selectedMenu: string;
+  setSelectedMenu: React.Dispatch<React.SetStateAction<string>>;
+}
 
 const banners = [
-  {
-    id: 1,
-    image: "https://i.pinimg.com/736x/5a/7e/90/5a7e903fa4d36808abddba1d331a4a34.jpg",
-    link: "#",
-    title: "iPhone 15 Pro Max",
-  },
-  {
-    id: 2,
-    image: "https://i.pinimg.com/736x/0b/a9/43/0ba943ea32ac6f8450ad1cae3de07b18.jpg",
-    link: "#",
-    title: "Samsung S24 Ultra",
-  },
-  {
-    id: 3,
-    image: "https://i.pinimg.com/736x/33/3f/b1/333fb13a2a0e48edc138b24b18af9b28.jpg",
-    link: "#",
-    title: "Xiaomi 14 Ultra",
-  },
-  {
-    id: 4,
-    image: "https://tse4.mm.bing.net/th/id/OIP.FfEr-bhU6d4W4UWUfvWUcQHaD3?pid=Api&P=0&h=180",
-    link: "#",
-    title: "OPPO Find X7",
-  },
+  { id: 1, image: 'https://cdn.tgdd.vn/2023/03/banner/banner1.png', link: '#', title: 'GALAXY Z7 SERIES' },
+  { id: 2, image: 'https://cdn.tgdd.vn/2023/03/banner/banner2.png', link: '#', title: 'IPHONE 16 PRO MAX' },
+  { id: 3, image: 'https://cdn.tgdd.vn/2023/03/banner/banner3.png', link: '#', title: 'OPPO RENO14' },
+  { id: 4, image: 'https://i.pinimg.com/736x/b5/ae/5d/b5ae5db87627e4b1bb47a1c40946fcf6.jpg', link: '#', title: 'XIAOMI' },
+  { id: 5, image: 'https://cdn.tgdd.vn/2023/03/banner/banner4.png', link: '#', title: 'TECNO POVA 7' },
 ];
 
 const sideBanners = [
-  {
-    id: 101,
-    image: "https://tse2.mm.bing.net/th/id/OIP.f52eNUCSFAz90D9EIxLNOQHaEK?pid=Api&P=0&h=180",
-    link: "#",
-  },
-  {
-    id: 102,
-    image: "https://tse2.mm.bing.net/th/id/OIP.gdsgQE21zgKSpJzhbI4uWAHaC0?pid=Api&P=0&h=180",
-    link: "#",
-  },
-  {
-    id: 103,
-    image: "https://tse1.mm.bing.net/th/id/OIP.tdigLWLbfjUppcXuXiU5GAHaCO?pid=Api&P=0&h=180",
-    link: "#",
-  },
+  { id: 101, image: 'https://cdn.tgdd.vn/2023/03/banner/380x160-1.png', link: '#' },
+  { id: 102, image: 'https://cdn.tgdd.vn/2023/03/banner/380x160-2.png', link: '#' },
+  { id: 103, image: 'https://cdn.tgdd.vn/2023/03/banner/380x160-3.png', link: '#' },
 ];
 
-const BannerSection: React.FC = () => {
+const leftMenu = [
+  { id: 0, name: 'Trang chủ', icon: <FaHome />, link: '/' },
+  { id: 1, name: 'Điện thoại', icon: <FaMobileAlt />, link: '#' },
+  { id: 2, name: 'Hãng điện thoại', icon: <FaBuilding />, link: '#' },
+  { id: 3, name: 'Mã giảm giá', icon: <FaTags />, link: '#' },
+  { id: 4, name: 'Liên hệ với chúng tôi', icon: <FaEnvelope />, link: '#' },
+  { id: 5, name: 'Thông tin cửa hàng', icon: <FaStore />, link: '#' },
+  { id: 6, name: 'Tin công nghệ', icon: <FaRegNewspaper />, link: '#' },
+  { id: 7, name: 'Thu cũ đổi mới', icon: <FaSyncAlt />, link: '#' },
+  { id: 8, name: 'Sản phẩm đang sale', icon: <FaBolt />, link: '#' },
+];
+
+const phoneBrands = [
+  'iPhone', 'Samsung', 'OPPO', 'Xiaomi', 'Realme', 'Vivo',
+  'Nokia', 'Asus', 'Masstel', 'Itel'
+];
+
+const BannerSection: React.FC<BannerSectionProps> = ({ selectedMenu, setSelectedMenu }) => {
   const swiperRef = useRef<any>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -61,67 +53,116 @@ const BannerSection: React.FC = () => {
   return (
     <div className="w-full mb-8">
       <div className="grid grid-cols-12 gap-4">
-        {/* BÊN TRÁI */}
-        <div className="col-span-12 md:col-span-9">
-          <div className="h-[500px] flex flex-col overflow-hidden rounded-xl shadow">
-            {/* Ảnh banner */}
-            <div className="h-[450px]">
-              <Swiper
-                modules={[Navigation, Pagination, Autoplay]}
-                spaceBetween={0}
-                slidesPerView={1}
-                navigation
-                pagination={{ clickable: true }}
-                autoplay={{ delay: 3000 }}
-                loop
-                onSlideChange={handleSlideChange}
-                onSwiper={(swiper) => (swiperRef.current = swiper)}
-                className="h-full"
-              >
-                {banners.map((banner) => (
-                  <SwiperSlide key={banner.id}>
-                    <a href={banner.link}>
-                      <img
-                        src={banner.image}
-                        alt={banner.title}
-                        className="w-full h-full object-cover block"
-                      />
-                    </a>
-                  </SwiperSlide>
-                ))}
-              </Swiper>
-            </div>
-
-            {/* Dòng tiêu đề banner */}
-            <div className="h-[50px] bg-gray-50 px-4 py-2 border-t border-gray-200 relative">
-              <div className="grid grid-cols-4 text-center h-full items-center">
-                {banners.map((banner, index) => (
+        {/* Menu trái */}
+        <div className="hidden md:block md:col-span-2">
+          <div className="h-[420px] bg-white rounded-xl shadow p-2 overflow-auto">
+            <ul className="space-y-2">
+              {leftMenu.map((item) => (
+                <li key={item.id}>
                   <button
-                    key={banner.id}
-                    onClick={() =>
-                      swiperRef.current?.slideToLoop(index)
-                    }
-                    className="py-2 font-medium text-sm sm:text-base text-gray-800 transition duration-150 relative"
+                    onClick={() => setSelectedMenu(item.name)}
+                    className={`w-full text-left group flex items-center justify-between text-sm px-3 py-2 rounded 
+                      ${selectedMenu === item.name ? 'bg-blue-100 text-blue-600 font-medium' : 'text-gray-700 hover:text-blue-600 hover:bg-gray-100'}
+                      transition`}
                   >
-                    {banner.title}
+                    <div className="flex items-center gap-3">
+                      <span className="text-base">{item.icon}</span>
+                      <span>{item.name}</span>
+                    </div>
+                    {(item.name === 'Hãng điện thoại' || item.name === 'Điện thoại') && (
+                      <FaChevronRight className="text-gray-400 group-hover:text-blue-500 text-xs" />
+                    )}
                   </button>
-                ))}
-              </div>
-              {/* Thanh gạch đỏ active */}
-              <div
-                className="absolute bottom-0 left-0 h-[3px] bg-red-500 rounded-t-full transition-all duration-300"
-                style={{
-                  width: "25%",
-                  transform: `translateX(${activeIndex * 100}%)`,
-                }}
-              />
-            </div>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
 
-        {/* BÊN PHẢI */}
+        {/* Banner hoặc Mega Menu */}
+        <div className="col-span-12 md:col-span-7">
+          <div className="h-[420px] flex flex-col overflow-hidden rounded-xl shadow bg-white">
+            {selectedMenu === 'Điện thoại' ? (
+              <div className="flex-1 p-4 overflow-auto">
+                <h3 className="text-base font-semibold mb-3">Thương hiệu điện thoại</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {phoneBrands.map((brand) => (
+                    <a
+                      key={brand}
+                      href="#"
+                      className="block px-3 py-2 bg-gray-100 hover:bg-blue-100 rounded text-sm"
+                    >
+                      {brand}
+                    </a>
+                  ))}
+                </div>
+                <button
+                  onClick={() => setSelectedMenu("")}
+                  className="mt-4 text-blue-600 text-sm hover:underline"
+                >
+                  ← Quay lại
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="h-[350px]">
+                  <Swiper
+                    modules={[Navigation, Pagination, Autoplay]}
+                    spaceBetween={0}
+                    slidesPerView={1}
+                    navigation
+                    pagination={{ clickable: true }}
+                    autoplay={{ delay: 3000 }}
+                    loop
+                    onSlideChange={handleSlideChange}
+                    onSwiper={(swiper) => (swiperRef.current = swiper)}
+                    className="h-full"
+                  >
+                    {banners.map((banner) => (
+                      <SwiperSlide key={banner.id}>
+                        <a href={banner.link}>
+                          <img
+                            src={banner.image}
+                            alt={banner.title}
+                            className="w-full h-full object-cover block"
+                          />
+                        </a>
+                      </SwiperSlide>
+                    ))}
+                  </Swiper>
+                </div>
+                <div className="h-[70px] bg-gray-50 px-4 py-3 border-t border-gray-200 relative">
+                  <div className="grid grid-cols-5 text-center h-full items-center">
+                    {banners.map((banner, index) => (
+                      <button
+                        key={banner.id}
+                        onClick={() => swiperRef.current?.slideToLoop(index)}
+                        className={`font-medium text-[13px] md:text-sm transition relative ${
+                          activeIndex === index
+                            ? 'text-red-600 font-semibold'
+                            : 'text-gray-800 hover:text-red-500'
+                        }`}
+                      >
+                        {banner.title}
+                      </button>
+                    ))}
+                  </div>
+                  <div
+                    className="absolute bottom-0 left-0 h-[3px] bg-red-500 rounded-t-full transition-all duration-300"
+                    style={{
+                      width: '20%',
+                      transform: `translateX(${activeIndex * 100}%)`,
+                    }}
+                  />
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Banner phải */}
         <div className="col-span-12 md:col-span-3">
-          <div className="h-[500px] flex flex-col gap-3">
+          <div className="h-[420px] flex flex-col gap-3">
             {sideBanners.map((banner) => (
               <a
                 key={banner.id}

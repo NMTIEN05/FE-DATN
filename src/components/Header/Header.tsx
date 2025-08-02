@@ -1,32 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  FaSearch,
-  FaPhoneAlt,
-  FaShoppingCart,
-  FaUserCircle,
-  FaBars,
-  FaTimes,
-  FaHome,
-  FaMobileAlt,
-  FaLaptop,
-  FaClipboardList,
-  FaChevronDown,
-  FaSignOutAlt,
-  FaUserLock,
-  FaHeart
+  FaSearch, FaPhoneAlt, FaShoppingCart, FaUserCircle, FaBars, FaTimes,
+  FaClipboardList, FaChevronDown, FaSignOutAlt, FaUserLock, FaHeart
 } from 'react-icons/fa';
-import { IoLogoApple } from 'react-icons/io';
-import { SiSamsung, SiXiaomi, SiOppo } from 'react-icons/si';
-import { TagFilled } from '@ant-design/icons';
 import axios from 'axios';
-import './Header.css'; // CSS animation marquee
-import logo from './img/Screenshot_2025-08-01_195447-removebg-preview.png'
+import './Header.css';
+import logo from './img/Screenshot_2025-08-01_195447-removebg-preview.png';
 
-const Header = () => {
- 
-  const mainHeaderHeight = 75;  // Thanh đỏ
+interface HeaderProps {
+  setSelectedMenu: (menu: string) => void;
+}
 
+const Header: React.FC<HeaderProps> = ({ setSelectedMenu }) => {
+  const mainHeaderHeight = 75;
   const [scrollY, setScrollY] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
@@ -34,27 +21,19 @@ const Header = () => {
   const [favoritesCount, setFavoritesCount] = useState(0);
   const [search, setSearch] = useState("");
   const [products, setProducts] = useState([]);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [hoverBrand, setHoverBrand] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-
   const navigate = useNavigate();
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-    };
+    const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener("scroll", handleScroll);
-
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Tự đóng dropdown khi click ngoài
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setShowDropdown(false);
-        setHoverBrand(false);
+        setIsAccountOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -65,7 +44,6 @@ const Header = () => {
     const delayDebounce = setTimeout(() => {
       fetchProducts(search);
     }, 500);
-
     return () => clearTimeout(delayDebounce);
   }, [search]);
 
@@ -102,15 +80,9 @@ const Header = () => {
 
   return (
     <div className='mb-20'>
-     
-
-      {/* Thanh đỏ chính */}
       <div
         className="fixed left-0 w-full bg-[#f85959] text-white z-40 flex items-center transition-all duration-300"
-        style={{
-          height: mainHeaderHeight,
-          
-        }}
+        style={{ height: mainHeaderHeight }}
       >
         <div className="container mx-auto px-10 flex items-center justify-between flex-wrap gap-y-2">
 
@@ -125,85 +97,25 @@ const Header = () => {
 
           <div className="order-2 md:order-1 flex items-center">
             <Link to="/" className="text-2xl font-extrabold ">
-            <img src={logo} alt="Logo" className="w-70 h-20" />
-
+              <img src={logo} alt="Logo" className="w-70 h-20" />
             </Link>
           </div>
 
-          {/* Danh mục nằm giữa logo và search */}
-          <div className="ml-10 hidden md:block order-2 relative" ref={menuRef}>
-            <button
-              onClick={() => setShowDropdown((prev) => !prev)}
-              className="flex items-center text-yellow-600 hover:text-yellow-700 px-4 py-2 rounded-xl bg-[#ffc8c8] hover:bg-yellow-50 border border-yellow-200 shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-105"
-            >
-              <span className="mr-2 text-lg">📂</span>
-              <span className="font-medium">Danh mục</span>
-              <FaChevronDown className="ml-2 text-xs" />
-            </button>
-
-            {showDropdown && (
-              <div
-                className={`absolute left-0 mt-7 ${
-                  hoverBrand ? "w-[620px]" : "w-[320px]"
-                } bg-white border border-gray-200 rounded-xl shadow-2xl z-50 flex transition-all duration-300`}
-                onMouseLeave={() => setHoverBrand(false)}
-              >
-                <div className="w-[300px] py-2 border-r border-gray-100">
-                  <Link to="/" className="flex items-center px-5 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700">
-                    <FaHome className="mr-3 " /> Trang chủ
-                  </Link>
-                  <Link to="/dien-thoai" className="flex items-center px-5 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700">
-                    <FaMobileAlt className="mr-3 " /> Điện thoại
-                  </Link>
-                  <Link to="/laptops" className="flex items-center px-5 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700">
-                    <FaLaptop className="mr-3 " /> Laptop
-                  </Link>
-                  <Link to="/phu-kien" className="flex items-center px-5 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700">
-                    <TagFilled className="mr-3 " /> Mã giảm giá
-                  </Link>
-
-                  <div
-                    className="flex items-center px-5 py-3  hover:bg-blue-50 hover:text-blue-700 cursor-pointer"
-                    onMouseEnter={() => setHoverBrand(true)}
-                    onClick={() => setHoverBrand((prev) => !prev)}
-                  >
-                    <span className="mr-3 text-lg">🛍️</span>
-                    <span className="font-medium">Thương hiệu</span>
-                  </div>
-                </div>
-
-                {hoverBrand && (
-                  <div className="w-[300px] py-2 ml-2">
-                    <Link to="/thuong-hieu/apple" className="flex items-center px-5 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700">
-                      <IoLogoApple className="mr-3 text-xl" /> Apple
-                    </Link>
-                    <Link to="/thuong-hieu/samsung" className="flex items-center px-5 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700">
-                      <SiSamsung className="mr-3 text-xl" /> Samsung
-                    </Link>
-                    <Link to="/thuong-hieu/xiaomi" className="flex items-center px-5 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700">
-                      <SiXiaomi className="mr-3 text-xl " /> Xiaomi
-                    </Link>
-                    <Link to="/thuong-hieu/oppo" className="flex items-center px-5 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-700">
-                      <SiOppo className="mr-3 text-xl " /> OPPO
-                    </Link>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+          {/* ✅ Nút Danh mục bấm để mở menu "Điện thoại" */}
+        
 
           <div className="hidden md:flex flex-grow justify-center relative order-3 items-center">
             <div className="w-full max-w-xl relative">
               <input
-                type="text"
-                placeholder="Tìm kiếm sản phẩm..."
-                className="w-full pl-4 pr-12 py-1 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleSearch();
-                }}
-              />
+    type="text"
+    placeholder="Tìm kiếm sản phẩm..."
+    className="w-full pl-12 text-gray-700 pr-4 py-2 rounded-xl border border-gray-300 shadow-sm text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+    value={search}
+    onChange={(e) => setSearch(e.target.value)}
+    onKeyDown={(e) => {
+      if (e.key === "Enter") handleSearch();
+    }}
+  />
               <button
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-blue-600"
                 onClick={handleSearch}
