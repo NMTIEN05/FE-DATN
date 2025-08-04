@@ -5,7 +5,10 @@ import {
   FaMobileAlt, FaTags, FaEnvelope, FaStore, FaBuilding, FaRegNewspaper,
   FaSyncAlt, FaBolt, FaHome, FaChevronRight
 } from 'react-icons/fa';
+
 import { Link } from 'react-router-dom';
+
+import { useBannerSync } from '../../../hooks/useBannerSync';
 
 interface BannerSectionProps {
   selectedMenu: string;
@@ -46,10 +49,14 @@ const phoneBrands = [
 const BannerSection: React.FC<BannerSectionProps> = ({ selectedMenu, setSelectedMenu }) => {
   const swiperRef = useRef<any>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  const { banners: apiBanners, loading, error } = useBannerSync();
 
   const handleSlideChange = (swiper: any) => {
     setActiveIndex(swiper.realIndex);
   };
+
+  // Sử dụng API banners nếu có, nếu không thì dùng banners mặc định
+  const displayBanners = apiBanners.length > 0 ? apiBanners : banners;
 
   return (
     <div className="w-full mb-8">
@@ -124,12 +131,12 @@ const BannerSection: React.FC<BannerSectionProps> = ({ selectedMenu, setSelected
                     onSwiper={(swiper) => (swiperRef.current = swiper)}
                     className="h-full"
                   >
-                    {banners.map((banner) => (
-                      <SwiperSlide key={banner.id}>
-                        <a href={banner.link}>
+                    {displayBanners.map((banner) => (
+                      <SwiperSlide key={banner._id || banner.id}>
+                        <a href={banner.link || '#'}>
                           <img
                             src={banner.image}
-                            alt={banner.title}
+                            alt={banner.title || 'Banner'}
                             className="w-full h-full object-cover block"
                           />
                         </a>
@@ -139,9 +146,9 @@ const BannerSection: React.FC<BannerSectionProps> = ({ selectedMenu, setSelected
                 </div>
                 <div className="h-[70px] bg-gray-50 px-4 py-3 border-t border-gray-200 relative">
                   <div className="grid grid-cols-5 text-center h-full items-center">
-                    {banners.map((banner, index) => (
+                    {displayBanners.map((banner, index) => (
                       <button
-                        key={banner.id}
+                        key={banner._id || banner.id}
                         onClick={() => swiperRef.current?.slideToLoop(index)}
                         className={`font-medium text-[13px] md:text-sm transition relative ${
                           activeIndex === index
@@ -149,7 +156,7 @@ const BannerSection: React.FC<BannerSectionProps> = ({ selectedMenu, setSelected
                             : 'text-gray-800 hover:text-red-500'
                         }`}
                       >
-                        {banner.title}
+                        {banner.title || `Banner ${index + 1}`}
                       </button>
                     ))}
                   </div>
