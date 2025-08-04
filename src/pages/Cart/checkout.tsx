@@ -58,24 +58,33 @@ const Checkout = () => {
   useEffect(() => {
     setFinalTotal(totalPrice - discount);
   }, [totalPrice, discount]);
+const categoryIds = [
+  ...new Set(
+    selectedItems
+      .map((item) => item.productId?.categoryId || item.categoryId)
+      .filter(Boolean)
+  ),
+];
 
-  const handleApplyVoucher = async () => {
-    if (!voucherCode) {
-      toast.warn("Vui lòng nhập mã giảm giá.");
-      return;
-    }
-    try {
-      const res = await axios.post("/vouchers/apply", {
-        code: voucherCode,
-        total: totalPrice,
-      });
-      setDiscount(res.data.discount);
-      toast.success(res.data.message || "Áp dụng mã thành công!");
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || "Không áp dụng được mã");
-      setDiscount(0);
-    }
-  };
+const handleApplyVoucher = async () => {
+  if (!voucherCode) {
+    toast.warn("Vui lòng nhập mã giảm giá.");
+    return;
+  }
+  try {
+    const res = await axios.post("/vouchers/apply", {
+      code: voucherCode,
+      total: totalPrice,
+      categoryIds, // 🆕 Gửi thêm categoryIds để backend kiểm tra
+    });
+    setDiscount(res.data.discount);
+    toast.success(res.data.message || "Áp dụng mã thành công!");
+  } catch (err: any) {
+    toast.error(err.response?.data?.message || "Không áp dụng được mã");
+    setDiscount(0);
+  }
+};
+
 
   const handleSubmit = async () => {
     if (!fullName || !phone || !address) {
