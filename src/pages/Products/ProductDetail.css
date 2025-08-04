@@ -96,3 +96,12 @@ img {
   background-color: #f0f8ff;
   border-color: #cce6ff;
 }
+/* Ẩn scrollbar trên Chrome, Edge, Safari */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Ẩn scrollbar trên Firefox */
+.no-scrollbar {
+  scrollbar-width: none;
+}

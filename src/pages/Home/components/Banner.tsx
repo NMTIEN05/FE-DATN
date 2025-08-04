@@ -5,6 +5,7 @@ import {
   FaMobileAlt, FaTags, FaEnvelope, FaStore, FaBuilding, FaRegNewspaper,
   FaSyncAlt, FaBolt, FaHome, FaChevronRight
 } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 
 interface BannerSectionProps {
   selectedMenu: string;
@@ -29,7 +30,7 @@ const leftMenu = [
   { id: 0, name: 'Trang chủ', icon: <FaHome />, link: '/' },
   { id: 1, name: 'Điện thoại', icon: <FaMobileAlt />, link: '#' },
   { id: 2, name: 'Hãng điện thoại', icon: <FaBuilding />, link: '#' },
-  { id: 3, name: 'Mã giảm giá', icon: <FaTags />, link: '#' },
+  { id: 3, name: 'Mã giảm giá', icon: <FaTags />, link: '/vouchers' },
   { id: 4, name: 'Liên hệ với chúng tôi', icon: <FaEnvelope />, link: '#' },
   { id: 5, name: 'Thông tin cửa hàng', icon: <FaStore />, link: '#' },
   { id: 6, name: 'Tin công nghệ', icon: <FaRegNewspaper />, link: '#' },
@@ -55,29 +56,34 @@ const BannerSection: React.FC<BannerSectionProps> = ({ selectedMenu, setSelected
       <div className="grid grid-cols-12 gap-4">
         {/* Menu trái */}
         <div className="hidden md:block md:col-span-2">
-          <div className="h-[420px] bg-white rounded-xl shadow p-2 overflow-auto">
-            <ul className="space-y-2">
-              {leftMenu.map((item) => (
-                <li key={item.id}>
-                  <button
-                    onClick={() => setSelectedMenu(item.name)}
-                    className={`w-full text-left group flex items-center justify-between text-sm px-3 py-2 rounded 
-                      ${selectedMenu === item.name ? 'bg-blue-100 text-blue-600 font-medium' : 'text-gray-700 hover:text-blue-600 hover:bg-gray-100'}
-                      transition`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-base">{item.icon}</span>
-                      <span>{item.name}</span>
-                    </div>
-                    {(item.name === 'Hãng điện thoại' || item.name === 'Điện thoại') && (
-                      <FaChevronRight className="text-gray-400 group-hover:text-blue-500 text-xs" />
-                    )}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
+  <div className="h-[420px] bg-white rounded-xl shadow p-2 overflow-auto">
+    <ul className="space-y-2">
+      {leftMenu.map((item) => (
+        <li key={item.id}>
+          <Link
+            to={item.link}
+            onClick={() => setSelectedMenu(item.name)}
+            className={`w-full block group text-sm px-3 py-2 rounded 
+              ${selectedMenu === item.name
+                ? 'bg-blue-100 text-blue-600 font-medium'
+                : 'text-gray-700 hover:text-blue-600 hover:bg-gray-100'}
+              transition`}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-base">{item.icon}</span>
+                <span>{item.name}</span>
+              </div>
+              {(item.name === 'Hãng điện thoại' || item.name === 'Điện thoại') && (
+                <FaChevronRight className="text-gray-400 group-hover:text-blue-500 text-xs" />
+              )}
+            </div>
+          </Link>
+        </li>
+      ))}
+    </ul>
+  </div>
+</div>
 
         {/* Banner hoặc Mega Menu */}
         <div className="col-span-12 md:col-span-7">

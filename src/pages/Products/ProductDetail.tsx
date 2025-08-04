@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeftOutlined,
@@ -14,6 +14,8 @@ import {
 import { Button, message } from "antd";
 import axios from "axios";
 import "./ProductDetail.css";
+import { ChevronLeft, ChevronRight, Star } from "lucide-react";
+
 
 const formatPrice = (price: number) =>
   price.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
@@ -24,7 +26,14 @@ const ProductDetaill = () => {
   const [group, setGroup] = useState<any[]>([]);
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedColor, setSelectedColor] = useState(0);
+const scrollRef = useRef<HTMLDivElement>(null);
 
+const scroll = (direction: "left" | "right") => {
+  if (scrollRef.current) {
+    const amount = direction === "left" ? -100 : 100;
+    scrollRef.current.scrollBy({ left: amount, behavior: "smooth" });
+  }
+};
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -106,75 +115,131 @@ const ProductDetaill = () => {
 });
   } catch (error) {
     console.error("Lỗi thêm giỏ hàng:", error);
-    alert("❌ Thêm vào giỏ hàng thất bại");
+    alert(" Thêm vào giỏ hàng thất bại");
   }
 };
 
 
-  const handleBuyNow = async () => {
-    try {
-      if (!variant || variant.stock === 0) return;
-      const token = localStorage.getItem("token");
-      if (!token) return alert("Bạn cần đăng nhập để mua hàng");
+ const handleBuyNow = async () => {
+  try {
+    if (!variant || variant.stock === 0) {
+      return alert("Sản phẩm đã hết hàng");
+    }
 
-      const selectedItem = {
+    const token = localStorage.getItem("token");
+    if (!token) return alert("Bạn cần đăng nhập để mua hàng");
+
+    const selectedItem = {
+      productId: product._id,
+      variantId: variant._id,
+      quantity: 1,
+      price: variant.price,
+      name: product.title,
+      image: variant.imageUrl?.[0],
+    };
+
+    // Gọi API thêm vào giỏ trước
+    await axios.post(
+      "http://localhost:8888/api/cart/add",
+      {
         productId: product._id,
         variantId: variant._id,
         quantity: 1,
-        price: variant.price,
-        name: product.title,
-        image: variant.imageUrl?.[0],
-      };
-      localStorage.setItem("selectedCheckoutItems", JSON.stringify([selectedItem]));
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
 
-      await axios.post(
-        "http://localhost:8888/api/cart/add",
-        {
-          productId: product._id,
-          variantId: variant._id,
-          quantity: 1,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+    // Sau khi thêm vào giỏ thành công → lưu tạm sản phẩm để dùng ở /checkout
+    localStorage.setItem(
+      "selectedCheckoutItems",
+      JSON.stringify([selectedItem])
+    );
 
-      navigate("/checkout");
-    } catch (error) {
-      console.error("Lỗi mua ngay:", error);
-      alert("Mua ngay thất bại");
-    }
-  };
+    // Điều hướng sang trang thanh toán
+    navigate("/checkout");
+  } catch (error) {
+    console.error("❌ Lỗi khi mua ngay:", error);
+    alert("Mua ngay thất bại, vui lòng thử lại.");
+  }
+};
+
 
   if (!product) return <div className="p-10 text-center text-gray-500">Loading...</div>;
 
   return (
     <div className="max-w-[1200px] mx-auto px-4 py-10">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-        {/* Ảnh */}
-        <div className="bg-white p-4 rounded-xl shadow-md">
-          <div className="w-full overflow-hidden border rounded-lg">
-            <img
-              src={variant?.imageUrl?.[selectedImage]}
-              className="w-full max-h-[400px] object-contain hover:scale-105 transition-transform duration-300"
-              alt="Ảnh sản phẩm"
-            />
-          </div>
-          <div className="flex flex-wrap justify-center gap-3 mt-4">
-            {variant?.imageUrl?.map((img: string, i: number) => (
-              <img
-                key={i}
-                src={img}
-                onClick={() => setSelectedImage(i)}
-                className={`w-16 h-16 object-cover rounded border-2 cursor-pointer transition duration-200 ${
-                  selectedImage === i
-                    ? "border-blue-600 shadow-md"
-                    : "border-gray-300 hover:border-gray-400"
-                }`}
-              />
-            ))}
-          </div>
-        </div>
+{/* Hình ảnh sản phẩm */}
+<div className="p-4 rounded-xl">
+  {/* Ảnh chính */}
+  <div className="w-full aspect-[4/3] bg-white border border-gray-200 rounded-xl shadow-md overflow-hidden flex items-center justify-center">
+    <img
+      src={variant?.imageUrl?.[selectedImage]}
+      alt="Ảnh sản phẩm"
+      className="max-h-[350px] object-contain transition-transform duration-300 hover:scale-105"
+    />
+  </div>
+
+<div className="relative mt-4">
+  {/* Nút trái */}
+  <button
+    onClick={() => scroll("left")}
+    className="absolute left-0 top-1/2 -translate-y-1/2 bg-white shadow p-2 rounded-full z-10"
+  >
+    <ChevronLeft size={20} />
+  </button>
+
+  {/* Danh sách ảnh */}
+ <div
+  ref={scrollRef}
+  className="flex gap-3 overflow-x-auto px-8 scroll-smooth no-scrollbar"
+>
+
+    {/* Icon "Tính năng nổi bật" */}
+    <div className="w-16 h-16 flex-shrink-0 rounded-lg border border-red-500 flex flex-col items-center justify-center text-xs text-gray-700">
+      <Star className="w-5 h-5 text-red-500 mb-1" />
+      <span className="leading-tight text-[10px] text-center">
+        Tính năng<br />nổi bật
+      </span>
+    </div>
+
+    {/* Ảnh nhỏ */}
+    {variant?.imageUrl?.map((img: string, i: number) => (
+      <button
+        key={i}
+        onClick={() => setSelectedImage(i)}
+        className={`w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden border transition-all duration-200 ${
+          selectedImage === i
+            ? "border-red-500 shadow-md"
+            : "border-gray-200"
+        }`}
+      >
+        <img
+          src={img}
+          alt={`Ảnh ${i + 1}`}
+          className="w-full h-full object-cover"
+        />
+      </button>
+    ))}
+  </div>
+
+  {/* Nút phải */}
+  <button
+    onClick={() => scroll("right")}
+    className="absolute right-0 top-1/2 -translate-y-1/2 bg-white shadow p-2 rounded-full z-10"
+  >
+    <ChevronRight size={20} />
+  </button>
+</div>
+
+
+</div>
+
+
+
+
 
         {/* Thông tin */}
         <div className="space-y-4">
