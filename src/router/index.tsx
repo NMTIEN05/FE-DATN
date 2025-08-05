@@ -26,9 +26,9 @@ import PaymentResult from '../pages/Cart/PaymentResult';
 import SearchResultPage from '../components/Header/SearchResultPage';
 import OrderManagement from '../pages/order/Listorder';
 
-import MyAccount from '../pages/auth/Account';
 import LuckyWheel from '../pages/voucher/VoucherAdd';
 import VoucherList from '../pages/voucher/VoucherAdd';
+import SavedVoucherList from '../pages/voucher/ListVoucher';
 
 export const routes: RouteObject[] = [
   {
@@ -39,7 +39,7 @@ export const routes: RouteObject[] = [
       { path: 'products', element: <Products /> },
       { path: 'dien-thoai', element: <Products /> },
       { path: 'product/:id', element: <Deteil /> },
-      { path: 'product/:id/review', element: <ReviewProduct /> },
+      // { path: 'product/:id/review', element: <ReviewProduct /> },
       { path: 'services', element: <Services /> },
       { path: 'contact', element: <Contact /> },
       { path: 'cart', element: <Cart /> },
@@ -50,8 +50,10 @@ export const routes: RouteObject[] = [
       { path: 'orders', element: <OrderManagement /> },
       { path: 'payment-result', element: <PaymentResult /> },
       { path: 'search', element: <SearchResultPage /> },
-      { path: 'account', element: <MyAccount /> },
+      // { path: 'account', element: <MyAccount /> },
       { path: 'vouchers', element: <VoucherList /> },
+      { path: 'vouchers/my', element: <SavedVoucherList /> },
+
     ],
   },
   // Auth routes (không có layout)

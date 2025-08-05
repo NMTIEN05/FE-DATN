@@ -173,21 +173,46 @@ const VoucherList: React.FC = () => {
           </div>
 
           {!disabled && (
-            <div className="mt-2 text-right">
-              <Button
-                type="default"
-                danger
-                onClick={() => handleCopy(voucher.code)}
-                className="border border-red-500 text-red-500 hover:bg-red-50"
-              >
-                Dùng Ngay
-              </Button>
-            </div>
+            <div className="mt-2 flex justify-end gap-2">
+  <Button
+    type="default"
+    onClick={() => handleSaveVoucher(voucher._id)}
+    className="border border-blue-500 text-blue-500 hover:bg-blue-50"
+  >
+    Lưu mã
+  </Button>
+
+  
+</div>
+
           )}
         </div>
       </div>
     );
   };
+  const handleSaveVoucher = async (voucherId: string) => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) return message.warning("Bạn cần đăng nhập");
+
+    await axios.post(
+      "http://localhost:8888/api/user-voucher",
+      { voucherId },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    message.success("🎉 Đã lưu mã thành công!");
+  } catch (err: any) {
+    message.error(
+      err?.response?.data?.message || "❌ Lỗi khi lưu mã giảm giá"
+    );
+  }
+};
+
 
   return (
     <div className="p-6 max-w-6xl mx-auto">

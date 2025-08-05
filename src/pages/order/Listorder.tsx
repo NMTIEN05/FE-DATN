@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { Button } from "antd";
+import ReturnModal from "./compudent/ReturnModal";
+import { ReloadOutlined } from "@ant-design/icons";
 
 interface Attribute {
   attributeId: { name: string };
@@ -82,6 +85,9 @@ const getStatusStyle = (status: string) => {
 };
 
 const OrderManagement = () => {
+  const [showReturnModal, setShowReturnModal] = useState(false);
+const [returningOrderId, setReturningOrderId] = useState<string | null>(null);
+
   const [orders, setOrders] = useState<Order[]>([]);
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [page, setPage] = useState(1);
@@ -279,12 +285,19 @@ const OrderManagement = () => {
                 )}
 
                 {order.status === "delivered" && (
-                  <button
-                    className="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600"
-                    onClick={() => handleReturnRequest(order._id)}
-                  >
-                    Yêu cầu trả hàng
-                  </button>
+                 <button
+  
+ 
+ className="px-4 py-2 bg-emerald-500 text-gray-800 rounded hover:bg-gray-300"
+  onClick={() => {
+    setReturningOrderId(order._id);
+    setShowReturnModal(true);
+  }}
+>
+  Yêu cầu trả hàng
+</button>
+
+
                 )}
               </div>
             </div>
@@ -310,6 +323,18 @@ const OrderManagement = () => {
           </div>
         )}
       </div>
+      {showReturnModal && returningOrderId && (
+  <ReturnModal
+    orderId={returningOrderId}
+    open={showReturnModal}
+    onClose={() => {
+      setShowReturnModal(false);
+      setReturningOrderId(null);
+    }}
+    onSuccess={fetchOrders}
+  />
+)}
+
     </div>
   );
 };

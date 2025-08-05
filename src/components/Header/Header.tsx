@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   FaSearch, FaPhoneAlt, FaShoppingCart, FaUserCircle, FaBars, FaTimes,
-  FaClipboardList, FaChevronDown, FaSignOutAlt, FaUserLock, FaHeart
+  FaClipboardList, FaChevronDown, FaSignOutAlt, FaUserLock, FaHeart,
+  FaTag
 } from 'react-icons/fa';
 import axios from 'axios';
 import './Header.css';
@@ -171,7 +172,15 @@ const Header: React.FC<HeaderProps> = ({ setSelectedMenu }) => {
                         <FaUserCircle /> Tài khoản
                       </div>
                     </Link>
-
+                     <Link
+                      to="/vouchers/my"
+                      className="block px-4 py-2 hover:bg-gray-100"
+                      onClick={() => setIsAccountOpen(false)}
+                    >
+                      <div className="flex items-center gap-2">
+                        <FaTag /> Mã giảm giá của tôi 
+                      </div>
+                    </Link>
                     <Link
                       to="/change-password"
                       className="block px-4 py-2 hover:bg-gray-100"

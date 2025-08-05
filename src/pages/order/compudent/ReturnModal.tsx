@@ -22,29 +22,44 @@ const ReturnModal: React.FC<Props> = ({ orderId, open, onClose, onSuccess }) => 
   const [customReason, setCustomReason] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleReturn = async () => {
-    const reasonToSend = selectedReason === "Khác" ? customReason.trim() : selectedReason;
+const handleReturn = async () => {
+  const reasonToSend = selectedReason === "Khác" ? customReason.trim() : selectedReason;
 
-    if (!reasonToSend) {
-      message.warning("Vui lòng chọn hoặc nhập lý do trả hàng.");
-      return;
-    }
+  if (!reasonToSend) {
+    message.warning("Vui lòng chọn hoặc nhập lý do trả hàng.");
+    return;
+  }
 
-    try {
-      setLoading(true);
-      await axios.post(`/api/orders/${orderId}/return-request`, { reason: reasonToSend });
-      message.success("Yêu cầu trả hàng đã được gửi");
-      onClose();
-      setSelectedReason("");
-      setCustomReason("");
-      onSuccess?.();
-    } catch (err) {
-      console.error("Lỗi trả hàng:", err);
-      message.error("Không thể gửi yêu cầu trả hàng.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const token = localStorage.getItem("token");
+  if (!token) {
+    message.error("Bạn cần đăng nhập để thực hiện thao tác này.");
+    return;
+  }
+
+  try {
+    setLoading(true);
+    await axios.post(
+      `http://localhost:8888/api/orders/${orderId}/return-request`,
+      { reason: reasonToSend },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    message.success("Yêu cầu trả hàng đã được gửi");
+    onClose();
+    setSelectedReason("");
+    setCustomReason("");
+    onSuccess?.();
+  } catch (err) {
+    console.error("Lỗi trả hàng:", err);
+    message.error("Không thể gửi yêu cầu trả hàng.");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <Modal
