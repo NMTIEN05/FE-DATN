@@ -17,49 +17,79 @@ interface Voucher {
   minOrderValue: number;
   startDate: string;
   endDate: string;
+  maxDiscount?: number;
+  categories?: { _id: string; name: string }[]; // ✅ sửa chỗ này
+}
+
+
+interface Category {
+  _id: string;
+  name: string;
 }
 
 const VoucherList: React.FC = () => {
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      message.warning('Bạn chưa đăng nhập!');
-      setLoading(false);
-      return;
-    }
+    const fetchData = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        message.warning('Bạn chưa đăng nhập!');
+        setLoading(false);
+        return;
+      }
 
-    axios
-      .get('http://localhost:8888/api/vouchers', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => {
-        if (Array.isArray(res.data)) {
-          setVouchers(res.data);
+      try {
+        const [voucherRes, categoryRes] = await Promise.all([
+          axios.get('http://localhost:8888/api/vouchers', {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          axios.get('http://localhost:8888/api/category', {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
+
+        if (Array.isArray(voucherRes.data)) {
+          setVouchers(voucherRes.data);
+          console.log('✅ Voucher data:', voucherRes.data);
         } else {
-          message.error('Dữ liệu không hợp lệ!');
+          message.error('Dữ liệu voucher không hợp lệ!');
         }
+
+        if (Array.isArray(categoryRes.data.data)) {
+          setCategories(categoryRes.data.data);
+          console.log('✅ Categories data:', categoryRes.data);
+        } else {
+          message.error('Dữ liệu danh mục không hợp lệ!');
+        }
+      } catch (err) {
+        console.error('❌ Lỗi lấy dữ liệu:', err);
+        message.error('Không thể lấy dữ liệu!');
+      } finally {
         setLoading(false);
-      })
-      .catch((err) => {
-        console.error('Lỗi gọi API voucher:', err);
-        message.error('Không thể lấy danh sách voucher!');
-        setLoading(false);
-      });
+      }
+    };
+
+    fetchData();
   }, []);
 
   const formatDiscount = (voucher: Voucher) => {
-    return voucher.discountType === 'fixed'
-      ? `Giảm ${voucher.discountValue.toLocaleString()}đ`
-      : `Giảm ${voucher.discountValue}%`;
+    if (voucher.discountType === 'fixed') {
+      return `Giảm ${voucher.discountValue.toLocaleString()}đ`;
+    } else {
+      return (
+        `Giảm ${voucher.discountValue}%` +
+        (voucher.maxDiscount ? ` (tối đa ${voucher.maxDiscount.toLocaleString()}đ)` : '')
+      );
+    }
   };
 
   const handleCopy = (code: string) => {
     navigator.clipboard.writeText(code).then(() => {
-      message.success(`📋 Mã ${code} đã được sao chép!`);
+      message.success(` Mã ${code} đã được sao chép!`);
     });
   };
 
@@ -68,21 +98,33 @@ const VoucherList: React.FC = () => {
     return hoursLeft > 0 && hoursLeft <= 24;
   };
 
+  const trimmedSearch = searchTerm.trim().toLowerCase();
+
   const availableVouchers = vouchers.filter(
     (v) =>
-      dayjs(v.endDate).isAfter(dayjs()) && v.usedCount < v.usageLimit &&
-      v.code.toLowerCase().includes(searchTerm.toLowerCase())
+      dayjs(v.endDate).isAfter(dayjs()) &&
+      v.usedCount < v.usageLimit &&
+      v.code.toLowerCase().includes(trimmedSearch)
   );
 
   const disabledVouchers = vouchers.filter(
     (v) =>
       (dayjs(v.endDate).isBefore(dayjs()) || v.usedCount >= v.usageLimit) &&
-      v.code.toLowerCase().includes(searchTerm.toLowerCase())
+      v.code.toLowerCase().includes(trimmedSearch)
   );
+
+  // Chuyển id danh mục sang tên danh mục
+  const getCategoryNames = (categoryIds?: string[]) => {
+    if (!categoryIds || categoryIds.length === 0) return [];
+    return categoryIds
+      .map((id) => categories.find((c) => c._id === id)?.name)
+      .filter(Boolean) as string[];
+  };
 
   const renderVoucher = (voucher: Voucher, disabled = false) => {
     const isExpired = dayjs(voucher.endDate).isBefore(dayjs());
     const isUsedUp = voucher.usedCount >= voucher.usageLimit;
+    
 
     return (
       <div
@@ -97,22 +139,12 @@ const VoucherList: React.FC = () => {
             disabled ? 'bg-gray-400' : 'bg-red-500'
           }`}
         >
-          {disabled
-            ? isExpired
-              ? 'Hết hạn'
-              : 'Hết lượt'
-            : `×${voucher.usageLimit - voucher.usedCount}`}
+          {disabled ? (isExpired ? 'Hết hạn' : 'Hết lượt') : `×${voucher.usageLimit - voucher.usedCount}`}
         </div>
 
         {/* Logo shop */}
         <div className="bg-orange-600 w-28 flex flex-col items-center justify-center text-white text-sm px-2 py-4">
-          
-       <div className="text-center font-bold text-white text-sm uppercase">
-  VOUCHER
-</div>
-
-
-
+          <div className="text-center font-bold text-white text-sm uppercase">VOUCHER</div>
         </div>
 
         {/* Nội dung */}
@@ -120,7 +152,7 @@ const VoucherList: React.FC = () => {
           <div>
             <p className="font-semibold text-base text-gray-800">{formatDiscount(voucher)}</p>
             <p className="text-sm text-gray-600">
-              Đơn tối thiểu: {voucher.minOrderValue.toLocaleString()}đ
+              Đơn tối thiểu: {voucher.minOrderValue?.toLocaleString() || 0}đ
             </p>
             <p className="text-xs mt-1 text-orange-600 border border-orange-500 px-2 inline-block rounded">
               Mã: {voucher.code}
@@ -130,7 +162,16 @@ const VoucherList: React.FC = () => {
                 ? `Sắp hết hạn: ${dayjs().to(dayjs(voucher.endDate))}`
                 : `HSD: đến ${dayjs(voucher.endDate).format('DD/MM/YYYY')}`}
             </p>
+
+         {voucher.categories && voucher.categories.length > 0 && (
+  <p className="text-xs mt-1 text-blue-600 border border-blue-500 px-2 inline-block rounded">
+    Chỉ áp dụng cho danh mục: {voucher.categories.map(c => c.name).join(', ')}
+  </p>
+)}
+
+
           </div>
+
           {!disabled && (
             <div className="mt-2 text-right">
               <Button
@@ -166,7 +207,7 @@ const VoucherList: React.FC = () => {
       {loading ? (
         <Spin size="large" />
       ) : availableVouchers.length + disabledVouchers.length === 0 ? (
-        <p>Không có voucher nào.</p>
+        <p className="text-center text-gray-500 italic">Không có voucher nào phù hợp.</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {availableVouchers.map((v) => renderVoucher(v, false))}
