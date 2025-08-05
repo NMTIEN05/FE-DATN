@@ -6,9 +6,12 @@ import {
   FaSyncAlt, FaBolt, FaHome, FaChevronRight
 } from 'react-icons/fa';
 
+
 import { useBannerSync } from '../../../hooks/useBannerSync';
 
 import { Link } from 'react-router-dom';
+
+
 
 
 interface BannerSectionProps {
