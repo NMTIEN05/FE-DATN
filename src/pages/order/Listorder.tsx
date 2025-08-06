@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Button } from "antd";
+import { Modal } from "antd";
+import { toast } from "react-toastify";
 import ReturnModal from "./compudent/ReturnModal";
-import { ReloadOutlined } from "@ant-design/icons";
+import ReviewProduct from "../Products/ReviewProduct";
 
 interface Attribute {
   attributeId: { name: string };
@@ -86,7 +87,7 @@ const getStatusStyle = (status: string) => {
 
 const OrderManagement = () => {
   const [showReturnModal, setShowReturnModal] = useState(false);
-const [returningOrderId, setReturningOrderId] = useState<string | null>(null);
+  const [returningOrderId, setReturningOrderId] = useState<string | null>(null);
 
   const [orders, setOrders] = useState<Order[]>([]);
   const [selectedStatus, setSelectedStatus] = useState("all");
@@ -94,6 +95,9 @@ const [returningOrderId, setReturningOrderId] = useState<string | null>(null);
   const [total, setTotal] = useState(0);
   const limit = 10;
   const token = localStorage.getItem("token");
+
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [reviewingProductId, setReviewingProductId] = useState<string | null>(null);
 
   const fetchOrders = async () => {
     try {
@@ -104,7 +108,7 @@ const [returningOrderId, setReturningOrderId] = useState<string | null>(null);
       setOrders(res.data.data);
       setTotal(res.data.total || 0);
     } catch (err) {
-      console.error("❌ Lỗi lấy đơn hàng:", err);
+      toast.error("❌ Lỗi khi tải danh sách đơn hàng");
     }
   };
 
@@ -115,7 +119,7 @@ const [returningOrderId, setReturningOrderId] = useState<string | null>(null);
   const handleCancelOrder = async (orderId: string) => {
     const reason = prompt("Vui lòng nhập lý do huỷ đơn hàng:");
     if (!reason || reason.trim() === "") {
-      alert("Lý do không được để trống");
+      toast.warning("Lý do không được để trống");
       return;
     }
 
@@ -126,29 +130,9 @@ const [returningOrderId, setReturningOrderId] = useState<string | null>(null);
         { headers: { Authorization: `Bearer ${token}` } }
       );
       fetchOrders();
+      toast.success("Huỷ đơn thành công!");
     } catch (err) {
-      alert("Lỗi khi huỷ đơn hàng");
-    }
-  };
-
-  const handleReturnRequest = async (orderId: string) => {
-    const reason = prompt("Vui lòng nhập lý do trả hàng:");
-    if (!reason || reason.trim() === "") {
-      alert("Lý do không được để trống");
-      return;
-    }
-
-    try {
-      await axios.post(
-        `http://localhost:8888/api/orders/${orderId}/return-request`,
-        { reason },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      alert("Đã gửi yêu cầu trả hàng thành công");
-      fetchOrders();
-    } catch (err: any) {
-      alert(err.response?.data?.message || "Không thể gửi yêu cầu trả hàng.");
-      console.error(err);
+      toast.error("❌ Lỗi khi huỷ đơn hàng");
     }
   };
 
@@ -159,12 +143,8 @@ const [returningOrderId, setReturningOrderId] = useState<string | null>(null);
       });
       window.location.href = res.data.paymentUrl;
     } catch (err) {
-      alert("Không thể tạo lại thanh toán.");
+      toast.error("❌ Không thể tạo lại thanh toán");
     }
-  };
-
-  const handleViewDetails = (id: string) => {
-    window.location.href = `/orders/${id}`;
   };
 
   const filteredOrders =
@@ -225,7 +205,7 @@ const [returningOrderId, setReturningOrderId] = useState<string | null>(null);
                           <div className={`mt-1 px-2 py-0.5 rounded-full inline-block ${getStatusStyle(order.status)}`}>
                             {statusLabels[order.status] || order.status}
                           </div>
-                          {/* ✅ Hiện lý do từ chối nếu bị rejected */}
+
                           {["rejected", "return_requested"].includes(order.status) &&
                             order.returnRequest?.reason && (
                               <div className="text-red-600 text-xs mt-1">
@@ -237,7 +217,6 @@ const [returningOrderId, setReturningOrderId] = useState<string | null>(null);
                                 {order.returnRequest.reason}
                               </div>
                             )}
-
                         </div>
                       </div>
                       <p className="text-xs text-gray-600">SL: x{item.quantity}</p>
@@ -257,13 +236,6 @@ const [returningOrderId, setReturningOrderId] = useState<string | null>(null);
               </div>
 
               <div className="mt-2 text-right space-x-2">
-                <button
-                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
-                  onClick={() => handleViewDetails(order._id)}
-                >
-                  Xem chi tiết
-                </button>
-
                 {order.paymentStatus === "unpaid" &&
                   order.paymentMethod === "VNPay" &&
                   order.status !== "cancelled" && (
@@ -285,19 +257,27 @@ const [returningOrderId, setReturningOrderId] = useState<string | null>(null);
                 )}
 
                 {order.status === "delivered" && (
-                 <button
-  
- 
- className="px-4 py-2 bg-emerald-500 text-gray-800 rounded hover:bg-gray-300"
-  onClick={() => {
-    setReturningOrderId(order._id);
-    setShowReturnModal(true);
-  }}
->
-  Yêu cầu trả hàng
-</button>
+                  <>
+                    <button
+                      className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                      onClick={() => {
+                        setReviewingProductId(order.items[0].productId._id);
+                        setShowReviewModal(true);
+                      }}
+                    >
+                      Đánh giá
+                    </button>
 
-
+                    <button
+                      className="px-4 py-2 bg-emerald-500 text-gray-800 rounded hover:bg-gray-300"
+                      onClick={() => {
+                        setReturningOrderId(order._id);
+                        setShowReturnModal(true);
+                      }}
+                    >
+                      Yêu cầu trả hàng
+                    </button>
+                  </>
                 )}
               </div>
             </div>
@@ -323,18 +303,29 @@ const [returningOrderId, setReturningOrderId] = useState<string | null>(null);
           </div>
         )}
       </div>
-      {showReturnModal && returningOrderId && (
-  <ReturnModal
-    orderId={returningOrderId}
-    open={showReturnModal}
-    onClose={() => {
-      setShowReturnModal(false);
-      setReturningOrderId(null);
-    }}
-    onSuccess={fetchOrders}
-  />
-)}
 
+      {showReturnModal && returningOrderId && (
+        <ReturnModal
+          orderId={returningOrderId}
+          open={showReturnModal}
+          onClose={() => {
+            setShowReturnModal(false);
+            setReturningOrderId(null);
+          }}
+          onSuccess={fetchOrders}
+        />
+      )}
+
+      <Modal
+        open={showReviewModal}
+        onCancel={() => setShowReviewModal(false)}
+        footer={null}
+        width={600}
+      >
+        {reviewingProductId && (
+          <ReviewProduct productId={reviewingProductId} hideOldComments={true} />
+        )}
+      </Modal>
     </div>
   );
 };
