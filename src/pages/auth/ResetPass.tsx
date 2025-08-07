@@ -29,7 +29,7 @@ const ResetPassword = () => {
     if (storedEmail) {
       setEmail(storedEmail);
     } else {
-      toast.error("Không tìm thấy email xác thực!");
+       toast.error("Không tìm thấy email xác thực!");
       navigate("/forgot-password");
     }
   }, [navigate]);

@@ -19,6 +19,7 @@ interface CartContextType {
   removeFromCart: (itemId: string) => void;
   updateQuantity: (itemId: string, quantity: number) => void;
   clearCart: () => void;
+  fetchCart: () => void;
   totalItems: number;
   totalPrice: number;
 }
@@ -28,24 +29,24 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [items, setItems] = useState<CartItem[]>([]);
 
-  // Gọi API lấy giỏ hàng nếu đã đăng nhập
+  // ✅ Hàm lấy giỏ hàng từ BE
+  const fetchCart = async () => {
+    try {
+      const res = await axios.get('/cart');
+      setItems(res.data);
+    } catch (err) {
+      console.error('❌ Lỗi khi lấy giỏ hàng:', err);
+    }
+  };
+
+  // ✅ Lấy giỏ hàng khi load lần đầu
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) return;
-
-    const fetchCart = async () => {
-      try {
-        const res = await axios.get('/cart');
-        setItems(res.data);
-      } catch (err) {
-        console.error('❌ Lỗi khi lấy giỏ hàng:', err);
-      }
-    };
-
     fetchCart();
   }, []);
 
-  // Thêm vào giỏ hàng (gọi API BE)
+  // ✅ Thêm vào giỏ hàng và load lại danh sách
   const addToCart = async (item: CartItem) => {
     try {
       const payload = {
@@ -54,16 +55,16 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         quantity: item.quantity,
       };
 
-      const res = await axios.post('/cart/add', payload);
+      await axios.post('/cart/add', payload);
 
-      // Thêm item vào local state từ phản hồi BE
-      setItems((prev) => [...prev, { ...item, _id: res.data._id }]);
+      // 🔁 Load lại danh sách từ backend để đồng bộ
+      await fetchCart();
     } catch (err) {
       console.error('❌ Lỗi khi thêm vào giỏ:', err);
     }
   };
 
-  // Cập nhật số lượng
+  // ✅ Cập nhật số lượng
   const updateQuantity = async (itemId: string, quantity: number) => {
     try {
       const res = await axios.put(`/cart/update/${itemId}`, { quantity });
@@ -77,7 +78,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Xoá 1 sản phẩm khỏi giỏ
+  // ✅ Xoá 1 sản phẩm
   const removeFromCart = async (itemId: string) => {
     try {
       await axios.delete(`/cart/remove/${itemId}`);
@@ -87,7 +88,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Xoá toàn bộ giỏ hàng
+  // ✅ Xoá toàn bộ giỏ hàng
   const clearCart = async () => {
     try {
       await axios.delete('/cart/clear');
@@ -109,6 +110,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updateQuantity,
         clearCart,
         totalItems,
+        fetchCart,
         totalPrice,
       }}
     >

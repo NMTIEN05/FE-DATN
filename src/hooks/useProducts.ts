@@ -1,12 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ProductService } from '../services/product.service';
 import axios from '../api/axios.config';
-
+import { Product } from '../types/product.type';
 
 interface UseProductsParams {
   limit?: number;
   page?: number;
-  sort?: string; // 'price-asc' | 'price-desc' | undefined
+  sort?: string; // 'price-asc' | 'price-desc'
   category_id?: string;
   group_id?: string;
   search?: string;
@@ -27,7 +27,7 @@ export const useProducts = ({
   return useQuery({
     queryKey: ['products', { limit, page, sort, category_id, group_id, search, deleted }],
     queryFn: async () => {
-      let url = `/products?limit=${limit}&offset=${offset}`;
+      let url = `/product?limit=${limit}&offset=${offset}`;
 
       if (category_id) url += `&categoryId=${category_id}`;
       if (group_id) url += `&groupId=${group_id}`;
@@ -67,7 +67,7 @@ export const useUpdateProduct = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, product }: { id: string; product: Partial<Product> }) =>
+    mutationFn: ({ id, product }: { id: number; product: Partial<Product> }) =>
       ProductService.updateProduct(id, product),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
@@ -79,7 +79,7 @@ export const useDeleteProduct = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => ProductService.deleteProduct(id),
+    mutationFn: (id: number) => ProductService.deleteProduct(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
     },

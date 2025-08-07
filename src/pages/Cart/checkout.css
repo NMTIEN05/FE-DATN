@@ -1,0 +1,182 @@
+.checkout-page {
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.checkout-title {
+  display: flex;
+  align-items: center;
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.checkout-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px;
+}
+
+.checkout-left,
+.checkout-right {
+  flex: 1;
+  min-width: 300px;
+}
+
+.checkout-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f7f7f7;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.input-group input,
+.input-group textarea,
+.input-group select {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  outline: none;
+}
+
+.input-group textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.input-group svg {
+  color: #666;
+  font-size: 18px;
+}
+
+.checkout-right {
+  border-left: 1px solid #eee;
+  padding-left: 20px;
+}
+
+.cart-items {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.cart-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f9f9f9;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #eee;
+}
+
+.cart-item-image {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+
+.total-price {
+  display: flex;
+  justify-content: space-between;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.checkout-btn {
+  background: #0060e6;
+  color: #fff;
+  border: none;
+  padding: 14px 24px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+  width: 100%;
+}
+
+.checkout-btn:hover {
+  background: #02cdec;
+}
+
+select {
+  background: transparent;
+}
+
+/* Custom payment method options styling */
+.input-group select option[value="VNPay"]::before {
+  content: '🏦 ';
+}
+.input-group select option[value="Momo"]::before {
+  content: '📱 ';
+}
+.input-group select option[value="Stripe"]::before {
+  content: '💳 ';
+}
+.input-group select option[value="COD"]::before {
+  content: '💵 ';
+}
+.input-group.select-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: #f8f9fa;
+  border: 1px solid #ccc;
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+.select-wrapper select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  border: none;
+  background: transparent;
+  flex: 1;
+  font-size: 16px;
+  padding-left: 10px;
+  outline: none;
+}
+
+.select-wrapper .icon {
+  font-size: 20px;
+  color: #666;
+}
+
+.select-wrapper .select-arrow {
+  position: absolute;
+  right: 12px;
+  pointer-events: none;
+  font-size: 18px;
+  color: #999;
+}
+.checkout-right {
+  flex: 1;
+  min-width: 320px;
+}
+
+.total-price span {
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
