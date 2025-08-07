@@ -3,7 +3,12 @@ import axios from "axios";
 import { Modal } from "antd";
 import { toast } from "react-toastify";
 import ReturnModal from "./compudent/ReturnModal";
+
+import { ReloadOutlined } from "@ant-design/icons";
+import { toast } from "react-toastify"; // nhớ import
+
 import ReviewProduct from "../Products/ReviewProduct";
+
 
 interface Attribute {
   attributeId: { name: string };
@@ -57,6 +62,7 @@ const statusLabels: Record<string, string> = {
   return_requested: "Yêu cầu trả hàng",
   returned: "Đã hoàn trả",
   rejected: "Từ chối hoàn trả",
+  delivery_failed: "Giao hàng thất bại",
   cancelled: "Đã huỷ",
 };
 
@@ -80,6 +86,8 @@ const getStatusStyle = (status: string) => {
       return "bg-pink-100 text-pink-800";
     case "cancelled":
       return "bg-red-100 text-red-800";
+    case "delivery_failed":
+      return "bg-red-100 text-gray-800";
     default:
       return "bg-gray-100 text-gray-800";
   }
@@ -135,6 +143,19 @@ const OrderManagement = () => {
       toast.error("❌ Lỗi khi huỷ đơn hàng");
     }
   };
+const handleConfirmReceived = async (orderId: string) => {
+  try {
+    await axios.patch(
+      `http://localhost:8888/api/orders/${orderId}/confirm-received`,
+      {},
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    toast.success(" Xác nhận đã nhận hàng thành công");
+    fetchOrders(); // Refresh lại danh sách
+  } catch (err: any) {
+    toast.error(err.response?.data?.message || " Lỗi xác nhận đã nhận hàng");
+  }
+};
 
   const handlePayment = async (orderId: string, amount: number) => {
     try {
@@ -206,6 +227,24 @@ const OrderManagement = () => {
                             {statusLabels[order.status] || order.status}
                           </div>
 
+                          {/* ✅ Hiện lý do từ chối nếu bị rejected */}
+                          {["rejected", "return_requested", "delivery_failed"].includes(order.status) &&
+  order.returnRequest?.reason && (
+    <div className="text-red-600 text-xs mt-1">
+      <strong>
+        {order.status === "rejected"
+          ? "Lý do từ chối:"
+          : order.status === "return_requested"
+          ? "Lý do yêu cầu trả hàng:"
+          : "Lý do giao hàng thất bại:"}
+      </strong>{" "}
+      {order.returnRequest.reason}
+    </div>
+)}
+
+
+
+
                           {["rejected", "return_requested"].includes(order.status) &&
                             order.returnRequest?.reason && (
                               <div className="text-red-600 text-xs mt-1">
@@ -217,6 +256,7 @@ const OrderManagement = () => {
                                 {order.returnRequest.reason}
                               </div>
                             )}
+
                         </div>
                       </div>
                       <p className="text-xs text-gray-600">SL: x{item.quantity}</p>
@@ -279,9 +319,19 @@ const OrderManagement = () => {
                     </button>
                   </>
                 )}
+                {order.status === "delivered" && (
+  <button
+    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+    onClick={() => handleConfirmReceived(order._id)}
+  >
+    Đã nhận hàng
+  </button>
+)}
+
               </div>
             </div>
           ))}
+
 
           {filteredOrders.length === 0 && (
             <p className="text-center text-gray-500">Không có đơn hàng nào.</p>
