@@ -1,31 +1,34 @@
 // src/components/Home/BlogSection.tsx
 import React from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import axios from '../../../api/axios.config';
 
-const blogPosts = [
-  {
-    id: 1,
-    title: 'iPhone 16 Pro ra mắt với chip A18 Bionic',
-    thumbnail: 'https://i.pinimg.com/736x/ea/3c/79/ea3c79ac340f9d460655f1069a5ec768.jpg',
-    date: '12/07/2025',
-    slug: 'iphone-16-pro-a18',
-  },
-  {
-    id: 2,
-    title: 'Samsung S24 Ultra - Đối thủ lớn nhất của iPhone',
-    thumbnail: 'https://i.pinimg.com/736x/59/ae/58/59ae58fdaec23d78a962889bb77599a7.jpg',
-    date: '11/07/2025',
-    slug: 'samsung-s24-vs-iphone',
-  },
-  {
-    id: 3,
-    title: 'Top 5 smartphone đáng mua nhất tháng 7',
-    thumbnail: 'https://i.pinimg.com/736x/f4/94/9e/f4949e9df3db5c7f0e33c1a5e04652b0.jpg',
-    date: '10/07/2025',
-    slug: 'top-5-smartphone-t7',
-  },
-];
+type Blog = {
+  _id: string;
+  largeTitle: string;
+  imageUrl?: string;
+  slug?: string;
+  createdAt?: string;
+};
+
+const toFullImageUrl = (url?: string) => {
+  if (!url) return '';
+  return url.startsWith('http') ? url : `http://localhost:8888${url}`;
+};
 
 const BlogSection: React.FC = () => {
+  const navigate = useNavigate();
+  const { data: blogs } = useQuery<Blog[]>({
+    queryKey: ['home_blogs'],
+    queryFn: async () => {
+      const res = await axios.get('/blog', { params: { status: 'published' } });
+      return res.data;
+    }
+  });
+
+  const blogPosts = (blogs || []).slice(0, 3);
+
   return (
     <section style={{ marginTop: 40 }}>
       <div
@@ -48,7 +51,7 @@ const BlogSection: React.FC = () => {
       >
         {blogPosts.map((post) => (
           <div
-            key={post.id}
+            key={post._id}
             style={{
               border: '1px solid #ddd',
               borderRadius: 8,
@@ -56,16 +59,18 @@ const BlogSection: React.FC = () => {
               backgroundColor: '#fff',
               cursor: 'pointer',
             }}
-            onClick={() => (window.location.href = `/blog/${post.slug}`)}
+            onClick={() => navigate(`/blog/${post.slug}`)}
           >
             <img
-              src={post.thumbnail}
-              alt={post.title}
+              src={toFullImageUrl(post.imageUrl)}
+              alt={post.largeTitle}
               style={{ width: '100%', height: 160, objectFit: 'cover' }}
             />
             <div style={{ padding: 12 }}>
-              <div style={{ fontSize: 14, color: '#888', marginBottom: 6 }}>{post.date}</div>
-              <h3 style={{ fontSize: 16 }}>{post.title}</h3>
+              <div style={{ fontSize: 14, color: '#888', marginBottom: 6 }}>
+                {post.createdAt ? new Date(post.createdAt).toLocaleDateString('vi-VN') : ''}
+              </div>
+              <h3 style={{ fontSize: 16 }}>{post.largeTitle}</h3>
             </div>
           </div>
         ))}

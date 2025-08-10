@@ -4,13 +4,30 @@ import { useQuery } from '@tanstack/react-query';
 import axios from '../../api/axios.config';
 import './BlogList.css';
 
+type Blog = {
+  _id: string;
+  largeTitle: string;
+  smallTitle: string;
+  description: string;
+  content: string;
+  imageUrl?: string;
+  author?: string;
+  slug?: string;
+  createdAt?: string;
+};
+
+const toFullImageUrl = (url?: string) => {
+  if (!url) return '';
+  return url.startsWith('http') ? url : `http://localhost:8888${url}`;
+};
+
 const BlogList: React.FC = () => {
   const navigate = useNavigate();
 
-  const { data: blogPosts, isLoading, error } = useQuery({
-    queryKey: ['blog_posts'],
+  const { data: blogPosts, isLoading, error } = useQuery<Blog[]>({
+    queryKey: ['blogs_published'],
     queryFn: async () => {
-      const response = await axios.get('/blog_posts?status=published');
+      const response = await axios.get('/blog', { params: { status: 'published' } });
       return response.data;
     }
   });
@@ -42,24 +59,24 @@ const BlogList: React.FC = () => {
         </div>
 
         <div className="blog-list-grid">
-          {blogPosts?.map((post: any) => (
-            <div 
-              key={post.id} 
+          {blogPosts?.map((post) => (
+            <div
+              key={post._id}
               className="blog-list-card"
               onClick={() => navigate(`/blog/${post.slug}`)}
             >
               <div className="blog-list-image">
-                <img src={post.thumbnail_url} alt={post.title} />
+                <img src={toFullImageUrl(post.imageUrl)} alt={post.largeTitle} />
                 <div className="blog-list-overlay">
                   <span className="blog-list-date">
-                    {new Date(post.published_at).toLocaleDateString('vi-VN')}
+                    {post.createdAt ? new Date(post.createdAt).toLocaleDateString('vi-VN') : ''}
                   </span>
                 </div>
               </div>
               <div className="blog-list-content">
-                <h3 className="blog-list-card-title">{post.title}</h3>
+                <h3 className="blog-list-card-title">{post.largeTitle}</h3>
                 <p className="blog-list-excerpt">
-                  {post.excerpt || post.content?.substring(0, 150) + '...'}
+                  {post.description || (post.content?.substring(0, 150) + '...')}
                 </p>
                 <div className="blog-list-meta">
                   <span className="blog-list-author">HOla Phone</span>
