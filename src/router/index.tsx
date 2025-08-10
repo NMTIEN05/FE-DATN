@@ -29,6 +29,8 @@ import OrderManagement from '../pages/order/Listorder';
 import LuckyWheel from '../pages/voucher/VoucherAdd';
 import VoucherList from '../pages/voucher/VoucherAdd';
 import SavedVoucherList from '../pages/voucher/ListVoucher';
+import BlogList from '../pages/Blog/BlogList';
+import BlogDetail from '../pages/Blog/BlogDetail';
 
 export const routes: RouteObject[] = [
   {
@@ -53,7 +55,9 @@ export const routes: RouteObject[] = [
       // { path: 'account', element: <MyAccount /> },
       { path: 'vouchers', element: <VoucherList /> },
       { path: 'vouchers/my', element: <SavedVoucherList /> },
-
+      
+      { path: 'blog', element: <BlogList /> },
+      { path: 'blog/:slug', element: <BlogDetail /> },
     ],
   },
   // Auth routes (không có layout)
