@@ -122,6 +122,7 @@ const OrderDetail: React.FC = () => {
     status,
     paymentStatus,
     totalAmount,
+    shipperId,
     items,
   } = order;
 
@@ -133,16 +134,28 @@ const OrderDetail: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-10 gap-6">
         <div className="col-span-10 md:col-span-8 space-y-6">
-          <div className="bg-white shadow-md rounded-xl p-6 border border-gray-200 space-y-2 relative">
-            <div className="flex justify-between items-center mb-2">
-              <h2 className="text-xl font-semibold text-gray-700">Thông tin giao hàng</h2>
-              <Button type="primary" ghost onClick={showEditModal}>Chỉnh sửa</Button>
-            </div>
-            <p><b>👤 Họ tên:</b> {shippingInfo?.fullName}</p>
-            <p><b>📞 SĐT:</b> {shippingInfo?.phone}</p>
-            <p><b>📍 Địa chỉ:</b> {shippingInfo?.address}</p>
-            <p><b>💳 Thanh toán:</b> {paymentMethod === 'cod' ? 'COD' : paymentMethod}</p>
-          </div>
+         <div className="bg-white shadow-md rounded-xl p-6 border border-gray-200 space-y-2 relative">
+  <div className="flex justify-between items-center mb-2">
+    <h2 className="text-xl font-semibold text-gray-700">Thông tin giao hàng</h2>
+    <Button type="primary" ghost onClick={showEditModal}>Chỉnh sửa</Button>
+  </div>
+  <p><b>👤 Họ tên:</b> {shippingInfo?.fullName}</p>
+  <p><b>📞 SĐT:</b> {shippingInfo?.phone}</p>
+  <p><b>📍 Địa chỉ:</b> {shippingInfo?.address}</p>
+  <p><b>💳 Thanh toán:</b> {paymentMethod === 'cod' ? 'COD' : paymentMethod}</p>
+
+  {/* Thông tin Shipper */}
+  {shipperId ? (
+    <div className="mt-4 border-t pt-4">
+      <h3 className="text-lg font-semibold text-gray-700">Thông tin Shipper</h3>
+      <p><b>👤 Họ tên:</b> {shipperId.full_name || shipperId.username}</p>
+      <p><b>📞 SĐT:</b> {shipperId.phone}</p>
+    </div>
+  ) : (
+    <p className="mt-4 text-gray-500 italic">Chưa có thông tin Shipper</p>
+  )}
+</div>
+
 
           <div className="bg-white shadow-md rounded-xl p-6 border border-gray-200 space-y-4">
             <h2 className="text-lg font-semibold text-gray-700 border-b pb-2">Sản phẩm trong đơn</h2>
@@ -193,7 +206,8 @@ const OrderDetail: React.FC = () => {
         <div className="col-span-10 md:col-span-2 h-fit bg-white shadow-md rounded-xl p-4 border border-gray-200 space-y-4">
           <h2 className="text-lg font-semibold text-gray-700">Tóm tắt</h2>
           <p><b>Trạng thái:</b></p>
-          <span className={`px-3 py-1 rounded-full text-xs font-bold ${statusClasses[status]}`}>{statusLabels[status]}</span>
+          
+          <span className={`px-3 py-1 rounded-full text-xs font-bold ${statusClasses[status ]} `}>{statusLabels[status]}</span>
 
           <p><b>Thanh toán:</b></p>
           <span className={`px-3 py-1 rounded-full text-xs font-medium ${paymentStatus === 'paid' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
