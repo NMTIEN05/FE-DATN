@@ -139,13 +139,11 @@ const OrderDetail: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchOrder();
+    if (id) fetchOrder();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  const handleCancelOrder = () => {
-    setIsCancelModalOpen(true);
-  };
+  const handleCancelOrder = () => setIsCancelModalOpen(true);
 
   const confirmCancelOrder = async () => {
     const reasonToSend =
@@ -188,13 +186,10 @@ const OrderDetail: React.FC = () => {
     }
   };
 
-  if (loading)
-    return <div className="p-10 text-center">Đang tải...</div>;
+  if (loading) return <div className="p-10 text-center">Đang tải...</div>;
   if (!order)
     return (
-      <div className="p-10 text-center text-red-500">
-        Không tìm thấy đơn hàng
-      </div>
+      <div className="p-10 text-center text-red-500">Không tìm thấy đơn hàng</div>
     );
 
   const {
@@ -209,20 +204,21 @@ const OrderDetail: React.FC = () => {
     discount = 0,
   } = order;
 
+  const safeStatus: OrderStatus = (status as OrderStatus) || "pending";
   const canCancel = ![
     "cancelled",
     "delivered",
     "shipping",
     "return_requested",
     "rejected",
-  ].includes(status);
+  ].includes(safeStatus);
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-10">
       <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">
         Chi tiết đơn hàng{" "}
         <span className="text-blue-600">
-          #{_id?.slice(-8)?.toUpperCase()}
+          #{(_id || "").slice(-8).toUpperCase()}
         </span>
       </h1>
 
@@ -232,9 +228,7 @@ const OrderDetail: React.FC = () => {
           {/* Shipping Card */}
           <div className="bg-white shadow-md rounded-xl p-6 border border-gray-200 space-y-2 relative">
             <div className="flex justify-between items-center mb-2">
-              <h2 className="text-xl font-semibold text-gray-700">
-                Thông tin giao hàng
-              </h2>
+              <h2 className="text-xl font-semibold text-gray-700">Thông tin giao hàng</h2>
               <Button type="primary" ghost onClick={showEditModal}>
                 Chỉnh sửa
               </Button>
@@ -253,24 +247,18 @@ const OrderDetail: React.FC = () => {
               {paymentMethod === "cod" ? "COD" : paymentMethod || "—"}
             </p>
 
-            {/* Shipper */}
             {shipperId ? (
               <div className="mt-4 border-t pt-4">
-                <h3 className="text-lg font-semibold text-gray-700">
-                  Thông tin Shipper
-                </h3>
+                <h3 className="text-lg font-semibold text-gray-700">Thông tin Shipper</h3>
                 <p>
-                  <b>👤 Họ tên:</b>{" "}
-                  {shipperId.full_name || shipperId.username || "—"}
+                  <b>👤 Họ tên:</b> {shipperId.full_name || shipperId.username || "—"}
                 </p>
                 <p>
                   <b>📞 SĐT:</b> {shipperId.phone || "—"}
                 </p>
               </div>
             ) : (
-              <p className="mt-4 text-gray-500 italic">
-                Chưa có thông tin Shipper
-              </p>
+              <p className="mt-4 text-gray-500 italic">Chưa có thông tin Shipper</p>
             )}
           </div>
 
@@ -297,7 +285,7 @@ const OrderDetail: React.FC = () => {
 
                 return (
                   <Link
-                    to={`/product/${product?._id || ""}`}
+                    to={product?._id ? `/product/${product._id}` : "#"}
                     key={`${product?._id || idx}-${idx}`}
                     className="flex gap-4 border-b pb-4 rounded-lg cursor-pointer hover:bg-gray-50"
                   >
@@ -307,9 +295,7 @@ const OrderDetail: React.FC = () => {
                       className="w-20 h-20 object-cover rounded-lg border"
                     />
                     <div className="flex-1 flex flex-col justify-between">
-                      <p className="text-gray-800 font-semibold text-base">
-                        {name}
-                      </p>
+                      <p className="text-gray-800 font-semibold text-base">{name}</p>
                       <div className="flex justify-between text-sm text-gray-600 mt-1">
                         <div>
                           <p>Dung lượng: {capacity}</p>
@@ -318,7 +304,7 @@ const OrderDetail: React.FC = () => {
                         </div>
                         <div className="text-right whitespace-nowrap">
                           <p className="font-bold text-gray-800">
-                            {formatVND(unitPrice * item.quantity)}
+                            {formatVND(unitPrice * (item.quantity || 0))}
                           </p>
                           <p className="text-sm text-gray-500">
                             {formatVND(unitPrice)} / món
@@ -347,10 +333,10 @@ const OrderDetail: React.FC = () => {
             </p>
             <span
               className={`px-3 py-1 rounded-full text-xs font-bold ${
-                statusClasses[status]
+                statusClasses[safeStatus] || "bg-gray-100 text-gray-700"
               }`}
             >
-              {statusLabels[status]}
+              {statusLabels[safeStatus] || safeStatus}
             </span>
           </div>
 
@@ -376,21 +362,17 @@ const OrderDetail: React.FC = () => {
             <div className="space-y-1 text-sm">
               <div className="flex justify-between text-gray-600">
                 <span>Giá gốc:</span>
-                <span>
-                  {formatVND((totalAmount || 0) + (discount || 0))}
-                </span>
+                <span>{formatVND(Number(totalAmount || 0) + Number(discount || 0))}</span>
               </div>
-
-              {(discount || 0) > 0 && (
+              {Number(discount) > 0 && (
                 <div className="flex justify-between text-red-600">
                   <span>Mã giảm giá:</span>
-                  <span>-{formatVND(discount)}</span>
+                  <span>-{formatVND(Number(discount))}</span>
                 </div>
               )}
-
               <div className="flex justify-between text-base font-bold text-blue-700 border-t pt-2 mt-2">
                 <span>Tổng tiền:</span>
-                <span>{formatVND(totalAmount)}</span>
+                <span>{formatVND(Number(totalAmount || 0))}</span>
               </div>
             </div>
           </div>
@@ -403,7 +385,6 @@ const OrderDetail: React.FC = () => {
         </div>
       </div>
 
-      {/* Modal chỉnh sửa thông tin giao hàng */}
       <Modal
         title="Chỉnh sửa thông tin giao hàng"
         open={isModalOpen}
@@ -438,7 +419,6 @@ const OrderDetail: React.FC = () => {
         </Form>
       </Modal>
 
-      {/* Modal lý do hủy đơn hàng */}
       <Modal
         title="Lý do hủy đơn hàng"
         open={isCancelModalOpen}
