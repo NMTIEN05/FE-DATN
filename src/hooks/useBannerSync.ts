@@ -1,78 +1,88 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
 
-interface Banner {
+export interface Banner {
   _id: string;
   title?: string;
-  image: string;
+  image: string;        // URL tuyệt đối sau khi normalize
   description?: string;
   link?: string;
   isActive: boolean;
   order: number;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
-const API_BASE_URL = 'http://localhost:8888/api';
+const API_BASE = import.meta.env?.VITE_API_URL || 'http://localhost:8888';
+const API_URL = `${API_BASE}/api/banners`;
 
 export const useBannerSync = () => {
   const [banners, setBanners] = useState<Banner[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Chuẩn hoá ảnh, path tương đối -> URL tuyệt đối
+  const normalizeImage = (raw?: string) => {
+    if (!raw) return '';
+    return raw.startsWith('http') ? raw : `${API_BASE}${raw}`;
+  };
+
+  // Lấy mảng banner từ nhiều dạng response khác nhau
+  const extractList = (data: any): any[] => {
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data?.data)) return data.data;
+    if (Array.isArray(data?.banners)) return data.banners;
+    return []; // fallback an toàn
+  };
 
   const fetchBanners = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get(`${API_BASE_URL}/banners`);
-      const allBanners = response.data;
-      // Chỉ lấy banners active và sắp xếp theo order
-      const activeBanners = allBanners
-        .filter((banner: Banner) => banner.isActive)
-        .sort((a: Banner, b: Banner) => a.order - b.order);
-      setBanners(activeBanners);
-    } catch (err) {
-      setError('Không thể tải banner');
+
+      const res = await axios.get(API_URL, { timeout: 10000 });
+      const listRaw = extractList(res.data);
+
+      const list: Banner[] = listRaw
+        .map((b: any) => ({
+          _id: b._id || b.id,
+          title: b.title || '',
+          image: normalizeImage(b.image || b.imageUrl),
+          description: b.description || '',
+          link: b.link || '#',
+          isActive: !!b.isActive,
+          order: typeof b.order === 'number' ? b.order : 0,
+          createdAt: b.createdAt,
+          updatedAt: b.updatedAt,
+        }))
+        .filter((b: Banner) => b.isActive)
+        .sort((a: Banner, b: Banner) => (a.order ?? 0) - (b.order ?? 0));
+
+      setBanners(list);
+    } catch (err: any) {
       console.error('Error fetching banners:', err);
+      setError('Không thể tải banner');
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Fetch banners khi component mount
+  useEffect(() => { fetchBanners(); }, [fetchBanners]);
+
+  // Polling 30s
   useEffect(() => {
-    fetchBanners();
+    const id = setInterval(fetchBanners, 30000);
+    return () => clearInterval(id);
   }, [fetchBanners]);
 
-  // Polling để đồng bộ real-time (mỗi 30 giây)
+  // Lắng nghe custom event từ admin (nếu có)
   useEffect(() => {
-    const interval = setInterval(() => {
-      fetchBanners();
-    }, 30000); // 30 giây
-
-    return () => clearInterval(interval);
+    const onUpdated = () => fetchBanners();
+    window.addEventListener('banners-updated', onUpdated);
+    return () => window.removeEventListener('banners-updated', onUpdated);
   }, [fetchBanners]);
 
-  // Lắng nghe event từ Admin panel (nếu có)
-  useEffect(() => {
-    const handleBannerUpdate = () => {
-      fetchBanners();
-    };
+  const refetch = useCallback(() => fetchBanners(), [fetchBanners]);
 
-    window.addEventListener('banners-updated', handleBannerUpdate);
-    return () => {
-      window.removeEventListener('banners-updated', handleBannerUpdate);
-    };
-  }, [fetchBanners]);
-
-  const refetch = useCallback(() => {
-    fetchBanners();
-  }, [fetchBanners]);
-
-  return {
-    banners,
-    loading,
-    error,
-    refetch,
-  };
-}; 
+  return useMemo(() => ({ banners, loading, error, refetch }), [banners, loading, error, refetch]);
+};
