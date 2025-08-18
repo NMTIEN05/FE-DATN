@@ -396,3 +396,8 @@
 .review-container .muted {
   color: var(--rp-muted);
 }
+
+/* helper error text */
+.review-container .error {
+  color: var(--rp-error);
+}

@@ -96,7 +96,6 @@ const ReviewProduct: React.FC<ReviewProductProps> = ({ productId, hideOldComment
       setIsLoadingList(false);
     }
   };
-
   useEffect(() => {
     fetchList();
   }, [productId]);
