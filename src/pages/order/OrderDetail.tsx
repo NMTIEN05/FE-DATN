@@ -16,7 +16,6 @@ const statusLabels: Record<string, string> = {
   cancelled: 'Đã hủy',
 };
 
-
 const statusClasses: Record<string, string> = {
   pending: 'bg-yellow-100 text-yellow-800',
   confirmed: 'bg-blue-100 text-blue-800',
@@ -28,7 +27,6 @@ const statusClasses: Record<string, string> = {
   returned: 'bg-teal-100 text-teal-800',
   cancelled: 'bg-red-100 text-red-800',
 };
-
 
 const predefinedReasons = [
   "Tôi muốn thay đổi địa chỉ/số điện thoại",
@@ -115,15 +113,7 @@ const OrderDetail: React.FC = () => {
   if (loading) return <div className="p-10 text-center">Đang tải...</div>;
   if (!order) return <div className="p-10 text-center text-red-500">Không tìm thấy đơn hàng</div>;
 
-  const {
-    _id,
-    shippingInfo,
-    paymentMethod,
-    status,
-    paymentStatus,
-    totalAmount,
-    items,
-  } = order;
+  const { _id, shippingInfo, paymentMethod, status, paymentStatus, totalAmount, items } = order;
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-10">
@@ -187,6 +177,7 @@ const OrderDetail: React.FC = () => {
                 </Link>
               );
             })}
+            <hr className="my-4" /> {/* Dấu gạch ngang ngăn cách */}
           </div>
         </div>
 
@@ -202,7 +193,7 @@ const OrderDetail: React.FC = () => {
 
           <p><b>Tổng tiền:</b></p>
           <div className="space-y-1 text-sm">
-            <div className="flex justify-between text-gray-600 line-through">
+            <div className="flex justify-between text-gray-600">
               <span>Giá gốc:</span>
               <span>{(order.totalAmount + (order.discount || 0)).toLocaleString("vi-VN")}₫</span>
             </div>
@@ -218,12 +209,11 @@ const OrderDetail: React.FC = () => {
             </div>
           </div>
 
-        {!['cancelled', 'delivered', 'shipping', 'return_requested', 'rejected'].includes(status) && (
-  <Button danger type="primary" block onClick={handleCancelOrder}>
-    Hủy đơn hàng
-  </Button>
-)}
-
+          {!['cancelled', 'delivered', 'shipping', 'return_requested', 'rejected'].includes(status) && (
+            <Button danger type="primary" block onClick={handleCancelOrder}>
+              Hủy đơn hàng
+            </Button>
+          )}
         </div>
       </div>
 
