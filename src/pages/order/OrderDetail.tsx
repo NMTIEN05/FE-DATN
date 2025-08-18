@@ -29,12 +29,12 @@ const statusClasses: Record<string, string> = {
 };
 
 const predefinedReasons = [
-  "Tôi muốn thay đổi địa chỉ/số điện thoại",
-  "Tôi muốn thay đổi sản phẩm",
-  "Tôi tìm thấy giá tốt hơn ở nơi khác",
-  "Thời gian giao hàng quá lâu",
-  "Tôi đặt nhầm",
-  "Khác"
+  'Tôi muốn thay đổi địa chỉ/số điện thoại',
+  'Tôi muốn thay đổi sản phẩm',
+  'Tôi tìm thấy giá tốt hơn ở nơi khác',
+  'Thời gian giao hàng quá lâu',
+  'Tôi đặt nhầm',
+  'Khác',
 ];
 
 const OrderDetail: React.FC = () => {
@@ -60,14 +60,14 @@ const OrderDetail: React.FC = () => {
 
   useEffect(() => {
     if (id) fetchOrder();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  const handleCancelOrder = () => {
-    setIsCancelModalOpen(true);
-  };
+  const handleCancelOrder = () => setIsCancelModalOpen(true);
 
   const confirmCancelOrder = async () => {
-    const reasonToSend = selectedReason === "Khác" ? customReason.trim() : selectedReason;
+    const reasonToSend =
+      selectedReason === 'Khác' ? customReason.trim() : selectedReason;
 
     if (!reasonToSend) {
       message.warning('Vui lòng chọn hoặc nhập lý do hủy đơn hàng.');
@@ -113,12 +113,27 @@ const OrderDetail: React.FC = () => {
   if (loading) return <div className="p-10 text-center">Đang tải...</div>;
   if (!order) return <div className="p-10 text-center text-red-500">Không tìm thấy đơn hàng</div>;
 
-  const { _id, shippingInfo, paymentMethod, status, paymentStatus, totalAmount, items } = order;
+  const {
+    _id,
+    shippingInfo,
+    paymentMethod,
+    status,
+    paymentStatus,
+    totalAmount,
+    shipperId,
+    items,
+    discount = 0,
+  } = order;
+
+  const safeStatus = status || 'pending';
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-10">
       <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">
-        Chi tiết đơn hàng <span className="text-blue-600">#{_id.slice(-8).toUpperCase()}</span>
+        Chi tiết đơn hàng{' '}
+        <span className="text-blue-600">
+          #{(_id || '').slice(-8).toUpperCase()}
+        </span>
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-10 gap-6">
@@ -126,68 +141,107 @@ const OrderDetail: React.FC = () => {
           <div className="bg-white shadow-md rounded-xl p-6 border border-gray-200 space-y-2 relative">
             <div className="flex justify-between items-center mb-2">
               <h2 className="text-xl font-semibold text-gray-700">Thông tin giao hàng</h2>
-              <Button type="primary" ghost onClick={showEditModal}>Chỉnh sửa</Button>
+              <Button type="primary" ghost onClick={showEditModal}>
+                Chỉnh sửa
+              </Button>
             </div>
-            <p><b>👤 Họ tên:</b> {shippingInfo?.fullName}</p>
-            <p><b>📞 SĐT:</b> {shippingInfo?.phone}</p>
-            <p><b>📍 Địa chỉ:</b> {shippingInfo?.address}</p>
-            <p><b>💳 Thanh toán:</b> {paymentMethod === 'cod' ? 'COD' : paymentMethod}</p>
+            <p>
+              <b>👤 Họ tên:</b> {shippingInfo?.fullName}
+            </p>
+            <p>
+              <b>📞 SĐT:</b> {shippingInfo?.phone}
+            </p>
+            <p>
+              <b>📍 Địa chỉ:</b> {shippingInfo?.address}
+            </p>
+            <p>
+              <b>💳 Thanh toán:</b> {paymentMethod === 'cod' ? 'COD' : paymentMethod}
+            </p>
+
+            {shipperId ? (
+              <div className="mt-4 border-t pt-4">
+                <h3 className="text-lg font-semibold text-gray-700">Thông tin Shipper</h3>
+                <p>
+                  <b>👤 Họ tên:</b> {shipperId.full_name || shipperId.username}
+                </p>
+                <p>
+                  <b>📞 SĐT:</b> {shipperId.phone}
+                </p>
+              </div>
+            ) : (
+              <p className="mt-4 text-gray-500 italic">Chưa có thông tin Shipper</p>
+            )}
           </div>
 
           <div className="bg-white shadow-md rounded-xl p-6 border border-gray-200 space-y-4">
             <h2 className="text-lg font-semibold text-gray-700 border-b pb-2">Sản phẩm trong đơn</h2>
-            {items.map((item: any, idx: number) => {
-              const variant = item.variantId;
-              const product = item.productId;
 
-              const image = getImage(variant?.imageUrl);
-              const name = variant?.name || 'Không rõ';
-              const price = variant?.price || 0;
+            {Array.isArray(items) &&
+              items.map((item: any, idx: number) => {
+                const variant = item?.variantId;
+                const product = item?.productId;
 
-              const capacity = product?.capacity || variant?.capacity || "Không rõ";
-              const color = variant?.attributes?.find((a: any) =>
-                a.attributeId?.name?.toLowerCase().includes("màu")
-              )?.attributeValueId?.value || "Không rõ";
+                const image = getImage(variant?.imageUrl);
+                const name = variant?.name || 'Không rõ';
+                const price = Number(variant?.price) || 0;
 
-              return (
-                <Link
-                  to={`/product/${product?._id}`}
-                  key={idx}
-                  className="flex gap-4 border-b pb-4 rounded-lg cursor-pointer"
-                >
-                  <img src={image} alt={name} className="w-20 h-20 object-cover rounded-lg border" />
-                  <div className="flex-1 flex flex-col justify-between">
-                    <p className="text-gray-800 font-semibold text-base">{name}</p>
-                    <div className="flex justify-between text-sm text-gray-600 mt-1">
-                      <div>
-                        <p>Dung lượng: {capacity}</p>
-                        <p>Màu: {color}</p>
-                        <p>Số lượng: {item.quantity}</p>
-                      </div>
-                      <div className="text-right whitespace-nowrap">
-                        <p className="font-bold text-gray-800">
-                          {(price * item.quantity).toLocaleString('vi-VN')}₫
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          {price.toLocaleString('vi-VN')}₫ / món
-                        </p>
+                const capacity = product?.capacity || variant?.capacity || 'Không rõ';
+                const color =
+                  variant?.attributes?.find((a: any) =>
+                    a?.attributeId?.name?.toLowerCase()?.includes('màu')
+                  )?.attributeValueId?.value || 'Không rõ';
+
+                return (
+                  <Link
+                    to={product?._id ? `/product/${product?._id}` : '#'}
+                    key={idx}
+                    className="flex gap-4 border-b pb-4 rounded-lg cursor-pointer"
+                  >
+                    <img src={image} alt={name} className="w-20 h-20 object-cover rounded-lg border" />
+                    <div className="flex-1 flex flex-col justify-between">
+                      <p className="text-gray-800 font-semibold text-base">{name}</p>
+                      <div className="flex justify-between text-sm text-gray-600 mt-1">
+                        <div>
+                          <p>Dung lượng: {capacity}</p>
+                          <p>Màu: {color}</p>
+                          <p>Số lượng: {item?.quantity}</p>
+                        </div>
+                        <div className="text-right whitespace-nowrap">
+                          <p className="font-bold text-gray-800">
+                            {(price * (item?.quantity || 0)).toLocaleString('vi-VN')}₫
+                          </p>
+                          <p className="text-sm text-gray-500">{price.toLocaleString('vi-VN')}₫ / món</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </Link>
-              );
-            })}
-            <hr className="my-4" /> {/* Dấu gạch ngang ngăn cách */}
+                  </Link>
+                );
+              })}
+
+            <hr className="my-4" />
           </div>
         </div>
 
         <div className="col-span-10 md:col-span-2 h-fit bg-white shadow-md rounded-xl p-4 border border-gray-200 space-y-4">
           <h2 className="text-lg font-semibold text-gray-700">Tóm tắt</h2>
+
           <p><b>Trạng thái:</b></p>
-          <span className={`px-3 py-1 rounded-full text-xs font-bold ${statusClasses[status]}`}>{statusLabels[status]}</span>
+          <span
+            className={`px-3 py-1 rounded-full text-xs font-bold ${
+              statusClasses[safeStatus] || 'bg-gray-100 text-gray-700'
+            }`}
+          >
+            {statusLabels[safeStatus] || safeStatus}
+          </span>
 
           <p><b>Thanh toán:</b></p>
-          <span className={`px-3 py-1 rounded-full text-xs font-medium ${paymentStatus === 'paid' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+          <span
+            className={`px-3 py-1 rounded-full text-xs font-medium ${
+              paymentStatus === 'paid'
+                ? 'bg-green-100 text-green-700'
+                : 'bg-red-100 text-red-700'
+            }`}
+          >
             {paymentStatus === 'paid' ? 'Đã thanh toán' : 'Chưa thanh toán'}
           </span>
 
@@ -195,21 +249,21 @@ const OrderDetail: React.FC = () => {
           <div className="space-y-1 text-sm">
             <div className="flex justify-between text-gray-600">
               <span>Giá gốc:</span>
-              <span>{(order.totalAmount + (order.discount || 0)).toLocaleString("vi-VN")}₫</span>
+              <span>{(Number(totalAmount || 0) + Number(discount || 0)).toLocaleString('vi-VN')}₫</span>
             </div>
-            {order.discount > 0 && (
+            {Number(discount) > 0 && (
               <div className="flex justify-between text-red-600">
                 <span>Mã giảm giá:</span>
-                <span>-{order.discount.toLocaleString("vi-VN")}₫</span>
+                <span>-{Number(discount).toLocaleString('vi-VN')}₫</span>
               </div>
             )}
             <div className="flex justify-between text-base font-bold text-blue-700 border-t pt-2 mt-2">
-              <span>Tổng tiền:  </span>
-              <span>{order.totalAmount.toLocaleString("vi-VN")}₫</span>
+              <span>Tổng tiền:</span>
+              <span>{Number(totalAmount || 0).toLocaleString('vi-VN')}₫</span>
             </div>
           </div>
 
-          {!['cancelled', 'delivered', 'shipping', 'return_requested', 'rejected'].includes(status) && (
+          {!['cancelled', 'delivered', 'shipping', 'return_requested', 'rejected'].includes(safeStatus) && (
             <Button danger type="primary" block onClick={handleCancelOrder}>
               Hủy đơn hàng
             </Button>
@@ -217,7 +271,6 @@ const OrderDetail: React.FC = () => {
         </div>
       </div>
 
-      {/* Modal chỉnh sửa thông tin giao hàng */}
       <Modal
         title="Chỉnh sửa thông tin giao hàng"
         open={isModalOpen}
@@ -227,19 +280,30 @@ const OrderDetail: React.FC = () => {
         cancelText="Hủy"
       >
         <Form layout="vertical" form={form}>
-          <Form.Item name="fullName" label="Họ tên" rules={[{ required: true, message: 'Vui lòng nhập họ tên' }]}>
+          <Form.Item
+            name="fullName"
+            label="Họ tên"
+            rules={[{ required: true, message: 'Vui lòng nhập họ tên' }]}
+          >
             <Input />
           </Form.Item>
-          <Form.Item name="phone" label="Số điện thoại" rules={[{ required: true, message: 'Vui lòng nhập SĐT' }]}>
+          <Form.Item
+            name="phone"
+            label="Số điện thoại"
+            rules={[{ required: true, message: 'Vui lòng nhập SĐT' }]}
+          >
             <Input />
           </Form.Item>
-          <Form.Item name="address" label="Địa chỉ" rules={[{ required: true, message: 'Vui lòng nhập địa chỉ' }]}>
+          <Form.Item
+            name="address"
+            label="Địa chỉ"
+            rules={[{ required: true, message: 'Vui lòng nhập địa chỉ' }]}
+          >
             <Input />
           </Form.Item>
         </Form>
       </Modal>
 
-      {/* Modal lý do hủy đơn hàng */}
       <Modal
         title="Lý do hủy đơn hàng"
         open={isCancelModalOpen}
@@ -261,7 +325,7 @@ const OrderDetail: React.FC = () => {
           ))}
         </Radio.Group>
 
-        {selectedReason === "Khác" && (
+        {selectedReason === 'Khác' && (
           <Input.TextArea
             rows={4}
             className="mt-4"
