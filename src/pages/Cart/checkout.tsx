@@ -100,6 +100,7 @@ const handleApplyVoucher = async () => {
     const itemsToCheckout = selectedItems.map((item) => ({
       variantId: item.variantId?._id || item.variantId,
       quantity: item.quantity,
+       price: item.price || item.variantId?.price || 0
     }));
 
     const payload = {
@@ -128,8 +129,10 @@ const handleApplyVoucher = async () => {
       localStorage.removeItem("selectedCheckoutItems");
       navigate(`/orders/${orderId}`);
     } catch (err: any) {
-      console.error("Lỗi khi đặt hàng:", err.response?.data || err);
-      toast.error(err.response?.data?.message || "Lỗi khi đặt hàng");
+      console.error( err.response?.data || err);
+      toast.error(err.response?.data?.message );
+     
+      navigate("/cart");
     } finally {
       setLoading(false);
     }

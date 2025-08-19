@@ -8,19 +8,27 @@ interface Product {
   priceDefault: number;
   imageUrl: string[];
   isFavorite?: boolean;
+  salePrice?: number;
+  discountPercent?: number;
 }
 
 const FlashSaleSection: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [discountPercent, setDiscountPercent] = useState<number>(0);
 
   useEffect(() => {
     const fetchFlashSale = async () => {
       try {
         const res = await axios.get("http://localhost:8888/api/flashsale");
-        const flashSale = res.data?.data?.[0];
-        setDiscountPercent(flashSale?.discountPercent || 0);
-        setProducts(flashSale?.products || []);
+        const flashSalesData = res.data?.data || [];
+
+        // Lấy tất cả sản phẩm từ tất cả flash sale
+        const productsWithSale = flashSalesData.map((fs: any) => ({
+          ...fs.product,
+          salePrice: fs.salePrice,
+          discountPercent: fs.discountPercent,
+        }));
+
+        setProducts(productsWithSale);
       } catch (err) {
         console.error("Lỗi lấy flash sale:", err);
       }
@@ -66,7 +74,8 @@ const FlashSaleSection: React.FC = () => {
             : "/placeholder-image.jpg";
 
           const originalPrice = product.priceDefault ?? 0;
-          const salePrice = Math.round(originalPrice * (1 - discountPercent / 100));
+          const discount = product.discountPercent ?? 0;
+          const salePrice = product.salePrice ?? Math.round(originalPrice * (1 - discount / 100));
           const isFreeShip = salePrice > 10000000;
 
           const handleFavoriteClick = (e: React.MouseEvent) => {
@@ -171,7 +180,7 @@ const FlashSaleSection: React.FC = () => {
                         : "border-green-300 text-green-600 bg-green-50"
                     }`}
                   >
-                    Giảm {discountPercent}% trực tiếp
+                    Giảm {discount}% trực tiếp
                   </span>
                 </div>
 
