@@ -9,13 +9,22 @@ import { WishlistItem, wishlistService } from "../../Services/wishlist/wishlist.
 
 // ------- APIs load category & products -------
 const fetchCategories = async (): Promise<Category[]> => {
-  const res = await axios.get("/category");
-  return res.data.data;
+
+    const res = await axios.get("http://localhost:8888/api/category?limit=4");
+    // Lọc bỏ danh mục có tên "Điện thoại"
+    const categories = res.data.data.filter((c: Category) => c.name !== "Điện thoại");
+    return categories;
 };
 
-const fetchProductsByCategory = async (categoryId: string): Promise<IProduct[]> => {
-  const res = await axios.get(`/product?categoryId=${categoryId}`);
-  return res.data.data;
+
+const fetchProductsByCategory = async (
+    categoryId: string
+): Promise<IProduct[]> => {
+    const res = await axios.get(
+        `http://localhost:8888/api/product?categoryId=${categoryId}`
+    );
+    return res.data.data;
+
 };
 
 // ============================================

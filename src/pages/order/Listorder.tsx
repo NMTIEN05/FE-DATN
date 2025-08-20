@@ -65,6 +65,7 @@ const statusLabels: Record<string, string> = {
   rejected: "Từ chối hoàn trả",
   delivery_failed: "Giao hàng thất bại",
   cancelled: "Đã huỷ",
+  received: "Đã nhận hàng", // Khách xác nhận đã nhận
 };
 
 const getStatusStyle = (status: string) => {
@@ -89,6 +90,8 @@ const getStatusStyle = (status: string) => {
       return "bg-red-100 text-red-800";
     case "delivery_failed":
       return "bg-red-100 text-gray-800";
+      case "received":
+      return "bg-green-100 text-gray-800";
     default:
       return "bg-gray-100 text-gray-800";
   }
@@ -110,41 +113,31 @@ const OrderManagement = () => {
 const navigate = useNavigate();
 
   const fetchOrders = async () => {
-    try {
-      const res = await axios.get("http://localhost:8888/api/orders", {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { limit: 99999, page },
-      });
-      setOrders(res.data.data);
-      setTotal(res.data.total || 0);
-    } catch (err) {
-      toast.error("❌ Lỗi khi tải danh sách đơn hàng");
-    }
-  };
+  if (!token) {
+    toast.error("Bạn chưa đăng nhập");
+    return;
+  }
 
+  try {
+    const res = await axios.get("http://localhost:8888/api/orders/my-orders", {
+      headers: { Authorization: `Bearer ${token}` },
+      params: { limit: 99999, page },
+    });
+
+    console.log("Orders response:", res.data);
+
+    // ✅ BE trả { data: orders }
+    setOrders(res.data.data || []);
+    setTotal((res.data.data || []).length); // vì BE chưa trả total
+  } catch (err: any) {
+    toast.error(err.response?.data?.message || "❌ Lỗi khi tải danh sách đơn hàng");
+  }
+};
   useEffect(() => {
     fetchOrders();
   }, [page]);
 
-  const handleCancelOrder = async (orderId: string) => {
-    const reason = prompt("Vui lòng nhập lý do huỷ đơn hàng:");
-    if (!reason || reason.trim() === "") {
-      toast.warning("Lý do không được để trống");
-      return;
-    }
 
-    try {
-      await axios.patch(
-        `http://localhost:8888/api/orders/${orderId}/cancel`,
-        { reason },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      fetchOrders();
-      toast.success("Huỷ đơn thành công!");
-    } catch (err) {
-      toast.error("❌ Lỗi khi huỷ đơn hàng");
-    }
-  };
 const handleConfirmReceived = async (orderId: string) => {
   try {
     await axios.patch(
@@ -298,33 +291,34 @@ const handleConfirmReceived = async (orderId: string) => {
                     </button>
                     
                   )}
+{(order.status === "delivered" || order.status === "received") && (
+  <>
+    {order.items.some((item) => !item.isReviewed) && (
+      <button
+        className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+        onClick={() => {
+          setReviewingProductId(order.items[0].productId._id);
+          setShowReviewModal(true);
+        }}
+      >
+        Đánh giá
+      </button>
+    )}
 
-                
+    <button
+      className="px-4 py-2 bg-emerald-500 text-gray-800 rounded hover:bg-gray-300"
+      onClick={() => {
+        setReturningOrderId(order._id);
+        setShowReturnModal(true);
+      }}
+    >
+      Yêu cầu trả hàng
+    </button>
+  </>
+)}
 
-                {order.status === "delivered" && (
-                  <>
-                    <button
-                      className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-                      onClick={() => {
-                        setReviewingProductId(order.items[0].productId._id);
-                        setShowReviewModal(true);
-                      }}
-                    >
-                      Đánh giá
-                    </button>
 
-                    <button
-                      className="px-4 py-2 bg-emerald-500 text-gray-800 rounded hover:bg-gray-300"
-                      onClick={() => {
-                        setReturningOrderId(order._id);
-                        setShowReturnModal(true);
-                      }}
-                    >
-                      Yêu cầu trả hàng
-                    </button>
-                  </>
-                )}
-                {order.status === "delivered" && (
+                {order.status === "delivered" &&  (
   <button
     className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
     onClick={() => handleConfirmReceived(order._id)}
@@ -372,15 +366,31 @@ const handleConfirmReceived = async (orderId: string) => {
       )}
 
       <Modal
-        open={showReviewModal}
-        onCancel={() => setShowReviewModal(false)}
-        footer={null}
-        width={600}
-      >
-        {reviewingProductId && (
-          <ReviewProduct productId={reviewingProductId} hideOldComments={true} />
-        )}
-      </Modal>
+  open={showReviewModal}
+  onCancel={() => setShowReviewModal(false)}
+  footer={null}
+  width={600}
+>
+  {reviewingProductId && (
+    <ReviewProduct
+      productId={reviewingProductId}
+      hideOldComments={true}
+      onReviewSuccess={(productId) => {
+        setOrders((prevOrders) =>
+          prevOrders.map((order) => ({
+            ...order,
+            items: order.items.map((item) =>
+              item.productId._id === productId
+                ? { ...item, isReviewed: true } // ✅ cập nhật trạng thái đã đánh giá
+                : item
+            ),
+          }))
+        );
+      }}
+    />
+  )}
+</Modal>
+
     </div>
   );
 };
