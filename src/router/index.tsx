@@ -29,6 +29,9 @@ import OrderManagement from '../pages/order/Listorder';
 import LuckyWheel from '../pages/voucher/VoucherAdd';
 import VoucherList from '../pages/voucher/VoucherAdd';
 import SavedVoucherList from '../pages/voucher/ListVoucher';
+import WishlistPage from '../pages/wishlist/WishlistPage';
+
+// 👇 Thêm import trang Wishlist (đúng với nơi bạn đã tạo)
 
 export const routes: RouteObject[] = [
   {
@@ -50,13 +53,13 @@ export const routes: RouteObject[] = [
       { path: 'orders', element: <OrderManagement /> },
       { path: 'payment-result', element: <PaymentResult /> },
       { path: 'search', element: <SearchResultPage /> },
-      // { path: 'account', element: <MyAccount /> },
       { path: 'vouchers', element: <VoucherList /> },
       { path: 'vouchers/my', element: <SavedVoucherList /> },
 
+      { path: 'favorites', element: <WishlistPage /> },
     ],
   },
-  // Auth routes (không có layout)
+
   { path: '/register', element: <Register /> },
   { path: '/login', element: <Login /> },
   { path: '/checkmail', element: <EmailVerificationUI /> },

@@ -1,146 +1,403 @@
+/* =========================
+   THEME TOKENS (Blue)
+   ========================= */
+:root {
+  --rp-primary: #1e88e5;         /* xanh dương chủ đạo */
+  --rp-primary-2: #1565c0;       /* xanh dương đậm hơn */
+  --rp-primary-ghost: rgba(30, 136, 229, 0.08);
+
+  --rp-star: #f6b100;            /* vàng cho sao */
+  --rp-text: #1f2937;            /* xám đậm */
+  --rp-muted: #6b7280;           /* xám nhạt */
+
+  --rp-border: #e5e7eb;          /* viền */
+  --rp-bg: #ffffff;              /* nền trắng */
+  --rp-card: #fafafa;            /* card xám nhẹ */
+
+  --rp-radius: 14px;
+  --rp-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+/* Optional Dark Mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --rp-text: #e5e7eb;
+    --rp-muted: #a1a1aa;
+    --rp-border: #2a2f3a;
+    --rp-bg: #0b1220;
+    --rp-card: #0f1629;
+    --rp-shadow: 0 10px 30px rgba(0,0,0,.45);
+    --rp-primary-ghost: rgba(30, 136, 229, .16);
+  }
+}
+
+/* =========================
+   CONTAINER
+   ========================= */
 .review-container {
-  max-width: 1200px;
-  margin: 40px auto;
-  padding: 24px;
-  background: #fff;
+  background: var(--rp-bg);
+  border: 1px solid var(--rp-border);
+  border-radius: var(--rp-radius);
+  padding: 18px;
+  color: var(--rp-text);
+  font-family: Inter, Roboto, system-ui, -apple-system, Segoe UI, "Helvetica Neue", Arial, sans-serif;
+  box-shadow: var(--rp-shadow);
+  animation: rp-fadein .25s ease;
+}
+
+@keyframes rp-fadein {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================
+   SUMMARY HEADER (score / breakdown / filters)
+   ========================= */
+.rp-summary {
+  display: grid;
+  grid-template-columns: 220px 1fr 240px;
+  gap: 16px;
+  align-items: stretch;
+  margin-bottom: 14px;
+}
+
+@media (max-width: 980px) {
+  .rp-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --- SCORE CARD --- */
+.rp-score {
+  background: var(--rp-bg);
+  border: 1px solid var(--rp-border);
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 14px;
+  text-align: center;
 }
 
+.rp-score-value {
+  font-size: 42px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--rp-primary);
+  letter-spacing: .5px;
+  margin-bottom: 4px;
+}
+
+.rp-score-count {
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--rp-muted);
+}
+
+/* --- BREAKDOWN --- */
+.rp-breakdown {
+  background: var(--rp-bg);
+  border: 1px solid var(--rp-border);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.rp-row {
+  display: grid;
+  grid-template-columns: 58px 1fr 44px;
+  gap: 10px;
+  align-items: center;
+  margin: 7px 0;
+}
+
+.rp-row-label {
+  font-size: 13px;
+  color: var(--rp-text);
+}
+
+.rp-progress {
+  height: 10px;
+  background: #eef2ff; /* nền thanh */
+  border-radius: 999px;
+  overflow: hidden;
+  outline: 1px solid rgba(30, 136, 229, .06);
+}
+
+.rp-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--rp-primary), var(--rp-primary-2));
+  border-radius: 999px;
+  width: 0%;
+  transition: width .35s ease;
+}
+
+.rp-row-num {
+  text-align: right;
+  font-size: 12px;
+  color: var(--rp-muted);
+}
+
+/* --- FILTER CHIPS --- */
+.rp-actions {
+  background: var(--rp-bg);
+  border: 1px solid var(--rp-border);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.rp-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rp-chip {
+  padding: 6px 12px;
+  font-size: 13px;
+  border: 1px solid var(--rp-border);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--rp-text);
+  cursor: pointer;
+  transition: all .15s ease;
+  user-select: none;
+}
+
+.rp-chip:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(30, 136, 229, .16);
+}
+
+.rp-chip.active {
+  border-color: var(--rp-primary);
+  color: var(--rp-primary);
+  background: var(--rp-primary-ghost);
+}
+
+/* =========================
+   TITLE
+   ========================= */
 .review-title {
-  font-size: 22px;
-  font-weight: 600;
-  margin-bottom: 24px;
-  color: #222;
-  border-bottom: 2px solid #f0f0f0;
-  padding-bottom: 10px;
+  font-size: 18px;
+  font-weight: 800;
+  margin: 6px 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #0d47a1; /* xanh đậm */
 }
 
-.loading-text {
-  color: #888;
-  font-style: italic;
+.review-title .muted {
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--rp-muted);
+  background: var(--rp-primary-ghost);
+  padding: 2px 8px;
+  border-radius: 999px;
 }
 
+/* =========================
+   LIST COMMENTS
+   ========================= */
 .comments-list {
-  margin-bottom: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 16px;
 }
 
 .comment-item {
-  padding: 16px;
-  border-bottom: 1px solid #f0f0f0;
+  border: 1px solid var(--rp-border);
+  border-radius: 12px;
+  padding: 12px;
+  background: var(--rp-card);
+  transition: border-color .2s ease, box-shadow .2s ease, transform .15s ease;
+}
+
+.comment-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(30, 136, 229, .10);
+  border-color: rgba(30, 136, 229, .25);
 }
 
 .comment-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-}
-
-.comment-avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 1px solid #ddd;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
 }
 
 .comment-info {
-  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: #e3f2fd;
+  color: #0d47a1;
+  font-weight: 800;
+  font-size: 14px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(13,71,161,.15);
 }
 
 .comment-username {
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 4px;
+  margin: 0;
+  font-weight: 700;
+  font-size: 14px;
+  color: #0d47a1;
 }
 
-.comment-stars {
-  display: flex;
-  gap: 3px;
-}
-
-.star {
-  font-size: 18px;
-  color: #ccc;
-}
-
-.star.filled {
-  color: #fadb14;
-}
-
-.delete-btn {
-  background: transparent;
-  border: none;
-  color: #f5222d;
-  cursor: pointer;
-  font-weight: 500;
+.comment-time {
+  font-size: 12px;
+  color: var(--rp-muted);
 }
 
 .comment-content {
-  margin-top: 10px;
-  font-size: 15px;
-  color: #444;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--rp-text);
 }
 
+/* =========================
+   STARS (list & sizes)
+   ========================= */
+.comment-stars .star {
+  font-size: 15px;
+  color: #d4d4d8;              /* xám nhạt khi chưa fill */
+  vertical-align: -2px;
+  transition: color .12s ease;
+}
+.comment-stars .star.filled { color: var(--rp-star); }
+
+.comment-stars.size-lg .star { font-size: 22px; }
+.comment-stars.size-sm .star { font-size: 13px; }
+
+/* =========================
+   RATING INPUT (stars chọn)
+   ========================= */
+.comment-rating-stars {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 0 6px;
+  padding: 10px 12px;
+  background: var(--rp-bg);
+  border: 1px solid var(--rp-border);
+  border-radius: 12px;
+}
+
+.comment-rating-stars label {
+  font-weight: 700;
+  color: var(--rp-text);
+}
+
+.comment-rating-stars .star {
+  font-size: 24px;
+  cursor: pointer;
+  color: #cdd0d5;
+  transition: transform .12s ease, color .12s ease;
+}
+
+.comment-rating-stars .star:hover {
+  transform: scale(1.06);
+  color: #fbbf24;
+}
+
+.comment-rating-stars .star.filled {
+  color: var(--rp-star);
+}
+
+/* =========================
+   ADD COMMENT (form)
+   ========================= */
 .add-comment {
-  margin-top: 32px;
+  border: 1px solid var(--rp-border);
+  border-radius: 12px;
+  padding: 12px;
+  background: var(--rp-bg);
 }
 
 .add-comment h3 {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 12px;
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 800;
+  color: #0d47a1;
 }
 
 .comment-input {
   width: 100%;
-  min-height: 80px;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  min-height: 96px;
   resize: vertical;
-  font-size: 14px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--rp-border);
+  outline: none;
+  background: #fff;
+  color: var(--rp-text);
+  transition: border-color .2s ease, box-shadow .2s ease;
+  box-shadow: inset 0 1px 0 rgba(0,0,0,.02);
 }
 
-.comment-rating {
-  margin: 16px 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.comment-input::placeholder {
+  color: #9aa4b2;
 }
 
-.comment-rating label {
-  font-weight: 500;
-  color: #333;
+.comment-input:focus {
+  border-color: var(--rp-primary);
+  box-shadow: 0 0 0 4px rgba(30, 136, 229, .15);
 }
 
-.rating-stars {
-  display: flex;
-  gap: 9px;
-  cursor: pointer;
-}
-
-.rating-stars .star {
-  font-size: 22px;
-  transition: transform 0.2s ease;
-}
-
-.rating-stars .star:hover {
-  transform: scale(1.2);
-}
-
+/* =========================
+   BUTTON
+   ========================= */
 .submit-btn {
-  background-color: #1677ff;
-  color: #fff;
+  margin-top: 10px;
+  width: 140px;
+  padding: 10px 16px;
   border: none;
-  padding: 10px 18px;
-  font-weight: 600;
-  border-radius: 6px;
+  border-radius: 10px;
+  font-weight: 800;
+  letter-spacing: .2px;
+  background: linear-gradient(90deg, var(--rp-primary), var(--rp-primary-2));
+  color: #fff;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: transform .12s ease, box-shadow .2s ease, filter .2s ease;
+  box-shadow: 0 6px 16px rgba(30, 136, 229, .35);
 }
 
 .submit-btn:hover {
-  background-color: #155ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(30, 136, 229, .45);
+  filter: brightness(1.04);
+}
+
+.submit-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 16px rgba(30, 136, 229, .35);
+}
+
+/* =========================
+   MISC
+   ========================= */
+.loading-text {
+  color: var(--rp-primary);
+  font-style: italic;
+  text-align: center;
+}
+
+/* helper muted text */
+.review-container .muted {
+  color: var(--rp-muted);
+}
+
+/* helper error text */
+.review-container .error {
+  color: var(--rp-error);
 }
