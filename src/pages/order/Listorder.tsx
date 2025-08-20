@@ -8,6 +8,7 @@ import { ReloadOutlined } from "@ant-design/icons";
 
 
 import ReviewProduct from "../Products/ReviewProduct";
+import { useNavigate } from "react-router-dom";
 
 
 interface Attribute {
@@ -106,6 +107,7 @@ const OrderManagement = () => {
 
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [reviewingProductId, setReviewingProductId] = useState<string | null>(null);
+const navigate = useNavigate();
 
   const fetchOrders = async () => {
     try {
@@ -187,6 +189,7 @@ const handleConfirmReceived = async (orderId: string) => {
         <div className="bg-white rounded-lg shadow mb-6">
           <div className="flex flex-wrap border-b">
             {[{ label: "Tất cả", value: "all" }, ...Object.entries(statusLabels).map(([value, label]) => ({ label, value }))].map((s, i) => (
+              
               <button
                 key={i}
                 onClick={() => setSelectedStatus(s.value)}
@@ -198,6 +201,7 @@ const handleConfirmReceived = async (orderId: string) => {
                 {s.label}
               </button>
             ))}
+            
           </div>
         </div>
 
@@ -276,6 +280,13 @@ const handleConfirmReceived = async (orderId: string) => {
               </div>
 
               <div className="mt-2 text-right space-x-2">
+                <button
+  className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+  onClick={() => navigate(`/orders/${order._id}`)}
+>
+  Xem chi tiết
+</button>
+
                 {order.paymentStatus === "unpaid" &&
                   order.paymentMethod === "VNPay" &&
                   order.status !== "cancelled" && (
@@ -285,16 +296,10 @@ const handleConfirmReceived = async (orderId: string) => {
                     >
                       Thanh toán
                     </button>
+                    
                   )}
 
-                {["pending", "processing", "ready_to_ship"].includes(order.status) && (
-                  <button
-                    className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                    onClick={() => handleCancelOrder(order._id)}
-                  >
-                    Huỷ đơn
-                  </button>
-                )}
+                
 
                 {order.status === "delivered" && (
                   <>
