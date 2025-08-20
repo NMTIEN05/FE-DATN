@@ -20,14 +20,6 @@ const BrandProductsPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // Map brand names to group IDs or search terms
-    const brandMapping: Record<string, string> = {
-        apple: "iphone",
-        samsung: "Samsung",
-        xiaomi: "Xiaomi",
-        oppo: "OPPO",
-    };
-
     useEffect(() => {
         if (!brand) return;
 
@@ -35,17 +27,16 @@ const BrandProductsPage = () => {
             setIsLoading(true);
             setError(null);
             try {
-                const brandName = brandMapping[brand.toLowerCase()] || brand;
                 const res = await axios.get(
                     "http://localhost:8888/api/product",
                     {
                         params: {
-                            search: brandName,
+                            brandId: brand, // ✅ dùng brandId trực tiếp
                             groupId: searchParams.get("groupId"),
                         },
                     }
                 );
-                setProducts(res.data.data);
+                setProducts(res.data.data || []);
             } catch (err) {
                 setError("Không thể tải sản phẩm theo thương hiệu");
                 console.error("Lỗi khi tải sản phẩm:", err);
@@ -89,7 +80,7 @@ const BrandProductsPage = () => {
                 <div className="p-6">
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="uppercase text-xl font-semibold tracking-wide border border-gray-700 bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700 w-[220px] h-11 flex items-center justify-center text-white rounded-lg shadow-md transform -rotate-1 skew-x-3">
-                            {brandMapping[brand?.toLowerCase()] || brand}
+                            {brand}
                         </h2>
                         <div className="text-gray-600">
                             Tìm thấy {products.length} sản phẩm
@@ -121,31 +112,6 @@ const BrandProductsPage = () => {
                                 const fakeOriginalPrice = salePrice + 1000000;
                                 const isFreeShip = salePrice > 10000000;
 
-                                const handleFavoriteClick = (
-                                    e: React.MouseEvent
-                                ) => {
-                                    e.stopPropagation();
-                                    console.log(
-                                        `Toggle favorite for ${product.title}`
-                                    );
-                                };
-
-                                const handleQuickView = (
-                                    e: React.MouseEvent
-                                ) => {
-                                    e.stopPropagation();
-                                    console.log(`Quick view: ${product.title}`);
-                                };
-
-                                const handleAddToCart = (
-                                    e: React.MouseEvent
-                                ) => {
-                                    e.stopPropagation();
-                                    console.log(
-                                        `Add to cart: ${product.title}`
-                                    );
-                                };
-
                                 return (
                                     <div
                                         key={product._id}
@@ -168,7 +134,12 @@ const BrandProductsPage = () => {
 
                                         {/* Favorite */}
                                         <button
-                                            onClick={handleFavoriteClick}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                console.log(
+                                                    `Toggle favorite for ${product.title}`
+                                                );
+                                            }}
                                             className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-md hover:scale-110 transition-transform duration-200 z-10"
                                             title="Yêu thích"
                                         >
@@ -189,18 +160,24 @@ const BrandProductsPage = () => {
                                             <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
                                                 <div className="flex space-x-3">
                                                     <button
-                                                        onClick={
-                                                            handleQuickView
-                                                        }
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            console.log(
+                                                                `Quick view: ${product.title}`
+                                                            );
+                                                        }}
                                                         className="bg-white p-2 rounded-full shadow hover:bg-gray-100 transition-transform transform hover:scale-110"
                                                         title="Xem nhanh"
                                                     >
                                                         <FaEye className="text-gray-600 text-sm" />
                                                     </button>
                                                     <button
-                                                        onClick={
-                                                            handleAddToCart
-                                                        }
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            console.log(
+                                                                `Add to cart: ${product.title}`
+                                                            );
+                                                        }}
                                                         className="bg-blue-600 p-2 rounded-full shadow hover:bg-blue-700 transition-transform transform hover:scale-110"
                                                         title="Thêm vào giỏ hàng"
                                                     >
@@ -235,14 +212,13 @@ const BrandProductsPage = () => {
                                                         ₫
                                                     </span>
                                                 </div>
-
                                                 <span
                                                     className={`mt-1 text-xs font-medium px-2 py-[2px] rounded border w-fit 
-                          ${
-                              salePrice > 20000000
-                                  ? "border-red-300 text-red-500 bg-red-50"
-                                  : "border-green-300 text-green-600 bg-green-50"
-                          }`}
+                                                        ${
+                                                            salePrice > 20000000
+                                                                ? "border-red-300 text-red-500 bg-red-50"
+                                                                : "border-green-300 text-green-600 bg-green-50"
+                                                        }`}
                                                 >
                                                     Giảm trực tiếp 1.000.000₫
                                                 </span>
