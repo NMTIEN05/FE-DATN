@@ -53,6 +53,17 @@ interface Order {
     requestedAt?: string;
   };
 }
+const PAYMENT_STATUS_LABELS: Record<string, string> = {
+  paid: "Đã thanh toán",
+  unpaid: "Chưa thanh toán",
+  failed: "Thanh toán thất bại",
+};
+
+const PAYMENT_STATUS_COLORS: Record<string, string> = {
+  paid: "green",
+  unpaid: "red",
+  failed: "orange",
+};
 
 const statusLabels: Record<string, string> = {
   pending: "Chờ xác nhận",

@@ -5,15 +5,22 @@ import { Button, Modal, Form, Input, message, Radio } from "antd";
 import { toast } from "react-toastify";
 
 type OrderStatus =
-  | "pending"
-  | "confirmed"
-  | "processing"
-  | "shipping"
-  | "delivered"
-  | "return_requested"
-  | "rejected"
-  | "returned"
-  | "cancelled";
+  | "pending"            // Chờ xác nhận
+  | "confirmed"          // Đã xác nhận (Admin/Shop)
+  | "processing"         // Đang xử lý
+  | "ready_to_ship"      // Chờ giao hàng
+  | "shipped"            // Đang giao hàng (Shipper)
+  | "delivered"          // Shipper đã giao
+  | "received"           // Khách xác nhận đã nhận hàng
+  | "delivery_failed"    // Giao không thành công
+  | "return_requested"   // Yêu cầu trả hàng
+  | "returned"           // Đã hoàn trả
+  | "cancelled"          // Đã hủy (User/Admin)
+  | "rejected";          // Admin từ chối đơn
+
+
+
+
 
 type PaymentStatus = "paid" | "unpaid";
 type PaymentMethod = "cod" | "momo" | "vnpay" | string;
@@ -70,31 +77,40 @@ interface Order {
   discount?: number;
   items: OrderItem[];
   shipperId?: ShipperInfo | null;
+  cancelReason?: string;
+  returnReason?: string; // Thêm dòng này
 }
 
 const statusLabels: Record<OrderStatus, string> = {
   pending: "Chờ xác nhận",
   confirmed: "Đã xác nhận",
   processing: "Đang xử lý",
-  shipping: "Đang giao hàng",
-  delivered: "Đã giao hàng",
+  ready_to_ship: "Chờ giao hàng",
+  shipped: "Đang giao hàng",
+  delivered: "Shipper đã giao",
+  received: "Khách đã nhận hàng",
+  delivery_failed: "Giao không thành công",
   return_requested: "Yêu cầu trả hàng",
-  rejected: "Từ chối hoàn trả",
   returned: "Đã hoàn trả",
   cancelled: "Đã hủy",
+  rejected: "Admin từ hoàn đơn",
 };
 
 const statusClasses: Record<OrderStatus, string> = {
   pending: "bg-yellow-100 text-yellow-800",
   confirmed: "bg-blue-100 text-blue-800",
   processing: "bg-orange-100 text-orange-800",
-  shipping: "bg-purple-100 text-purple-800",
+  ready_to_ship: "bg-purple-100 text-purple-800",
+  shipped: "bg-purple-200 text-purple-800",
   delivered: "bg-green-100 text-green-800",
-  return_requested: "bg-orange-100 text-orange-800",
-  rejected: "bg-pink-100 text-pink-800",
+  received: "bg-green-200 text-green-800",
+  delivery_failed: "bg-red-200 text-red-800",
+  return_requested: "bg-orange-200 text-orange-800",
   returned: "bg-teal-100 text-teal-800",
   cancelled: "bg-red-100 text-red-800",
+  rejected: "bg-pink-100 text-pink-800",
 };
+
 
 const predefinedReasons = [
   "Tôi muốn thay đổi địa chỉ/số điện thoại",
@@ -208,7 +224,7 @@ const OrderDetail: React.FC = () => {
   const canCancel = ![
     "cancelled",
     "delivered",
-    "shipping",
+    "shipped",
     "return_requested",
     "rejected",
   ].includes(safeStatus);
@@ -222,9 +238,9 @@ const OrderDetail: React.FC = () => {
         </span>
       </h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-10 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
         {/* LEFT */}
-        <div className="col-span-10 md:col-span-8 space-y-6">
+        <div className="col-span-12 md:col-span-9 space-y-6">
           {/* Shipping Card */}
           <div className="bg-white shadow-md rounded-xl p-6 border border-gray-200 space-y-2 relative">
             <div className="flex justify-between items-center mb-2">
@@ -323,66 +339,98 @@ const OrderDetail: React.FC = () => {
           </div>
         </div>
 
-        {/* RIGHT */}
-        <div className="col-span-10 md:col-span-2 h-fit bg-white shadow-md rounded-xl p-4 border border-gray-200 space-y-4">
-          <h2 className="text-lg font-semibold text-gray-700">Tóm tắt</h2>
+       {/* RIGHT */}
+<div className="col-span-12 md:col-span-3 h-fit bg-white shadow-md rounded-xl p-4 border border-gray-200 space-y-4">
+  <h2 className="text-lg font-semibold text-gray-700">Tóm tắt</h2>
 
-          <div>
-            <p className="mb-1">
-              <b>Trạng thái:</b>
-            </p>
-            <span
-              className={`px-3 py-1 rounded-full text-xs font-bold ${
-                statusClasses[safeStatus] || "bg-gray-100 text-gray-700"
-              }`}
-            >
-              {statusLabels[safeStatus] || safeStatus}
-            </span>
-          </div>
+  {/* Trạng thái */}
+  <div>
+    <p className="mb-1"><b>Trạng thái:</b></p>
+    <span
+      className={`px-3 py-1 rounded-full text-xs font-bold ${
+        statusClasses[safeStatus] || "bg-gray-100 text-gray-700"
+      }`}
+    >
+      {statusLabels[safeStatus] || safeStatus}
+    </span>
+  </div>
 
-          <div>
-            <p className="mb-1">
-              <b>Thanh toán:</b>
-            </p>
-            <span
-              className={`px-3 py-1 rounded-full text-xs font-medium ${
-                paymentStatus === "paid"
-                  ? "bg-green-100 text-green-700"
-                  : "bg-red-100 text-red-700"
-              }`}
-            >
-              {paymentStatus === "paid" ? "Đã thanh toán" : "Chưa thanh toán"}
-            </span>
-          </div>
+  {/* Lý do hủy */}
+  {order.cancelReason && (
+    <div>
+      <p className="mb-1"><b>Lý do hủy:</b></p>
+      <span className="px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
+        {order.cancelReason}
+      </span>
+    </div>
+  )}
 
-          <div>
-            <p className="mb-1">
-              <b>Tổng tiền:</b>
-            </p>
-            <div className="space-y-1 text-sm">
-              <div className="flex justify-between text-gray-600">
-                <span>Giá gốc:</span>
-                <span>{formatVND(Number(totalAmount || 0) + Number(discount || 0))}</span>
-              </div>
-              {Number(discount) > 0 && (
-                <div className="flex justify-between text-red-600">
-                  <span>Mã giảm giá:</span>
-                  <span>-{formatVND(Number(discount))}</span>
-                </div>
-              )}
-              <div className="flex justify-between text-base font-bold text-blue-700 border-t pt-2 mt-2">
-                <span>Tổng tiền:</span>
-                <span>{formatVND(Number(totalAmount || 0))}</span>
-              </div>
-            </div>
-          </div>
+  {/* Lý do trả hàng / từ chối */}
+  {order.returnRequest && order.returnRequest.status && (
+    <div>
+      <p className="mb-1">
+        <b>
+          {order.returnRequest.status === "rejected"
+            ? "Lý do từ chối hoàn trả:"
+            : "Lý do yêu cầu trả hàng:"}
+        </b>
+      </p>
+      <span
+        className={`px-3 py-1 rounded-full text-xs font-medium ${
+          order.returnRequest.status === "rejected"
+            ? "bg-pink-100 text-pink-800"
+            : "bg-orange-100 text-orange-800"
+        }`}
+      >
+        {order.returnRequest.reason || "—"}
+      </span>
+    </div>
+  )}
 
-          {canCancel && (
-            <Button danger type="primary" block onClick={handleCancelOrder}>
-              Hủy đơn hàng
-            </Button>
-          )}
+  {/* Thanh toán */}
+  <div>
+    <p className="mb-1"><b>Thanh toán:</b></p>
+    <span
+      className={`px-3 py-1 rounded-full text-xs font-medium ${
+        paymentStatus === "paid"
+          ? "bg-green-100 text-green-700"
+          : "bg-red-100 text-red-700"
+      }`}
+    >
+      {paymentStatus === "paid" ? "Đã thanh toán" : "Chưa thanh toán"}
+    </span>
+  </div>
+
+  {/* Tổng tiền */}
+  <div>
+    <p className="mb-1"><b>Tổng tiền:</b></p>
+    <div className="space-y-1 text-sm">
+      <div className="flex justify-between text-gray-600">
+        <span>Giá gốc:</span>
+        <span>{formatVND(Number(totalAmount || 0) + Number(discount || 0))}</span>
+      </div>
+      {Number(discount) > 0 && (
+        <div className="flex justify-between text-red-600">
+          <span>Mã giảm giá:</span>
+          <span>-{formatVND(Number(discount))}</span>
         </div>
+      )}
+      <div className="flex justify-between text-base font-bold text-blue-700 border-t pt-2 mt-2">
+        <span>Tổng tiền:</span>
+        <span>{formatVND(Number(totalAmount || 0))}</span>
+      </div>
+    </div>
+  </div>
+
+  {/* Nút hủy */}
+  {canCancel && (
+    <Button danger type="primary" block onClick={handleCancelOrder}>
+      Hủy đơn hàng
+    </Button>
+  )}
+</div>
+
+
       </div>
 
       <Modal
