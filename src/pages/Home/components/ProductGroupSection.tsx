@@ -7,9 +7,12 @@ import { IProduct } from "../../../types/product";
 import { Category } from "../../../types/category";
 
 const fetchCategories = async (): Promise<Category[]> => {
-    const res = await axios.get("http://localhost:8888/api/category");
-    return res.data.data;
+    const res = await axios.get("http://localhost:8888/api/category?limit=4");
+    // Lọc bỏ danh mục có tên "Điện thoại"
+    const categories = res.data.data.filter((c: Category) => c.name !== "Điện thoại");
+    return categories;
 };
+
 
 const fetchProductsByCategory = async (
     categoryId: string
