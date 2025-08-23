@@ -38,9 +38,13 @@ const handleReturn = async () => {
 
   try {
     setLoading(true);
-    await axios.post(
-      `http://localhost:8888/api/orders/${orderId}/return-request`,
-      { reason: reasonToSend },
+    // Đảm bảo gửi request PATCH thay vì POST và truyền trạng thái phù hợp
+    await axios.put(
+      `http://localhost:8888/api/orders/${orderId}/status`, // Cập nhật API đúng route
+      {
+        status: "return_requested", // Cập nhật trạng thái
+        reason: reasonToSend, // Lý do trả hàng
+      },
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -59,6 +63,7 @@ const handleReturn = async () => {
     setLoading(false);
   }
 };
+
 
 
   return (

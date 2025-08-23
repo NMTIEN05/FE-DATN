@@ -42,6 +42,9 @@ export const routes: RouteObject[] = [
       { path: 'products', element: <Products /> },
       { path: 'dien-thoai', element: <Products /> },
       { path: 'product/:id', element: <Deteil /> },
+      { path: 'product/:id', element: <Deteil /> },
+{ path: 'flashsale/product/:id', element: <Deteil /> },
+
       // { path: 'product/:id/review', element: <ReviewProduct /> },
       { path: 'services', element: <Services /> },
       { path: 'contact', element: <Contact /> },

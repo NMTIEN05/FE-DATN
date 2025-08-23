@@ -3,6 +3,36 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../contexts/CartContext';
 import { FaTrash } from 'react-icons/fa';
 import { BsCartX } from 'react-icons/bs';
+import { Attribute } from '../../utils/utils';
+
+// Interface cho Cart item
+interface CartItemType {
+  _id?: string;
+  productId?: string; // <- string vì backend trả về ObjectId
+  variantId?: string; // <- string
+  productTitle?: string;
+  variantName?: string;
+  quantity: number;
+  price?: number;       // giá đang áp dụng (có flash sale)
+  originalPrice?: number; // giá gốc
+  image?: string;
+  color?: string;
+  variant?: {
+    name?: string;
+    price?: number;
+    stock?: number;
+    imageUrl?: string[];
+    attributes?: Attribute[];
+  };
+  product?: {
+    title?: string;
+    priceDefault?: number;
+    capacity?: string;
+    imageUrl?: string[];
+  };
+  [key: string]: any;
+}
+
 
 const Cart: React.FC = () => {
   const { items, updateQuantity, removeFromCart, fetchCart } = useCart();
@@ -42,18 +72,25 @@ const Cart: React.FC = () => {
 
   const selectedCartItems = items.filter((item) => isChecked(item._id!));
 
-  const totalDiscount = selectedCartItems.reduce((acc, item) => {
-    const price = item.price || (item as any).variantId?.price || 0;
-    const originalPrice = price + 3400000;
-    return acc + (originalPrice - price) * item.quantity;
-  }, 0);
+  // Tổng tiền áp dụng flash sale
+  const totalPrice = selectedCartItems.reduce(
+    (acc, item) => acc + (item.price ?? 0) * item.quantity,
+    0
+  );
 
-  const totalPrice = selectedCartItems.reduce((acc, item) => {
-    const price = item.price || (item as any).variantId?.price || 0;
-    return acc + price * item.quantity;
-  }, 0);
+  // Tổng gốc và khuyến mãi
+  const totalOriginal = selectedCartItems.reduce(
+    (acc, item) =>
+      acc +
+      ((item.originalPrice ??
+        (item.variantId as any)?.price ??
+        (item.productId as any)?.priceDefault ??
+        item.price) as number) *
+        item.quantity,
+    0
+  );
 
-  const totalOriginal = totalPrice + totalDiscount;
+  const totalDiscount = totalOriginal - totalPrice;
 
   return (
     <>
@@ -72,9 +109,16 @@ const Cart: React.FC = () => {
             </div>
           ) : (
             <>
-              {items.map((item) => {
-                const product = (item as any).productId;
-                const variant = (item as any).variantId;
+              {items.map((item: CartItemType) => {
+                const product = item.productId as any;
+                const variant = item.variantId as any;
+
+                const name = item.productTitle || product?.title || 'Sản phẩm';
+                const image =
+                  item.image ||
+                  variant?.imageUrl?.[0] ||
+                  product?.imageUrl?.[0] ||
+                  '/placeholder.jpg';
                 const capacity = product?.capacity;
                 const color =
                   item.color ||
@@ -82,20 +126,15 @@ const Cart: React.FC = () => {
                     a.attributeId?.name?.toLowerCase().includes('màu')
                   )?.attributeValueId?.value;
 
-                const name = item.name || product?.title || 'Sản phẩm';
-                const image =
-                  item.image ||
-                  variant?.imageUrl?.[0] ||
-                  product?.imageUrl?.[0] ||
-                  '/placeholder.jpg';
-                const price = item.price || variant?.price || 0;
-                const oldPrice = price + 3400000;
+                const price = item.price ?? 0;
+                const originalPrice =
+                  item.originalPrice ?? variant?.price ?? product?.priceDefault ?? price;
 
                 return (
                   <div
                     key={item._id}
                     className={`flex items-center gap-4 py-4 px-2 border rounded-md mb-4 transition-all duration-200 ${
-                      isChecked(item._id!) ? 'border' : 'border-gray-200'
+                      isChecked(item._id!) ? 'border-blue-500' : 'border-gray-200'
                     } hover:shadow-sm`}
                   >
                     <input
@@ -114,13 +153,22 @@ const Cart: React.FC = () => {
                       {capacity && <p className="text-xs text-gray-500">Dung lượng: {capacity}</p>}
                       {color && <p className="text-xs text-gray-500">Màu: {color}</p>}
 
+                      {/* Giá hiển thị flash sale */}
                       <div className="flex items-baseline gap-2 mt-1">
-                        <span className="text-red-600 font-semibold text-lg">
-                          {price.toLocaleString('vi-VN')}₫
-                        </span>
-                        <span className="line-through text-sm text-gray-400">
-                          {oldPrice.toLocaleString('vi-VN')}₫
-                        </span>
+                        {price < originalPrice ? (
+                          <>
+                            <span className="line-through text-sm text-gray-400">
+                              {originalPrice.toLocaleString('vi-VN')}₫
+                            </span>
+                            <span className="text-red-600 font-semibold text-lg">
+                              {price.toLocaleString('vi-VN')}₫
+                            </span>
+                          </>
+                        ) : (
+                          <span className="text-red-600 font-semibold text-lg">
+                            {price.toLocaleString('vi-VN')}₫
+                          </span>
+                        )}
                       </div>
 
                       {/* Số lượng + - */}
@@ -158,7 +206,6 @@ const Cart: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Nút xóa */}
                     <div>
                       <button
                         onClick={() => removeFromCart(item._id!)}
