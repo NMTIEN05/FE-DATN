@@ -20,6 +20,12 @@ const formatPrice = (price: number) =>
 
 const isObjectId = (s: string) => /^[a-f\d]{24}$/i.test(s);
 
+// ====== Fallback endpoints cho comments (khớp ReviewProduct) ======
+const COMMENT_BASES = [
+  "http://localhost:8888/api/comments",
+  "http://localhost:8888/api/comments/comments",
+] as const;
+
 async function fetchProductByParam(param: string) {
   if (isObjectId(param)) {
     const { data } = await axios.get(`/product/${param}`);
@@ -34,6 +40,41 @@ async function fetchProductByParam(param: string) {
   }
 }
 
+// Đọc toàn bộ comments theo productId (dùng fetch để không phụ thuộc axios baseURL)
+async function fetchCommentsByProductId(productId: string) {
+  let lastErr: any;
+  for (const base of COMMENT_BASES) {
+    try {
+      const res = await fetch(`${base}/${productId}`);
+      if (!res.ok) {
+        lastErr = new Error(`HTTP ${res.status}`);
+        continue;
+      }
+      const data = await res.json();
+      return Array.isArray(data) ? data : [];
+    } catch (e) {
+      lastErr = e;
+    }
+  }
+  throw lastErr;
+}
+
+// Component hiển thị sao (không dùng hook)
+const StarsRow: React.FC<{ value: number }> = ({ value }) => {
+  const rounded = Math.round(value || 0);
+  return (
+    <>
+      {[1, 2, 3, 4, 5].map((i) =>
+        i <= rounded ? (
+          <StarFilled key={i} className="text-yellow-400 text-lg" />
+        ) : (
+          <StarOutlined key={i} className="text-gray-300 text-lg" />
+        )
+      )}
+    </>
+  );
+};
+
 const ProductDetail = () => {
   const { id: param = "" } = useParams();
   const [product, setProduct] = useState<any>(null);
@@ -41,6 +82,11 @@ const ProductDetail = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedColor, setSelectedColor] = useState(0);
   const [loading, setLoading] = useState(true);
+
+  // === summary rating từ comments ===
+  const [ratingAvg, setRatingAvg] = useState(0);
+  const [ratingCount, setRatingCount] = useState(0);
+
   const scrollRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
@@ -77,6 +123,33 @@ const ProductDetail = () => {
       }
     })();
   }, [product]);
+
+  // Lấy comments -> tính average + count mỗi khi có product._id
+  useEffect(() => {
+    (async () => {
+      try {
+        if (!product?._id) {
+          setRatingAvg(0);
+          setRatingCount(0);
+          return;
+        }
+        const comments = await fetchCommentsByProductId(product._id);
+        const valid = comments.filter(
+          (c: any) => Number(c?.rating) >= 1 && Number(c?.rating) <= 5
+        );
+        const count = valid.length;
+        const avg = count
+          ? valid.reduce((a: number, c: any) => a + Number(c.rating || 0), 0) / count
+          : 0;
+        setRatingAvg(avg);
+        setRatingCount(count);
+      } catch (e) {
+        console.error("Lỗi lấy đánh giá:", e);
+        setRatingAvg(0);
+        setRatingCount(0);
+      }
+    })();
+  }, [product?._id]);
 
   const variant = product?.variants?.[selectedColor];
 
@@ -119,7 +192,7 @@ const ProductDetail = () => {
         quantity: 1,
         price: variant.price,
         name: product.title ?? product.name,
-        image: variant.imageUrl?.[0],
+        image: Array.isArray(variant.imageUrl) ? variant.imageUrl[0] : variant.imageUrl,
       };
 
       await axios.post(
@@ -163,7 +236,14 @@ const ProductDetail = () => {
   }
 
   const title = product.title ?? product.name ?? "Sản phẩm";
-  const cover = Array.isArray(variant?.imageUrl) ? variant.imageUrl[0] : variant?.imageUrl;
+
+  // Ảnh chính: dùng selectedImage nếu có
+  const imgs = Array.isArray(variant?.imageUrl)
+    ? variant.imageUrl
+    : variant?.imageUrl
+    ? [variant.imageUrl]
+    : [];
+  const cover = imgs[selectedImage] ?? imgs[0];
 
   return (
     <div className="max-w-[1200px] mx-auto px-4 py-6">
@@ -183,7 +263,7 @@ const ProductDetail = () => {
           </div>
 
           {/* Thumbnails */}
-          {Array.isArray(variant?.imageUrl) && variant.imageUrl.length > 0 && (
+          {imgs.length > 0 && (
             <div className="relative">
               <button
                 onClick={() => scroll("left")}
@@ -201,7 +281,7 @@ const ProductDetail = () => {
                   </span>
                 </div>
 
-                {variant.imageUrl.map((img: string, i: number) => (
+                {imgs.map((img, i) => (
                   <button
                     key={i}
                     onClick={() => setSelectedImage(i)}
@@ -228,15 +308,12 @@ const ProductDetail = () => {
         <div className="space-y-4">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{title}</h1>
 
+          {/* Sao + lượt đánh giá (đồng bộ từ comments) */}
           <div className="flex items-center gap-1">
-            {[...Array(5)].map((_, i) =>
-              i < 4 ? (
-                <StarFilled key={i} className="text-yellow-400 text-lg" />
-              ) : (
-                <StarOutlined key={i} className="text-gray-300 text-lg" />
-              )
-            )}
-            <span className="text-sm text-gray-600 ml-2">(0 đánh giá)</span>
+            <StarsRow value={ratingAvg} />
+            <span className="text-sm text-gray-600 ml-2">
+              ({ratingCount} đánh giá)
+            </span>
           </div>
 
           {/* Giá */}
@@ -268,7 +345,7 @@ const ProductDetail = () => {
                 {group.map((item) => (
                   <Link
                     key={item._id}
-                    to={`/product/${item._id}`} // dùng _id để chắc chắn
+                    to={`/product/${item._id}`}
                     className={`px-3 py-1.5 rounded-full text-sm border ${
                       item._id === product._id
                         ? "bg-blue-600 text-white border-blue-600"
@@ -298,7 +375,7 @@ const ProductDetail = () => {
                     } ${v.stock === 0 ? "opacity-60" : ""}`}
                   >
                     <img
-                      src={v.imageUrl?.[0]}
+                      src={Array.isArray(v.imageUrl) ? v.imageUrl[0] : v.imageUrl}
                       alt={v.attributes?.[0]?.attributeValueId?.value || "Màu"}
                       className="w-14 h-14 object-contain rounded"
                     />
