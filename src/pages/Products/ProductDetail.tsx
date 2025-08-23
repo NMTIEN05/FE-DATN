@@ -83,6 +83,9 @@ const ProductDetail = () => {
   const [selectedColor, setSelectedColor] = useState(0);
   const [loading, setLoading] = useState(true);
 
+  const [flashSale, setFlashSale] = useState<any>(null);
+
+
   // === summary rating từ comments ===
   const [ratingAvg, setRatingAvg] = useState(0);
   const [ratingCount, setRatingCount] = useState(0);
@@ -153,31 +156,68 @@ const ProductDetail = () => {
 
   const variant = product?.variants?.[selectedColor];
 
-  const handleAddToCart = async () => {
-    try {
-      if (!variant || variant.stock === 0) return;
+  useEffect(() => {
+    if (!product?._id || !variant?._id) return;
 
-      const token = localStorage.getItem("token");
-      if (!token) return alert("Bạn cần đăng nhập để thêm vào giỏ hàng");
+    (async () => {
+      try {
+        const { data } = await axios.get(`/flashsale/product/${product._id}`);
+        setFlashSale(data?.data ?? null);
+      } catch (e) {
+        console.log("Không có flash sale cho sp này");
+      }
+    })();
+  }, [product, variant]);
 
-      await axios.post(
-        "/cart/add",
-        { productId: product._id, variantId: variant._id, quantity: 1 },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      message.open({
-        type: "success",
-        content: "Đã thêm vào giỏ hàng!",
-        icon: <CheckCircleOutlined style={{ color: "#52c41a" }} />,
-        duration: 2,
-        style: { marginTop: "20vh", textAlign: "center", fontSize: 16 },
-      });
-    } catch (error) {
-      console.error("Lỗi thêm giỏ:", error);
-      alert("Thêm vào giỏ hàng thất bại");
-    }
+  const getVariantPrice = (v: any) => {
+    if (!v) return 0;
+    if (flashSale && flashSale.variant?._id === v._id) return flashSale.salePrice;
+    return v.price;
   };
+
+  const getVariantStockText = (v: any) => {
+    if (!v) return "";
+    if (v.stock === 0) return "Hết hàng";
+    if (v.stock <= 5) return `Chỉ còn ${v.stock} sản phẩm`;
+    return `Còn ${v.stock} sản phẩm`;
+  };
+
+const handleAddToCart = async () => {
+  try {
+    if (!variant || variant.stock === 0) return alert("Sản phẩm đã hết hàng");
+
+    const token = localStorage.getItem("token");
+    if (!token) return alert("Bạn cần đăng nhập để thêm vào giỏ hàng");
+
+    const res = await axios.post(
+      "/cart/add",
+      { productId: product._id, variantId: variant._id, quantity: 1 },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    const addedItem = res.data; // lấy đúng object từ backend
+
+    console.log("Đã thêm vào giỏ:", {
+      productId: addedItem.productId,
+      productTitle: addedItem.productTitle,
+      variantId: addedItem.variantId,
+      variantName: addedItem.variantName,
+      quantity: addedItem.quantity,
+      price: addedItem.flashSalePrice ?? addedItem.price, // ưu tiên flash sale
+      flashSale: addedItem.flashSale ?? false,
+      discountPercent: addedItem.discountPercent,
+      flashSaleStart: addedItem.flashSaleStart,
+      flashSaleEnd: addedItem.flashSaleEnd
+    });
+
+    message.success("Đã thêm vào giỏ hàng!");
+  } catch (error) {
+    console.error("Lỗi thêm giỏ:", error);
+    alert("Thêm vào giỏ hàng thất bại");
+  }
+};
+
+
 
   const handleBuyNow = async () => {
     try {
@@ -186,18 +226,20 @@ const ProductDetail = () => {
       const token = localStorage.getItem("token");
       if (!token) return alert("Bạn cần đăng nhập để mua hàng");
 
+      const priceToUse = getVariantPrice(variant);
+
       const selectedItem = {
         productId: product._id,
         variantId: variant._id,
         quantity: 1,
-        price: variant.price,
+        price: priceToUse,
         name: product.title ?? product.name,
         image: Array.isArray(variant.imageUrl) ? variant.imageUrl[0] : variant.imageUrl,
       };
 
       await axios.post(
         "/cart/add",
-        { productId: product._id, variantId: variant._id, quantity: 1 },
+        { productId: product._id, variantId: variant._id, quantity: 1, price: priceToUse },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -273,7 +315,6 @@ const ProductDetail = () => {
               </button>
 
               <div ref={scrollRef} className="flex gap-3 overflow-x-auto px-8 no-scrollbar">
-                {/* Icon nhỏ */}
                 <div className="w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-lg border border-red-500 flex flex-col items-center justify-center text-[10px] text-gray-700">
                   <Star className="w-5 h-5 text-red-500 mb-1" />
                   <span className="text-center leading-tight">
@@ -318,21 +359,21 @@ const ProductDetail = () => {
 
           {/* Giá */}
           <div className="flex flex-wrap items-center gap-3 mt-1">
-            {variant?.oldPrice && variant.oldPrice > variant.price ? (
+            {flashSale && flashSale.variant?._id === variant?._id ? (
               <>
                 <span className="line-through text-gray-400 text-lg">
-                  {formatPrice(variant.oldPrice)}
-                </span>
-                <span className="text-red-600 text-2xl sm:text-3xl font-bold">
                   {formatPrice(variant.price)}
                 </span>
+                <span className="text-red-600 text-2xl sm:text-3xl font-bold">
+                  {formatPrice(flashSale.salePrice)}
+                </span>
                 <span className="bg-red-100 text-red-600 px-2 py-1 text-sm rounded-full font-medium">
-                  Giảm {Math.round(((variant.oldPrice - variant.price) / variant.oldPrice) * 100)}%
+                  Giảm {flashSale.discountPercent}%
                 </span>
               </>
             ) : (
               <span className="text-red-600 text-2xl sm:text-3xl font-bold">
-                {formatPrice(variant?.price ?? product?.priceDefault ?? product?.price ?? 0)}
+                {formatPrice(variant?.price ?? product?.priceDefault ?? 0)}
               </span>
             )}
           </div>
@@ -383,17 +424,14 @@ const ProductDetail = () => {
                       <div className="text-sm font-medium">
                         {v.attributes?.[0]?.attributeValueId?.value || v.name || "Tuỳ chọn"}
                       </div>
-                      {v.oldPrice && v.oldPrice > v.price && (
-                        <div className="text-xs text-gray-400 line-through">
-                          {formatPrice(v.oldPrice)}
-                        </div>
-                      )}
-                      <div className="text-sm text-red-600 font-semibold">{formatPrice(v.price)}</div>
-                      {v.stock === 0 && <div className="text-xs text-gray-500 mt-1">Hết hàng</div>}
-                      {v.stock > 0 && v.stock <= 5 && (
-                        <div className="text-xs text-orange-500 mt-1">Chỉ còn {v.stock} sản phẩm</div>
-                      )}
-                      {v.stock > 5 && <div className="text-xs text-green-600 mt-1">Còn {v.stock} sản phẩm</div>}
+
+                      {/* Giá đúng flash sale */}
+                      <div className="text-sm text-red-600 font-semibold">
+                        {formatPrice(getVariantPrice(v))}
+                      </div>
+
+                      {/* Stock */}
+                      <div className="text-xs text-gray-500 mt-1">{getVariantStockText(v)}</div>
                     </div>
                     {selectedColor === idx && <CheckOutlined className="text-blue-500" />}
                   </div>

@@ -37,8 +37,6 @@ import SaleProductsPage from "../pages/SaleProductsPage";
 
 import ContactPage from "../pages/ContactPage";
 
-// 👇 Thêm import trang Wishlist (đúng với nơi bạn đã tạo)
-
 export const routes: RouteObject[] = [
     {
         path: "/",
@@ -48,7 +46,8 @@ export const routes: RouteObject[] = [
             { path: "products", element: <Products /> },
             { path: "dien-thoai", element: <Products /> },
             { path: "product/:id", element: <Deteil /> },
-            // { path: 'product/:id/review', element: <ReviewProduct /> },
+            { path: "flashsale/product/:id", element: <Deteil /> },
+            // { path: "product/:id/review", element: <ReviewProduct /> },
             { path: "services", element: <Services /> },
             { path: "contact", element: <Contact /> },
             { path: "cart", element: <Cart /> },
@@ -61,19 +60,13 @@ export const routes: RouteObject[] = [
             { path: "search", element: <SearchResultPage /> },
             { path: "vouchers", element: <VoucherList /> },
             { path: "vouchers/my", element: <SavedVoucherList /> },
-
             { path: "favorites", element: <WishlistPage /> },
-            { path: "contact", element: <ContactPage /> },
             { path: "store-info", element: <StoreInfoPage /> },
             { path: "tech-news", element: <TechNewsPage /> },
             { path: "exchange", element: <ExchangePage /> },
             { path: "sale-products", element: <SaleProductsPage /> },
-            {
-                /* ✅ sửa chỗ này */
-            },
         ],
     },
-
     { path: "/register", element: <Register /> },
     { path: "/login", element: <Login /> },
     { path: "/checkmail", element: <EmailVerificationUI /> },
