@@ -36,6 +36,7 @@ import ExchangePage from "../pages/ExchangePage";
 import SaleProductsPage from "../pages/SaleProductsPage";
 
 import ContactPage from "../pages/ContactPage";
+import Account from "../pages/auth/account";
 
 export const routes: RouteObject[] = [
     {
@@ -65,6 +66,8 @@ export const routes: RouteObject[] = [
             { path: "tech-news", element: <TechNewsPage /> },
             { path: "exchange", element: <ExchangePage /> },
             { path: "sale-products", element: <SaleProductsPage /> },
+                  { path: "account", element: <Account /> },  // 
+
         ],
     },
     { path: "/register", element: <Register /> },

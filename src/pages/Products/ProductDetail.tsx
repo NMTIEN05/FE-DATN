@@ -20,7 +20,6 @@ const formatPrice = (price: number) =>
 
 const isObjectId = (s: string) => /^[a-f\d]{24}$/i.test(s);
 
-// ====== Fallback endpoints cho comments (khớp ReviewProduct) ======
 const COMMENT_BASES = [
   "http://localhost:8888/api/comments",
   "http://localhost:8888/api/comments/comments",
@@ -40,7 +39,6 @@ async function fetchProductByParam(param: string) {
   }
 }
 
-// Đọc toàn bộ comments theo productId (dùng fetch để không phụ thuộc axios baseURL)
 async function fetchCommentsByProductId(productId: string) {
   let lastErr: any;
   for (const base of COMMENT_BASES) {
@@ -59,7 +57,6 @@ async function fetchCommentsByProductId(productId: string) {
   throw lastErr;
 }
 
-// Component hiển thị sao (không dùng hook)
 const StarsRow: React.FC<{ value: number }> = ({ value }) => {
   const rounded = Math.round(value || 0);
   return (
@@ -75,6 +72,85 @@ const StarsRow: React.FC<{ value: number }> = ({ value }) => {
   );
 };
 
+const DescriptionCard: React.FC<{
+  short?: string;
+  full?: string;        
+  maxChars?: number;    
+}> = ({ short, full, maxChars = 500 }) => {
+  const [expanded, setExpanded] = useState(false);
+
+  const hasContent = (short && short.trim()) || (full && full.trim());
+  if (!hasContent) return null;
+
+  const fullText = String(full || "");
+  const preview = fullText.length > maxChars ? fullText.slice(0, maxChars) + "…" : fullText;
+  const isTruncated = fullText.length > maxChars;
+
+  return (
+    <div className="mt-10 rounded-2xl border shadow-sm bg-white overflow-hidden">
+      <div className="flex items-center gap-3 px-5 py-4 border-b bg-gradient-to-r from-gray-50 to-white">
+        <div className="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center">
+          <Star className="w-5 h-5" />
+        </div>
+        <div>
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Mô tả sản phẩm</h2>
+          <p className="text-xs text-gray-500">Thông tin tổng quan, điểm nổi bật</p>
+        </div>
+      </div>
+
+      <div className="p-5 sm:p-6">
+        {short?.trim() && (
+          <div className="mb-4 rounded-xl bg-blue-50/60 border border-blue-100 px-4 py-3">
+            <div className="text-[13px] font-medium text-blue-900">Thông tin nhanh</div>
+            <div className="text-[13px] text-blue-800 mt-1">{short}</div>
+          </div>
+        )}
+
+        {full?.trim() && (
+          <>
+            <div className="text-[15px] leading-relaxed text-gray-800 whitespace-pre-line">
+              {expanded ? fullText : preview}
+            </div>
+
+            {isTruncated && (
+              <div className="mt-3">
+                <button
+                  onClick={() => setExpanded((v) => !v)}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium
+                             border border-gray-300 hover:border-gray-400 transition bg-white"
+                >
+                  {expanded ? "Thu gọn" : "Xem thêm"}
+                  <svg
+                    className={`w-4 h-4 transition ${expanded ? "rotate-180" : ""}`}
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="1.8" fill="none" />
+                  </svg>
+                </button>
+              </div>
+            )}
+          </>
+        )}
+
+        <div className="mt-6 grid sm:grid-cols-3 gap-3">
+          <div className="rounded-xl border bg-gray-50 px-4 py-3 text-sm">
+            <div className="font-medium text-gray-800">Hàng chính hãng</div>
+            <div className="text-gray-600 mt-1">Nguồn gốc rõ ràng, bảo hành tại TTBH uỷ quyền.</div>
+          </div>
+          <div className="rounded-xl border bg-gray-50 px-4 py-3 text-sm">
+            <div className="font-medium text-gray-800">Đổi trả 7 ngày</div>
+            <div className="text-gray-600 mt-1">Đổi sản phẩm nếu lỗi do NSX theo chính sách.</div>
+          </div>
+          <div className="rounded-xl border bg-gray-50 px-4 py-3 text-sm">
+            <div className="font-medium text-gray-800">Hỗ trợ trả góp</div>
+            <div className="text-gray-600 mt-1">Lãi suất tốt, duyệt nhanh tại cửa hàng.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const ProductDetail = () => {
   const { id: param = "" } = useParams();
   const [product, setProduct] = useState<any>(null);
@@ -83,10 +159,6 @@ const ProductDetail = () => {
   const [selectedColor, setSelectedColor] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  const [flashSale, setFlashSale] = useState<any>(null);
-
-
-  // === summary rating từ comments ===
   const [ratingAvg, setRatingAvg] = useState(0);
   const [ratingCount, setRatingCount] = useState(0);
 
@@ -127,7 +199,6 @@ const ProductDetail = () => {
     })();
   }, [product]);
 
-  // Lấy comments -> tính average + count mỗi khi có product._id
   useEffect(() => {
     (async () => {
       try {
@@ -156,30 +227,30 @@ const ProductDetail = () => {
 
   const variant = product?.variants?.[selectedColor];
 
-  useEffect(() => {
-    if (!product?._id || !variant?._id) return;
+  const handleAddToCart = async () => {
+    try {
+      if (!variant || variant.stock === 0) return;
 
-    (async () => {
-      try {
-        const { data } = await axios.get(`/flashsale/product/${product._id}`);
-        setFlashSale(data?.data ?? null);
-      } catch (e) {
-        console.log("Không có flash sale cho sp này");
-      }
-    })();
-  }, [product, variant]);
+      const token = localStorage.getItem("token");
+      if (!token) return alert("Bạn cần đăng nhập để thêm vào giỏ hàng");
 
-  const getVariantPrice = (v: any) => {
-    if (!v) return 0;
-    if (flashSale && flashSale.variant?._id === v._id) return flashSale.salePrice;
-    return v.price;
-  };
+      await axios.post(
+        "/cart/add",
+        { productId: product._id, variantId: variant._id, quantity: 1 },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-  const getVariantStockText = (v: any) => {
-    if (!v) return "";
-    if (v.stock === 0) return "Hết hàng";
-    if (v.stock <= 5) return `Chỉ còn ${v.stock} sản phẩm`;
-    return `Còn ${v.stock} sản phẩm`;
+      message.open({
+        type: "success",
+        content: "Đã thêm vào giỏ hàng!",
+        icon: <CheckCircleOutlined style={{ color: "#52c41a" }} />,
+        duration: 2,
+        style: { marginTop: "20vh", textAlign: "center", fontSize: 16 },
+      });
+    } catch (error) {
+      console.error("Lỗi thêm giỏ:", error);
+      alert("Thêm vào giỏ hàng thất bại");
+    }
   };
 
 const handleAddToCart = async () => {
@@ -264,6 +335,7 @@ const handleAddToCart = async () => {
   }
 };
 
+
   if (loading) {
     return (
       <div className="max-w-[1200px] mx-auto px-4 py-10">
@@ -292,7 +364,6 @@ const handleAddToCart = async () => {
 
   const title = product.title ?? product.name ?? "Sản phẩm";
 
-  // Ảnh chính: dùng selectedImage nếu có
   const imgs = Array.isArray(variant?.imageUrl)
     ? variant.imageUrl
     : variant?.imageUrl
@@ -303,7 +374,6 @@ const handleAddToCart = async () => {
   return (
     <div className="max-w-[1200px] mx-auto px-4 py-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Ảnh sản phẩm */}
         <div className="space-y-4">
           <div className="w-full aspect-square bg-white border rounded-xl shadow-md flex items-center justify-center overflow-hidden">
             {cover ? (
@@ -317,7 +387,6 @@ const handleAddToCart = async () => {
             )}
           </div>
 
-          {/* Thumbnails */}
           {imgs.length > 0 && (
             <div className="relative">
               <button
@@ -358,40 +427,34 @@ const handleAddToCart = async () => {
           )}
         </div>
 
-        {/* Thông tin */}
         <div className="space-y-4">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{title}</h1>
 
-          {/* Sao + lượt đánh giá (đồng bộ từ comments) */}
           <div className="flex items-center gap-1">
             <StarsRow value={ratingAvg} />
-            <span className="text-sm text-gray-600 ml-2">
-              ({ratingCount} đánh giá)
-            </span>
+            <span className="text-sm text-gray-600 ml-2">({ratingCount} đánh giá)</span>
           </div>
 
-          {/* Giá */}
           <div className="flex flex-wrap items-center gap-3 mt-1">
-            {flashSale && flashSale.variant?._id === variant?._id ? (
+            {variant?.oldPrice && variant.oldPrice > variant.price ? (
               <>
                 <span className="line-through text-gray-400 text-lg">
-                  {formatPrice(variant.price)}
+                  {formatPrice(variant.oldPrice)}
                 </span>
                 <span className="text-red-600 text-2xl sm:text-3xl font-bold">
-                  {formatPrice(flashSale.salePrice)}
+                  {formatPrice(variant.price)}
                 </span>
                 <span className="bg-red-100 text-red-600 px-2 py-1 text-sm rounded-full font-medium">
-                  Giảm {flashSale.discountPercent}%
+                  Giảm {Math.round(((variant.oldPrice - variant.price) / variant.oldPrice) * 100)}%
                 </span>
               </>
             ) : (
               <span className="text-red-600 text-2xl sm:text-3xl font-bold">
-                {formatPrice(variant?.price ?? product?.priceDefault ?? 0)}
+                {formatPrice(variant?.price ?? product?.priceDefault ?? product?.price ?? 0)}
               </span>
             )}
           </div>
 
-          {/* Phiên bản (group) */}
           {group.length > 1 && (
             <div>
               <h3 className="font-medium text-gray-800 mb-2">Dung lượng/phiên bản:</h3>
@@ -413,7 +476,6 @@ const handleAddToCart = async () => {
             </div>
           )}
 
-          {/* Biến thể / màu sắc */}
           {Array.isArray(product.variants) && product.variants.length > 0 && (
             <div>
               <h3 className="font-medium text-gray-800 mb-2">Chọn màu:</h3>
@@ -437,14 +499,17 @@ const handleAddToCart = async () => {
                       <div className="text-sm font-medium">
                         {v.attributes?.[0]?.attributeValueId?.value || v.name || "Tuỳ chọn"}
                       </div>
-
-                      {/* Giá đúng flash sale */}
-                      <div className="text-sm text-red-600 font-semibold">
-                        {formatPrice(getVariantPrice(v))}
-                      </div>
-
-                      {/* Stock */}
-                      <div className="text-xs text-gray-500 mt-1">{getVariantStockText(v)}</div>
+                      {v.oldPrice && v.oldPrice > v.price && (
+                        <div className="text-xs text-gray-400 line-through">
+                          {formatPrice(v.oldPrice)}
+                        </div>
+                      )}
+                      <div className="text-sm text-red-600 font-semibold">{formatPrice(v.price)}</div>
+                      {v.stock === 0 && <div className="text-xs text-gray-500 mt-1">Hết hàng</div>}
+                      {v.stock > 0 && v.stock <= 5 && (
+                        <div className="text-xs text-orange-500 mt-1">Chỉ còn {v.stock} sản phẩm</div>
+                      )}
+                      {v.stock > 5 && <div className="text-xs text-green-600 mt-1">Còn {v.stock} sản phẩm</div>}
                     </div>
                     {selectedColor === idx && <CheckOutlined className="text-blue-500" />}
                   </div>
@@ -453,7 +518,6 @@ const handleAddToCart = async () => {
             </div>
           )}
 
-          {/* Nút mua */}
           <div className="flex flex-col sm:flex-row gap-3 mt-4">
             <Button
               type="primary"
@@ -474,7 +538,6 @@ const handleAddToCart = async () => {
             </Button>
           </div>
 
-          {/* Chính sách */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 text-sm text-center">
             <div className="bg-gray-50 p-3 rounded-xl border">
               <CarOutlined className="text-blue-500 text-xl" />
@@ -491,6 +554,11 @@ const handleAddToCart = async () => {
           </div>
         </div>
       </div>
+
+      <DescriptionCard
+        short={product.shortDescription}
+        full={product.description}
+      />
     </div>
   );
 };
