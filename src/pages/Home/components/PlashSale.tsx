@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FaHeart, FaRegHeart, FaEye, FaShoppingCart } from "react-icons/fa";
 import { FieldTimeOutlined } from "@ant-design/icons";
+import { Progress } from "antd";
 
 interface Product {
   _id: string;
@@ -11,6 +12,8 @@ interface Product {
   isFavorite?: boolean;
   salePrice?: number;
   discountPercent?: number;
+  quantity?: number;        // tổng số xuất flash sale
+  soldQuantity?: number;    // số đã bán
 }
 
 const FlashSaleSection: React.FC = () => {
@@ -27,6 +30,8 @@ const FlashSaleSection: React.FC = () => {
           ...fs.product,
           salePrice: fs.salePrice,
           discountPercent: fs.discountPercent,
+          quantity: fs.quantity,
+          soldQuantity: fs.soldQuantity,
         }));
         
         setProducts(productsWithSale);
@@ -73,8 +78,7 @@ const FlashSaleSection: React.FC = () => {
             ? product.imageUrl[0]
             : "/placeholder-image.jpg";
           const originalPrice = product.priceDefault ?? 0;
-          const discount = product.discountPercent ?? 0;
-          const salePrice = product.salePrice ?? Math.round(originalPrice * (1 - discount / 100));
+          const salePrice = product.salePrice ?? originalPrice;
           const isFreeShip = salePrice > 10000000;
 
           const handleFavoriteClick = (e: React.MouseEvent) => {
@@ -157,12 +161,25 @@ const FlashSaleSection: React.FC = () => {
                       {salePrice.toLocaleString("vi-VN")}₫
                     </span>
                   </div>
-                  <span
-                    className={`mt-1 text-xs font-medium px-2 py-[2px] rounded-full w-fit 
-                    ${salePrice > 20000000 ? "bg-red-100 text-red-600" : "bg-green-100 text-green-600"}`}
-                  >
-                    Giảm {discount}% trực tiếp
-                  </span>
+                  {/* 🔥 Thay đổi phần hiển thị giảm giá bằng số xuất flash sale */}
+                 <div className="flex flex-col gap-1 mt-1">
+  <div className="flex justify-between items-center text-xs font-medium">
+    <span>
+      Đã bán {product.soldQuantity} / {product.quantity}
+    </span>
+    <span className="text-gray-500">
+      {product.quantity ? Math.round((product.soldQuantity! / product.quantity) * 100) : 0}%
+    </span>
+  </div>
+  <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+    <div
+      className="h-full bg-rose-500"
+      style={{
+        width: `${product.quantity ? (product.soldQuantity! / product.quantity) * 100 : 0}%`,
+      }}
+    ></div>
+  </div>
+</div>
                 </div>
                 <div className="flex items-center mt-2">
                   <div className="flex text-yellow-400 text-sm">
@@ -178,7 +195,6 @@ const FlashSaleSection: React.FC = () => {
         })}
       </div>
       
-      {/* Vị trí mới của nút "Xem tất cả" */}
       <div className="text-center mt-8">
         <a
           href="/all-sales"
