@@ -10,6 +10,8 @@ import {
   FaMoneyCheckAlt,
   FaBoxOpen,
   FaAngleDown,
+  FaCreditCard,
+  FaMoneyBillWave,
 } from "react-icons/fa";
 import "./Checkout.css";
 import { jwtDecode } from "jwt-decode";
@@ -29,7 +31,22 @@ const Checkout = () => {
   const [voucherCode, setVoucherCode] = useState("");
   const [discount, setDiscount] = useState(0);
   const [finalTotal, setFinalTotal] = useState(0);
+// const [address, setAddress] = useState("");   // Giá trị gộp
+const [city, setCity] = useState("");
+const [district, setDistrict] = useState("");
+const [ward, setWard] = useState("");
+const [cuthe, setCuthe] = useState("");
 
+
+const handleAddressChange = (value: string, type: 'city' | 'district' | 'ward'|'cuthe') => {
+  if (type === 'city') setCity(value);
+  if (type === 'district') setDistrict(value);
+  if (type === 'ward') setWard(value);
+  if (type === 'cuthe') setCuthe(value);
+
+  // Gộp thành 1 chuỗi để lưu vào `address`
+  setAddress(`${cuthe},${ward}, ${district}, ${city}`);
+};
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -139,65 +156,167 @@ const handleApplyVoucher = async () => {
   };
 
   return (
-  <div className="checkout-page">
-  <h2 className="checkout-title">
-    <FaBoxOpen style={{ marginRight: 8 }} /> Xác nhận đơn hàng
-  </h2>
+    <div className="mt-[60px]" >
+      <h2 className="flex items-center justify-center text-2xl font-semibold mb-6 text-gray-900">
+  <FaBoxOpen className="w-7 h-7 mr-2 text-blue-600" />
+  Xác nhận đơn hàng
+</h2>
+
+  <div className="checkout-page ">
+  
 
   <div className="checkout-content">
     {/* Bên trái - Form thông tin giao hàng */}
     <div className="checkout-left">
       <div className="checkout-form">
-        <h3>Thông tin giao hàng</h3>
+<h3 className="text-lg md:text-xl font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">
+  Thông tin giao hàng
+</h3>
 
-        <div className="input-group">
-          <FaUser />
-          <input
-            type="text"
-            placeholder="Họ tên người nhận"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-          />
-        </div>
+{/* Họ tên người nhận */}
+<div className="flex flex-col w-full mt-4">
+  <span className="mb-2 text-gray-700 font-medium">Họ tên người nhận</span>
+  <div className="flex items-center bg-white border border-gray-300 rounded-lg shadow-sm focus-within:ring-2 focus-within:ring-blue-500 p-3">
+    <FaUser className="text-gray-400 text-xl mr-3" />
+    <input
+      type="text"
+      placeholder="Nhập họ tên"
+      value={fullName}
+      onChange={(e) => setFullName(e.target.value)}
+      className="flex-1 outline-none placeholder-gray-400 text-gray-800"
+    />
+  </div>
+</div>
 
-        <div className="input-group">
-          <FaPhone />
-          <input
-            type="text"
-            placeholder="Số điện thoại"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-          />
-        </div>
+{/* Số điện thoại */}
+<div className="flex flex-col w-full mt-4">
+  <span className="mb-2 text-gray-700 font-medium">Số điện thoại</span>
+  <div className="flex items-center bg-white border border-gray-300 rounded-lg shadow-sm focus-within:ring-2 focus-within:ring-blue-500 p-3">
+    <FaPhone className="text-gray-400 text-xl mr-3" />
+    <input
+      type="text"
+      placeholder="Nhập số điện thoại"
+      value={phone}
+      onChange={(e) => setPhone(e.target.value)}
+      className="flex-1 outline-none placeholder-gray-400 text-gray-800"
+    />
+  </div>
+</div>
 
-        <div className="input-group">
-          <FaMapMarkerAlt />
-          <textarea
-            placeholder="Địa chỉ cụ thể"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-          />
-        </div>
+{/* Địa chỉ */}
+<div className="flex flex-col w-full mt-4">
+  <span className="mb-2 text-gray-700 font-medium">Địa chỉ</span>
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    {/* TP */}
+    <div className="flex items-center bg-white border border-gray-300 rounded-lg shadow-sm focus-within:ring-2 focus-within:ring-blue-500">
+      <FaMapMarkerAlt className="text-gray-400 text-xl ml-3" />
+      <input
+        type="text"
+        placeholder="TP"
+        value={city}
+        onChange={(e) => handleAddressChange(e.target.value, 'city')}
+        className="flex-1 outline-none placeholder-gray-400 text-gray-800 py-2 px-3"
+      />
+    </div>
 
-        <div className="input-group select-wrapper">
-          <FaMoneyCheckAlt className="icon" />
-          <select
-            value={paymentMethod}
-            onChange={(e) => setPaymentMethod(e.target.value)}
-          >
-            <option value="COD">Thanh toán khi nhận hàng</option>
-            <option value="VNPay">Thanh toán VNPay</option>
-            <option value="Stripe">Thanh toán Stripe</option>
-            <option value="Momo">Thanh toán Momo</option>
-          </select>
-          <FaAngleDown className="select-arrow" />
+    {/* Quận/Huyện */}
+    <div className="flex items-center bg-white border border-gray-300 rounded-lg shadow-sm focus-within:ring-2 focus-within:ring-blue-500">
+      <input
+        type="text"
+        placeholder="Quận/Huyện"
+        value={district}
+        onChange={(e) => handleAddressChange(e.target.value, 'district')}
+        className="flex-1 outline-none placeholder-gray-400 text-gray-800 py-2 px-3"
+      />
+    </div>
+
+    {/* Phường/Xã */}
+    <div className="flex items-center bg-white border border-gray-300 rounded-lg shadow-sm focus-within:ring-2 focus-within:ring-blue-500">
+      <input
+        type="text"
+        placeholder="Phường/Xã"
+        value={ward}
+        onChange={(e) => handleAddressChange(e.target.value, 'ward')}
+        className="flex-1 outline-none placeholder-gray-400 text-gray-800 py-2 px-3"
+      />
+    </div>
+
+    {/* Số nhà / Đường */}
+    <div className="flex items-center bg-white border border-gray-300 rounded-lg shadow-sm focus-within:ring-2 focus-within:ring-blue-500">
+      <input
+        type="text"
+        placeholder="Số nhà / Đường"
+        value={cuthe}
+        onChange={(e) => handleAddressChange(e.target.value, 'cuthe')}
+        className="flex-1 outline-none placeholder-gray-400 text-gray-800 py-2 px-3"
+      />
+    </div>
+  </div>
+</div>
+
+
+       <div className="flex flex-row items-stretch gap-2 mt-5 ">
+      {/* Ô chọn COD */}
+      <label
+        className={`
+          flex flex-1 items-center gap-2 p-3 rounded-lg cursor-pointer transition-all duration-300
+          ${paymentMethod === 'COD' ? 'border-2 border-blue-500 bg-blue-50 shadow-sm' : 'border border-gray-300 bg-white hover:border-blue-400'}
+        `}
+      >
+        <input
+          type="radio"
+          name="paymentMethod"
+          value="COD"
+          checked={paymentMethod === 'COD'}
+          onChange={(e) => setPaymentMethod(e.target.value)}
+          className="hidden"
+        />
+        <div className="flex-shrink-0">
+          <FaMoneyBillWave className="text-2xl text-gray-700" />
         </div>
+        <div className="flex-grow">
+          <h3 className="font-semibold text-sm text-gray-800">Thanh toán khi nhận hàng</h3>
+          <p className="text-xs text-gray-500">Thanh toán tiền mặt.</p>
+        </div>
+      </label>
+
+      {/* Ô chọn VNPay */}
+      <label
+        className={`
+          flex flex-1 items-center gap-2 p-3 rounded-lg cursor-pointer transition-all duration-300
+          ${paymentMethod === 'VNPay' ? 'border-2 border-blue-500 bg-blue-50 shadow-sm' : 'border border-gray-300 bg-white hover:border-blue-400'}
+        `}
+      >
+        <input
+          type="radio"
+          name="paymentMethod"
+          value="VNPay"
+          checked={paymentMethod === 'VNPay'}
+          onChange={(e) => setPaymentMethod(e.target.value)}
+          className="hidden"
+        />
+        <div className="flex-shrink-0">
+          <img 
+    src="https://cdn.haitrieu.com/wp-content/uploads/2022/10/Logo-VNPAY-QR-350x65.png" 
+    alt="VNPAY" 
+    className="w-16 h-auto"
+  />
+        </div>
+        <div className="flex-grow">
+          <h3 className="font-semibold text-sm text-gray-800">Thanh toán VNPay</h3>
+          <p className="text-xs text-gray-500">Thanh toán an toàn.</p>
+        </div>
+      </label>
+    </div>
       </div>
     </div>
 
     {/* Bên phải - Sản phẩm, voucher, tổng tiền */}
     <div className="checkout-right">
-      <h3>Sản phẩm</h3>
+      <h2 className="flex items-center justify-center text-2xl font-semibold mb-6 text-gray-900">
+  <FaBoxOpen className="w-7 h-7 mr-2 text-blue-600" />
+ Sản phẩm 
+</h2>
 
       <div className="cart-items">
         {selectedItems.length > 0 ? (
@@ -257,6 +376,11 @@ const handleApplyVoucher = async () => {
           <span className="font-medium">Tạm tính:</span>
           <span>{totalPrice.toLocaleString("vi-VN")}₫</span>
         </div>
+        <div className="flex justify-between">
+    <span className="font-medium">Phí vận chuyển:</span>
+    <span>0₫</span>
+  </div>
+
 
         {discount > 0 && (
           <>
@@ -264,6 +388,8 @@ const handleApplyVoucher = async () => {
               <span className="font-medium">Giảm giá:</span>
               <span>-{discount.toLocaleString("vi-VN")}₫</span>
             </div>
+            
+
 
             <div className="flex justify-between text-base font-semibold border-t pt-2 mt-2">
               <span>Thành tiền:</span>
@@ -284,7 +410,7 @@ const handleApplyVoucher = async () => {
   </div>
 </div>
 
-
+</div>
   );
 };
 
