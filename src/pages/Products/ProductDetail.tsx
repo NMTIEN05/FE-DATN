@@ -219,37 +219,50 @@ const handleAddToCart = async () => {
 
 
 
-  const handleBuyNow = async () => {
-    try {
-      if (!variant || variant.stock === 0) return alert("Sản phẩm đã hết hàng");
+ const handleBuyNow = async () => {
+  try {
+    if (!variant || variant.stock === 0) {
+      return alert("Sản phẩm đã hết hàng");
+    }
 
-      const token = localStorage.getItem("token");
-      if (!token) return alert("Bạn cần đăng nhập để mua hàng");
+    const token = localStorage.getItem("token");
+    if (!token) return alert("Bạn cần đăng nhập để mua hàng");
 
-      const priceToUse = getVariantPrice(variant);
+    const selectedItem = {
+      productId: product._id,
+      variantId: variant._id,
+      quantity: 1,
+      price: variant.price,
+      name: product.title,
+      image: variant.imageUrl?.[0],
+    };
 
-      const selectedItem = {
+    // Gọi API thêm vào giỏ trước
+    await axios.post(
+      "http://localhost:8888/api/cart/add",
+      {
         productId: product._id,
         variantId: variant._id,
         quantity: 1,
-        price: priceToUse,
-        name: product.title ?? product.name,
-        image: Array.isArray(variant.imageUrl) ? variant.imageUrl[0] : variant.imageUrl,
-      };
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
 
-      await axios.post(
-        "/cart/add",
-        { productId: product._id, variantId: variant._id, quantity: 1, price: priceToUse },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+    // Sau khi thêm vào giỏ thành công → lưu tạm sản phẩm để dùng ở /checkout
+    localStorage.setItem(
+      "selectedCheckoutItems",
+      JSON.stringify([selectedItem])
+    );
 
-      localStorage.setItem("selectedCheckoutItems", JSON.stringify([selectedItem]));
-      navigate("/checkout");
-    } catch (error) {
-      console.error("Lỗi mua ngay:", error);
-      alert("Mua ngay thất bại, vui lòng thử lại.");
-    }
-  };
+    // Điều hướng sang trang thanh toán
+    navigate("/checkout");
+  } catch (error) {
+    console.error("❌ Lỗi khi mua ngay:", error);
+    alert("Mua ngay thất bại, vui lòng thử lại.");
+  }
+};
 
   if (loading) {
     return (
