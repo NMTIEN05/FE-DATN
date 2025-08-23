@@ -147,7 +147,7 @@ const Header: React.FC<HeaderProps> = ({ setSelectedMenu }) => {
             <Link to="/cart" className="flex items-center  hover:text-blue-600 relative px-2 group">
               <FaShoppingCart className="mr-2" />
               <span className="hidden lg:block">Giỏ hàng</span>
-              <span className="absolute -top-1 right-0 bg-red-500 text-white text-[0.6rem] font-bold rounded-full h-4 w-4 flex items-center justify-center">3</span>
+              
             </Link>
 
             {isLoggedIn ? (
