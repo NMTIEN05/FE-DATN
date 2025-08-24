@@ -4,6 +4,7 @@ import axios from "../../api/axios.config";
 import { Button, Modal, Form, Input, message, Radio } from "antd";
 import { toast } from "react-toastify";
 import ReturnModal from "./compudent/ReturnModal";
+import { CreditCardOutlined, EnvironmentOutlined, PhoneOutlined, UserOutlined } from "@ant-design/icons";
 
 type OrderStatus =
   | "pending"            // Chờ xác nhận
@@ -21,7 +22,11 @@ type OrderStatus =
 
 
 
-
+// Định nghĩa interface ReturnRequest bị thiếu
+interface ReturnRequest {
+  status?: "pending" | "rejected" | "approved";
+  reason?: string;
+}
 
 type PaymentStatus = "paid" | "unpaid";
 type PaymentMethod = "cod" | "momo" | "vnpay" | string;
@@ -79,7 +84,12 @@ interface Order {
   items: OrderItem[];
   shipperId?: ShipperInfo | null;
   cancelReason?: string;
+    returnRequest?: ReturnRequest;
+      deliveryFailedReason?: string; // Đã thêm dòng này để khắc phục lỗi
   returnReason?: string; // Thêm dòng này
+    createdAt?: string; // Đã thêm dòng này để khắc phục lỗi
+    
+
 }
 
 const statusLabels: Record<OrderStatus, string> = {
@@ -90,7 +100,7 @@ const statusLabels: Record<OrderStatus, string> = {
   shipped: "Đang giao hàng",
   delivered: "Shipper đã giao",
   received: "Khách đã nhận hàng",
-  delivery_failed: "Giao không thành công",
+  delivery_failed: "Giao hàng không thành công",
   return_requested: "Yêu cầu trả hàng",
   returned: "Đã hoàn trả",
   cancelled: "Đã hủy",
@@ -145,6 +155,17 @@ const OrderDetail: React.FC = () => {
   const [customReason, setCustomReason] = useState("");
   const [form] = Form.useForm<ShippingInfo>();
 const token = localStorage.getItem("token") || "";
+// Đặt hàm này ở đầu file hoặc trong một file helper chung
+const formatDate = (dateString:any) => {
+  if (!dateString) return "—";
+  const date = new Date(dateString);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${day}/${month}/${year} ${hours}:${minutes}`;
+};
   const fetchOrder = async () => {
     if (!id) return;
     try {
@@ -245,11 +266,12 @@ const handleConfirmReceived = async (orderId: string) => {
   "shipped",
   "return_requested",
   "rejected",
+   "delivery_failed", 
 ].includes(safeStatus);
 
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-10">
+    <div className="max-w-6xl mx-auto px-4 py-10  ">
       <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">
         Chi tiết đơn hàng{" "}
         <span className="text-blue-600">
@@ -261,45 +283,91 @@ const handleConfirmReceived = async (orderId: string) => {
         {/* LEFT */}
         <div className="col-span-12 md:col-span-9 space-y-6">
           {/* Shipping Card */}
-          <div className="bg-white shadow-md rounded-xl p-6 border border-gray-200 space-y-2 relative">
-            <div className="flex justify-between items-center mb-2">
-  <h2 className="text-xl font-semibold text-gray-700">Thông tin giao hàng</h2>
-  {(safeStatus === "pending" || safeStatus === "processing") && (
-    <Button type="primary" ghost onClick={showEditModal}>
-      Chỉnh sửa
-    </Button>
+<div className="bg-white shadow-lg rounded-2xl p-8 border border-gray-200 space-y-5 relative">
+  {/* Header chính - Thông tin giao hàng */}
+  <div className="flex justify-between items-center pb-4 border-b border-gray-200">
+    <h2 className="text-2xl font-bold text-gray-800">Thông tin giao hàng</h2>
+    {(safeStatus === "pending" || safeStatus === "processing") && (
+      <Button type="primary" ghost onClick={showEditModal}>
+        Chỉnh sửa
+      </Button>
+    )}
+  </div>
+
+  {/* Nội dung thông tin giao hàng */}
+  <div className="space-y-3 pt-2">
+    <p className="text-gray-700 text-base flex items-center gap-2">
+      <UserOutlined className="text-lg text-gray-600" />
+      <b className="font-semibold text-gray-900">Họ tên:</b>{" "}
+      {shippingInfo?.fullName || "—"}
+    </p>
+    <p className="text-gray-700 text-base flex items-center gap-2">
+      <PhoneOutlined className="text-lg text-gray-600" />
+      <b className="font-semibold text-gray-900">SĐT:</b> {shippingInfo?.phone || "—"}
+    </p>
+    <p className="text-gray-700 text-base flex items-center gap-2">
+      <EnvironmentOutlined className="text-lg text-gray-600" />
+      <b className="font-semibold text-gray-900">Địa chỉ:</b>{" "}
+      {shippingInfo?.address || "—"}
+    </p>
+  </div>
+  
+  {/* Đường phân cách */}
+  <div className="border-t border-gray-200 my-4"></div>
+
+{/* Container chứa thông tin Đơn hàng và Shipper (2 cột) */}
+<div className="flex flex-col md:flex-row justify-between gap-8">
+  {/* Cột 1: Thông tin Shipper */}
+  {shipperId ? (
+    <div className="flex-1">
+      <h3 className="text-xl font-bold text-gray-800 mb-4">Thông tin Shipper</h3>
+      <div className="space-y-3">
+        <p className="text-gray-700 text-base flex items-center gap-2">
+          <UserOutlined className="text-lg text-gray-600" />
+          <b className="font-semibold text-gray-900">Họ tên:</b>{" "}
+          {shipperId.full_name || shipperId.username || "—"}
+        </p>
+        <p className="text-gray-700 text-base flex items-center gap-2">
+          <PhoneOutlined className="text-lg text-gray-600" />
+          <b className="font-semibold text-gray-900">SĐT:</b>{" "}
+          {shipperId.phone || "—"}
+        </p>
+      </div>
+    </div>
+  ) : (
+    <div className="flex-1">
+      <h3 className="text-xl font-bold text-gray-800 mb-4">Thông tin Shipper</h3>
+      <p className="text-gray-500 italic">Chưa có thông tin Shipper</p>
+    </div>
   )}
+
+  {/* Dấu gạch chia ở giữa (cho desktop) */}
+  <div className="hidden md:block border-l border-gray-300"></div>
+
+  {/* Cột 2: Thông tin đơn hàng */}
+  <div className="flex-1">
+    <h3 className="text-xl font-bold text-gray-800 mb-4">Thông tin đơn hàng</h3>
+   <div className="space-y-3 text-gray-700">
+  <div className="flex justify-between">
+    <span className="font-semibold text-gray-900">Mã đơn hàng:</span>
+    <span className="font-medium text-gray-700">{order._id}</span>
+  </div>
+  <div className="flex justify-between">
+    <span className="font-semibold text-gray-900">Ngày đặt:</span>
+    <span className="font-medium text-gray-700">
+      {formatDate(order.createdAt)}
+    </span>
+  </div>
+  <div className="flex justify-between">
+    <span className="font-semibold text-gray-900">Thanh toán:</span>
+    <span className="font-medium text-gray-700">
+      {order.paymentMethod || "—"}
+    </span>
+  </div>
 </div>
-
-            <p>
-              <b>👤 Họ tên:</b> {shippingInfo?.fullName || "—"}
-            </p>
-            <p>
-              <b>📞 SĐT:</b> {shippingInfo?.phone || "—"}
-            </p>
-            <p>
-              <b>📍 Địa chỉ:</b> {shippingInfo?.address || "—"}
-            </p>
-            <p>
-              <b>💳 Thanh toán:</b>{" "}
-              {paymentMethod === "cod" ? "COD" : paymentMethod || "—"}
-            </p>
-
-            {shipperId ? (
-              <div className="mt-4 border-t pt-4">
-                <h3 className="text-lg font-semibold text-gray-700">Thông tin Shipper</h3>
-                <p>
-                  <b>👤 Họ tên:</b> {shipperId.full_name || shipperId.username || "—"}
-                </p>
-                <p>
-                  <b>📞 SĐT:</b> {shipperId.phone || "—"}
-                </p>
-              </div>
-            ) : (
-              <p className="mt-4 text-gray-500 italic">Chưa có thông tin Shipper</p>
-            )}
-          </div>
-
+  </div>
+</div>
+</div>
           {/* Items */}
           <div className="bg-white shadow-md rounded-xl p-6 border border-gray-200 space-y-4">
             <h2 className="text-lg font-semibold text-gray-700 border-b pb-2">
@@ -367,7 +435,7 @@ const handleConfirmReceived = async (orderId: string) => {
 
   {/* Trạng thái */}
   <div>
-    <p className="mb-1"><b>Trạng thái:</b></p>
+    <p className="mb-1"><b>Trạng thái đơn hàng:</b></p>
     <span
       className={`px-3 py-1 rounded-full text-xs font-bold ${
         statusClasses[safeStatus] || "bg-gray-100 text-gray-700"
@@ -408,6 +476,14 @@ const handleConfirmReceived = async (orderId: string) => {
       </span>
     </div>
   )}
+  {order.status === "delivery_failed" && order.deliveryFailedReason && (
+  <div className="mt-2 p-3 rounded-lg bg-red-50 border border-red-200">
+    <p className="text-sm text-red-600 font-medium">
+      Lý do giao hàng thất bại: {order.deliveryFailedReason}
+    </p>
+  </div>
+)}
+
 {/* Nút xác nhận đã nhận và yêu cầu trả hàng */}
 {(safeStatus === "delivered" || safeStatus === "received") && (
   <div className="space-y-2">
@@ -512,7 +588,7 @@ const handleConfirmReceived = async (orderId: string) => {
 
   {/* Thanh toán */}
   <div>
-    <p className="mb-1"><b>Thanh toán:</b></p>
+    <p className="mb-1"><b>Trạng thái thanh toán:</b></p>
     <span
       className={`px-3 py-1 rounded-full text-xs font-medium ${
         paymentStatus === "paid"

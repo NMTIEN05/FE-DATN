@@ -4,7 +4,7 @@ import { Modal } from "antd";
 import { toast } from "react-toastify";
 import ReturnModal from "./compudent/ReturnModal";
 
-import { ReloadOutlined } from "@ant-design/icons";
+
 
 
 import ReviewProduct from "../Products/ReviewProduct";
@@ -36,6 +36,7 @@ interface OrderItem {
   variantId: Variant;
   quantity: number;
   price: number;
+  isReviewed?: boolean; // ✅ thêm trường này để theo dõi đã đánh giá hay chưa
 }
 
 interface Order {
@@ -51,6 +52,7 @@ interface Order {
     reason?: string;
     status?: string;
     requestedAt?: string;
+    
   };
 }
 
@@ -377,7 +379,7 @@ const handleConfirmReceived = async (orderId: string) => {
     <ReviewProduct
       productId={reviewingProductId}
       hideOldComments={true}
-      onReviewSuccess={(productId) => {
+      onReviewSuccess={(productId:any) => {
         setOrders((prevOrders) =>
           prevOrders.map((order) => ({
             ...order,

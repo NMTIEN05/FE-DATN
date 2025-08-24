@@ -149,7 +149,7 @@ const FlashSaleSection: React.FC = () => {
                 </div>
               </div>
               <div className="p-4">
-                <h3 className="text-sm font-medium text-gray-800 line-clamp-2" title={product.title}>
+                <h3 className="text-sm font-medium text-gray-800 line-clamp-2 h-10" title={product.title}>
                   {product.title}
                 </h3>
                 <div className="flex flex-col mt-2">
@@ -182,12 +182,8 @@ const FlashSaleSection: React.FC = () => {
 </div>
                 </div>
                 <div className="flex items-center mt-2">
-                  <div className="flex text-yellow-400 text-sm">
-                    {[...Array(5)].map((_, i) => (
-                      <span key={i}>{i < 4 ? "★" : "☆"}</span>
-                    ))}
-                  </div>
-                  <span className="text-gray-500 text-xs ml-2">(24 đánh giá)</span>
+                  
+                  
                 </div>
               </div>
             </div>

@@ -6,25 +6,22 @@ import { Button } from "antd";
 import { IProduct } from "../../../types/product";
 import { Category } from "../../../types/category";
 import { WishlistItem, wishlistService } from "../../Services/wishlist/wishlist.service";
+// StarFilled đã bị xoá khỏi đây vì không còn dùng nữa
 
 // ------- APIs load category & products -------
 const fetchCategories = async (): Promise<Category[]> => {
-
-    const res = await axios.get("http://localhost:8888/api/category?limit=4");
-    // Lọc bỏ danh mục có tên "Điện thoại"
-    const categories = res.data.data.filter((c: Category) => c.name !== "Điện thoại");
-    return categories;
+  const res = await axios.get("http://localhost:8888/api/category?limit=4");
+  const categories = res.data.data.filter((c: Category) => c.name !== "Điện thoại");
+  return categories;
 };
 
-
 const fetchProductsByCategory = async (
-    categoryId: string
+  categoryId: string
 ): Promise<IProduct[]> => {
-    const res = await axios.get(
-        `http://localhost:8888/api/product?categoryId=${categoryId}`
-    );
-    return res.data.data;
-
+  const res = await axios.get(
+    `http://localhost:8888/api/product?categoryId=${categoryId}`
+  );
+  return res.data.data;
 };
 
 // ============================================
@@ -107,14 +104,13 @@ const CategorySection: React.FC<{ category: Category }> = ({ category }) => {
     const liked = !!favMap[productId];
     try {
       if (!liked) {
-        await wishlistService.add(productId);           // POST /wishlist/:id
+        await wishlistService.add(productId);
         setFavMap((prev) => ({ ...prev, [productId]: true }));
       } else {
-        await wishlistService.remove(productId);        // DELETE /wishlist/:id
+        await wishlistService.remove(productId);
         setFavMap((prev) => ({ ...prev, [productId]: false }));
       }
     } catch (e: any) {
-      // fallback theo BE của bạn: 400=đã tồn tại, 404=chưa có
       const code = e?.response?.status;
       if (!liked && code === 400) {
         await wishlistService.remove(productId);
@@ -176,7 +172,7 @@ const CategorySection: React.FC<{ category: Category }> = ({ category }) => {
   }
 
   return (
-    <section className="mb-16 overflow-hidden">
+   <section className="mb-16 overflow-hidden">
       <div className="p-6">
         <div className="flex justify-between items-center mb-6">
           <h2 className="uppercase text-xl font-semibold tracking-wide border border-gray-700 bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700 w-[220px] h-11 flex items-center justify-center text-white rounded-lg shadow-md transform -rotate-1 skew-x-3">
@@ -197,7 +193,7 @@ const CategorySection: React.FC<{ category: Category }> = ({ category }) => {
             const fakeOriginalPrice = salePrice + 1000000;
             const isFreeShip = salePrice > 10000000;
 
-            const isFav = !!favMap[product._id]; // ✅ trạng thái tim theo wishlist
+            const isFav = !!favMap[product._id];
 
             const handleQuickView = (e: React.MouseEvent) => {
               e.stopPropagation();
@@ -272,7 +268,8 @@ const CategorySection: React.FC<{ category: Category }> = ({ category }) => {
 
                 {/* Content */}
                 <div className="p-4">
-                  <h3 className="text-sm font-medium text-gray-800 line-clamp-2" title={product.title}>
+                  <h3   className="text-sm font-medium text-gray-800 line-clamp-2 h-10"
+ title={product.title}>
                     {product.title}
                   </h3>
 
@@ -295,14 +292,11 @@ const CategorySection: React.FC<{ category: Category }> = ({ category }) => {
                     </span>
                   </div>
 
-                  {/* Rating */}
+                  {/* Số lượng đã bán */}
                   <div className="flex items-center mt-2">
-                    <div className="flex text-yellow-400 text-sm">
-                      {[...Array(5)].map((_, i) => (
-                        <span key={i}>{i < 4 ? "★" : "☆"}</span>
-                      ))}
-                    </div>
-                    <span className="text-gray-500 text-xs ml-2">(24 đánh giá)</span>
+                    <span className="text-gray-500 text-sm font-medium">
+                      Đã bán {(product.soldCount ?? 0).toLocaleString("vi-VN")}
+                    </span>
                   </div>
                 </div>
               </div>

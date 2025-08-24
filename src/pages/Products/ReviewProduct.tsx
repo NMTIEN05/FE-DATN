@@ -35,7 +35,12 @@ async function axiosPostWithFallback<T>(path: string, body: any, headers?: any):
   }
   throw lastErr;
 }
-
+// Thêm dòng này vào đầu file cùng với các interface khác
+interface ReviewProductProps {
+  productId: string;
+  hideOldComments?: boolean;
+  onReviewSuccess?: (productId: any) => void; // Thêm dòng này
+}
 interface ReviewProductProps {
   productId: string;
   hideOldComments?: boolean;
