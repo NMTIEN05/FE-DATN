@@ -14,6 +14,7 @@ import { Button, message } from "antd";
 import axios from "../../api/axios.config";
 import { ChevronLeft, ChevronRight, Star } from "lucide-react";
 import "./ProductDetail.css";
+import DescriptionCard from "./compudent/Mota";
 
 const formatPrice = (price: number) =>
   Number(price || 0).toLocaleString("vi-VN", { style: "currency", currency: "VND" });
@@ -323,7 +324,7 @@ const handleBuyNow = async () => {
                   </span>
                 </div>
 
-                {imgs.map((img, i) => (
+                {imgs.map((img:any, i:any) => (
                   <button
                     key={i}
                     onClick={() => setSelectedImage(i)}
@@ -476,9 +477,16 @@ const handleBuyNow = async () => {
               <ReloadOutlined className="text-blue-500 text-xl" />
               <p className="mt-2">Đổi trả 7 ngày</p>
             </div>
+             
           </div>
+         
         </div>
+        
       </div>
+       <DescriptionCard
+        short={product.shortDescription}
+        full={product.description}
+      />
     </div>
   );
 };

@@ -225,19 +225,21 @@ const handleConfirmReceived = async (orderId: string) => {
                           </div>
 
                           {/* ✅ Hiện lý do từ chối nếu bị rejected */}
-                          {["rejected", "return_requested", "delivery_failed"].includes(order.status) &&
-  order.returnRequest?.reason && (
-    <div className="text-red-600 text-xs mt-1">
-      <strong>
-        {order.status === "rejected"
-          ? "Lý do từ chối:"
-          : order.status === "return_requested"
-          ? "Lý do yêu cầu trả hàng:"
-          : "Lý do giao hàng thất bại:"}
-      </strong>{" "}
-      {order.returnRequest.reason}
-    </div>
+{["rejected", "return_requested", "delivery_failed"].includes(order.status) && (
+  <div className="text-red-600 text-xs mt-1">
+    <strong>
+      {order.status === "rejected"
+        ? "Lý do từ chối:"
+        : order.status === "return_requested"
+        ? "Lý do yêu cầu trả hàng:"
+        : "Lý do giao hàng thất bại:"}
+    </strong>{" "}
+    {order.returnRequest?.reason && order.returnRequest.reason.trim() !== ""
+      ? order.returnRequest.reason
+      : "Chưa có lý do"}
+  </div>
 )}
+
 
 
 

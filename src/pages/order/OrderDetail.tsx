@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import axios from "../../api/axios.config";
 import { Button, Modal, Form, Input, message, Radio } from "antd";
 import { toast } from "react-toastify";
+import ReturnModal from "./compudent/ReturnModal";
 
 type OrderStatus =
   | "pending"            // Chờ xác nhận
@@ -93,7 +94,7 @@ const statusLabels: Record<OrderStatus, string> = {
   return_requested: "Yêu cầu trả hàng",
   returned: "Đã hoàn trả",
   cancelled: "Đã hủy",
-  rejected: "Admin từ hoàn đơn",
+  rejected: "Admin từ chối hoàn đơn",
 };
 
 const statusClasses: Record<OrderStatus, string> = {
@@ -134,13 +135,16 @@ const OrderDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
-
+// const [showReviewModal, setShowReviewModal] = useState(false);
+  const [returningOrderId, setReturningOrderId] = useState<string | null>(null);
+    const [showReturnModal, setShowReturnModal] = useState(false);
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [selectedReason, setSelectedReason] = useState("");
   const [customReason, setCustomReason] = useState("");
   const [form] = Form.useForm<ShippingInfo>();
-
+const token = localStorage.getItem("token") || "";
   const fetchOrder = async () => {
     if (!id) return;
     try {
@@ -153,6 +157,19 @@ const OrderDetail: React.FC = () => {
       setLoading(false);
     }
   };
+const handleConfirmReceived = async (orderId: string) => {
+  try {
+    await axios.patch(
+      `http://localhost:8888/api/orders/${orderId}/confirm-received`,
+      {},
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    toast.success(" Xác nhận đã nhận hàng thành công");
+    fetchOrder(); // Refresh lại danh sách
+  } catch (err: any) {
+    toast.error(err.response?.data?.message || " Lỗi xác nhận đã nhận hàng");
+  }
+};
 
   useEffect(() => {
     if (id) fetchOrder();
@@ -221,13 +238,15 @@ const OrderDetail: React.FC = () => {
   } = order;
 
   const safeStatus: OrderStatus = (status as OrderStatus) || "pending";
-  const canCancel = ![
-    "cancelled",
-    "delivered",
-    "shipped",
-    "return_requested",
-    "rejected",
-  ].includes(safeStatus);
+ const canCancel = ![
+  "cancelled",
+  "delivered",
+  "received",        // <- thêm dòng này
+  "shipped",
+  "return_requested",
+  "rejected",
+].includes(safeStatus);
+
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-10">
@@ -244,11 +263,14 @@ const OrderDetail: React.FC = () => {
           {/* Shipping Card */}
           <div className="bg-white shadow-md rounded-xl p-6 border border-gray-200 space-y-2 relative">
             <div className="flex justify-between items-center mb-2">
-              <h2 className="text-xl font-semibold text-gray-700">Thông tin giao hàng</h2>
-              <Button type="primary" ghost onClick={showEditModal}>
-                Chỉnh sửa
-              </Button>
-            </div>
+  <h2 className="text-xl font-semibold text-gray-700">Thông tin giao hàng</h2>
+  {(safeStatus === "pending" || safeStatus === "processing") && (
+    <Button type="primary" ghost onClick={showEditModal}>
+      Chỉnh sửa
+    </Button>
+  )}
+</div>
+
             <p>
               <b>👤 Họ tên:</b> {shippingInfo?.fullName || "—"}
             </p>
@@ -386,6 +408,107 @@ const OrderDetail: React.FC = () => {
       </span>
     </div>
   )}
+{/* Nút xác nhận đã nhận và yêu cầu trả hàng */}
+{(safeStatus === "delivered" || safeStatus === "received") && (
+  <div className="space-y-2">
+    {/* Nút xác nhận đã nhận */}
+    {safeStatus === "delivered" && (
+      <Button
+        type="primary"
+        block
+        onClick={() => handleConfirmReceived(order._id)}
+      >
+        Đã nhận hàng
+      </Button>
+    )}
+  </div>
+)}
+
+{/* Hiển thị lý do trả hàng ngay sau nút */}
+{order.returnReason && (
+  <div className="mt-2">
+    <p className="mb-1"><b>Lý do trả hàng:</b></p>
+    <span className="px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+      {order.returnReason}
+    </span>
+  </div>
+)}
+
+{/* Modal yêu cầu trả hàng */}
+{showReturnModal && order?._id && (
+  <Modal
+    title="Yêu cầu trả hàng"
+    open={showReturnModal}
+    onCancel={() => setShowReturnModal(false)}
+    onOk={async () => {
+      const reasonToSend =
+        selectedReason === "Khác" ? customReason.trim() : selectedReason;
+      if (!reasonToSend) {
+        message.warning("Vui lòng chọn hoặc nhập lý do trả hàng.");
+        return;
+      }
+      try {
+        await axios.post(
+          `/orders/${order._id}/request-return`,
+          { reason: reasonToSend },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        toast.success("Yêu cầu trả hàng đã được gửi thành công");
+
+        // Cập nhật luôn lý do trả hàng trên UI mà không reload
+        setOrder(prev => prev ? { ...prev, returnReason: reasonToSend, status: "return_requested" } : prev);
+
+        setShowReturnModal(false);
+        setSelectedReason("");
+        setCustomReason("");
+      } catch (err: any) {
+        toast.error(err.response?.data?.message || "Lỗi khi gửi yêu cầu trả hàng");
+      }
+    }}
+    okText="Gửi yêu cầu"
+    cancelText="Hủy"
+  >
+    <p>Vui lòng chọn lý do bạn muốn trả hàng:</p>
+    <Radio.Group
+      onChange={(e) => setSelectedReason(e.target.value)}
+      value={selectedReason}
+      className="flex flex-col gap-2 mt-2"
+    >
+      {predefinedReasons.map((reason) => (
+        <Radio key={reason} value={reason}>
+          {reason}
+        </Radio>
+      ))}
+    </Radio.Group>
+
+    {selectedReason === "Khác" && (
+      <Input.TextArea
+        rows={4}
+        className="mt-4"
+        placeholder="Vui lòng nhập lý do cụ thể..."
+        value={customReason}
+        onChange={(e) => setCustomReason(e.target.value)}
+      />
+    )}
+  </Modal>
+)}
+
+
+
+{showReturnModal && returningOrderId && (
+  <ReturnModal
+    orderId={returningOrderId}
+    open={showReturnModal}
+    onClose={() => {
+      setShowReturnModal(false);
+      setReturningOrderId(null);
+    }}
+    onSuccess={fetchOrder} // reload lại đơn hàng sau khi yêu cầu trả hàng thành công
+  />
+)}
+
+
+
 
   {/* Thanh toán */}
   <div>
@@ -423,11 +546,35 @@ const OrderDetail: React.FC = () => {
   </div>
 
   {/* Nút hủy */}
-  {canCancel && (
+{/* Nút Hủy hoặc Yêu cầu trả hàng */}
+<div className="mt-4">
+  {safeStatus === "received" && !order.returnReason ? (
+    <Button
+      type="primary"
+      block
+      style={{ backgroundColor: "#10B981", borderColor: "#10B981", color: "#fff" }}
+      onClick={() => setReturningOrderId(order._id)}
+    >
+      Yêu cầu trả hàng
+    </Button>
+  ) : canCancel ? (
     <Button danger type="primary" block onClick={handleCancelOrder}>
       Hủy đơn hàng
     </Button>
+  ) : null}
+
+  {/* Modal ReturnModal */}
+  {returningOrderId && (
+    <ReturnModal
+      orderId={returningOrderId}
+      open={!!returningOrderId}
+      onClose={() => setReturningOrderId(null)}
+      onSuccess={fetchOrder} // reload lại đơn hàng sau khi gửi yêu cầu trả hàng
+    />
   )}
+</div>
+
+
 </div>
 
 

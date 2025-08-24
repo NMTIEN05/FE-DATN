@@ -39,18 +39,20 @@ const handleReturn = async () => {
   try {
     setLoading(true);
     // Đảm bảo gửi request PATCH thay vì POST và truyền trạng thái phù hợp
-    await axios.put(
-      `http://localhost:8888/api/orders/${orderId}/status`, // Cập nhật API đúng route
-      {
-        status: "return_requested", // Cập nhật trạng thái
-        reason: reasonToSend, // Lý do trả hàng
-      },
+   await axios.put(
+  `http://localhost:8888/api/orders/${orderId}/status`,
+  {
+    status: "return_requested", 
+    returnReason: reasonToSend, // ✅ đúng với BE
+  },
+
       {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       }
     );
+    
     message.success("Yêu cầu trả hàng đã được gửi");
     onClose();
     setSelectedReason("");
