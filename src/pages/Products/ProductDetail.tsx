@@ -170,11 +170,18 @@ const ProductDetail = () => {
     })();
   }, [product, variant]);
 
-  const getVariantPrice = (v: any) => {
-    if (!v) return 0;
-    if (flashSale && flashSale.variant?._id === v._id) return flashSale.salePrice;
-    return v.price;
-  };
+const getVariantPrice = (v: any) => {
+  if (!v) return 0;
+  if (
+    flashSale &&
+    flashSale.variant?._id === v._id &&
+    flashSale.soldQuantity < flashSale.quantity
+  ) {
+    return flashSale.salePrice;
+  }
+  return v.price;
+};
+
 
   const getVariantStockText = (v: any) => {
     if (!v) return "";
@@ -185,38 +192,53 @@ const ProductDetail = () => {
 
 const handleAddToCart = async () => {
   try {
-    if (!variant || variant.stock === 0) return alert("Sản phẩm đã hết hàng");
+    if (!variant || variant.stock === 0) {
+      return alert("Sản phẩm đã hết hàng");
+    }
 
     const token = localStorage.getItem("token");
     if (!token) return alert("Bạn cần đăng nhập để thêm vào giỏ hàng");
 
+    // ===== Kiểm tra flash sale còn hiệu lực =====
+    const now = new Date().getTime();
+    const isFlashSaleActive =
+      flashSale &&
+      flashSale.variant?._id === variant._id &&
+      flashSale.soldQuantity < flashSale.quantity && // vẫn còn sản phẩm trong flash sale
+      now >= new Date(flashSale.startTime).getTime() &&
+      now <= new Date(flashSale.endTime).getTime();
+
+    // Giá thực tế áp dụng
+    const priceToUse = isFlashSaleActive ? flashSale.salePrice : variant.price;
+
+    // Gửi request đến backend, bắt buộc gửi giá đúng
     const res = await axios.post(
       "/cart/add",
-      { productId: product._id, variantId: variant._id, quantity: 1 },
+      {
+        productId: product._id,
+        variantId: variant._id,
+        quantity: 1,
+        price: priceToUse,       // ✅ giá frontend quyết định
+        flashSale: isFlashSaleActive, // optional: backend có thể lưu cờ
+      },
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
-    const addedItem = res.data; // lấy đúng object từ backend
+    const addedItem = res.data;
 
-    console.log("Đã thêm vào giỏ:", {
-      productId: addedItem.productId,
-      productTitle: addedItem.productTitle,
-      variantId: addedItem.variantId,
-      variantName: addedItem.variantName,
-      quantity: addedItem.quantity,
-      price: addedItem.flashSalePrice ?? addedItem.price, // ưu tiên flash sale
-      flashSale: addedItem.flashSale ?? false,
-      discountPercent: addedItem.discountPercent,
-      flashSaleStart: addedItem.flashSaleStart,
-      flashSaleEnd: addedItem.flashSaleEnd
-    });
-
-    message.success("Đã thêm vào giỏ hàng!");
+    message.success(
+      `Đã thêm ${addedItem.quantity} sản phẩm vào giỏ với giá ${priceToUse.toLocaleString(
+        "vi-VN",
+        { style: "currency", currency: "VND" }
+      )}`
+    );
   } catch (error) {
     console.error("Lỗi thêm giỏ:", error);
-    alert("Thêm vào giỏ hàng thất bại");
+    alert("Thêm vào giỏ hàng thất bại, vui lòng thử lại");
   }
 };
+
+
 
 
 
@@ -227,13 +249,23 @@ const handleBuyNow = async () => {
     const token = localStorage.getItem("token");
     if (!token) return alert("Bạn cần đăng nhập để mua hàng");
 
+    // 👉 Chọn giá đúng (ưu tiên flash sale nếu còn hiệu lực và đúng variant)
+    const isFlashSaleActive =
+      flashSale &&
+      flashSale.variant?._id === variant._id &&
+      flashSale.quantity > 0 &&
+      new Date().getTime() >= new Date(flashSale.startTime).getTime() &&
+      new Date().getTime() <= new Date(flashSale.endTime).getTime();
+
     const selectedItem = {
       productId: product._id,
       variantId: variant._id,
       quantity: 1,
-      price: variant.price,
+      price: isFlashSaleActive ? flashSale.salePrice : variant.price, // ✅ sửa ở đây
       name: product.title,
       image: Array.isArray(variant.imageUrl) ? variant.imageUrl[0] : variant.imageUrl,
+      flashSale: isFlashSaleActive ? true : false, // thêm cờ flash sale (nếu cần)
+      discountPercent: isFlashSaleActive ? flashSale.discountPercent : 0,
     };
 
     // Thêm vào giỏ
@@ -252,6 +284,7 @@ const handleBuyNow = async () => {
     alert("Mua ngay thất bại, vui lòng thử lại.");
   }
 };
+
 
   if (loading) {
     return (
@@ -360,25 +393,29 @@ const handleBuyNow = async () => {
           </div>
 
           {/* Giá */}
-          <div className="flex flex-wrap items-center gap-3 mt-1">
-            {flashSale && flashSale.variant?._id === variant?._id ? (
-              <>
-                <span className="line-through text-gray-400 text-lg">
-                  {formatPrice(variant.price)}
-                </span>
-                <span className="text-red-600 text-2xl sm:text-3xl font-bold">
-                  {formatPrice(flashSale.salePrice)}
-                </span>
-                <span className="bg-red-100 text-red-600 px-2 py-1 text-sm rounded-full font-medium">
-                  Giảm {flashSale.discountPercent}%
-                </span>
-              </>
-            ) : (
-              <span className="text-red-600 text-2xl sm:text-3xl font-bold">
-                {formatPrice(variant?.price ?? product?.priceDefault ?? 0)}
-              </span>
-            )}
-          </div>
+        {/* Giá */}
+<div className="flex flex-wrap items-center gap-3 mt-1">
+  {flashSale &&
+  flashSale.variant?._id === variant?._id &&
+  flashSale.soldQuantity < flashSale.quantity ? (
+    <>
+      <span className="line-through text-gray-400 text-lg">
+        {formatPrice(variant.price)}
+      </span>
+      <span className="text-red-600 text-2xl sm:text-3xl font-bold">
+        {formatPrice(flashSale.salePrice)}
+      </span>
+      <span className="bg-red-100 text-red-600 px-2 py-1 text-sm rounded-full font-medium">
+        Giảm {flashSale.discountPercent}%
+      </span>
+    </>
+  ) : (
+    <span className="text-red-600 text-2xl sm:text-3xl font-bold">
+      {formatPrice(variant?.price ?? product?.priceDefault ?? 0)}
+    </span>
+  )}
+</div>
+
 
           {/* Phiên bản (group) */}
           {group.length > 1 && (

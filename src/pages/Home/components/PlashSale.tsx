@@ -66,10 +66,7 @@ const FlashSaleSection: React.FC = () => {
         <h2 className="section-title text-3xl font-bold text-red-600">
           🔥 <span className="text-red-800">Flash</span> Sale
         </h2>
-        <div className="countdown flex items-center space-x-2 text-red-600 font-bold text-xl bg-red-200 px-4 py-2 rounded-full">
-          <span className="animate-pulse"><FieldTimeOutlined /></span>
-          <span>Kết thúc sau: {timeLeft}</span>
-        </div>
+       
       </div>
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
