@@ -13,6 +13,8 @@ type OrderStatus =
   | "ready_to_ship"      // Chờ giao hàng
   | "shipped"            // Đang giao hàng (Shipper)
   | "delivered"          // Shipper đã giao
+    | "return_to_store"   // 👈 thêm trạng thái mới
+  |"returned_to_store"  // Đã trả về cửa hàng
   | "received"           // Khách xác nhận đã nhận hàng
   | "delivery_failed"    // Giao không thành công
   | "return_requested"   // Yêu cầu trả hàng
@@ -101,6 +103,8 @@ const statusLabels: Record<OrderStatus, string> = {
   delivered: "Shipper đã giao",
   received: "Khách đã nhận hàng",
   delivery_failed: "Giao hàng không thành công",
+  return_to_store: "Trả về cửa hàng",
+  returned_to_store: "Đã trả về cửa hàng",
   return_requested: "Yêu cầu trả hàng",
   returned: "Đã hoàn trả",
   cancelled: "Đã hủy",
@@ -115,10 +119,12 @@ const statusClasses: Record<OrderStatus, string> = {
   shipped: "bg-purple-200 text-purple-800",
   delivered: "bg-green-100 text-green-800",
   received: "bg-green-200 text-green-800",
+  return_to_store: "bg-gray-200 text-gray-800",
   delivery_failed: "bg-red-200 text-red-800",
   return_requested: "bg-orange-200 text-orange-800",
   returned: "bg-teal-100 text-teal-800",
   cancelled: "bg-red-100 text-red-800",
+  returned_to_store: "bg-gray-300 text-gray-900",
   rejected: "bg-pink-100 text-pink-800",
 };
 
@@ -261,7 +267,10 @@ const handleConfirmReceived = async (orderId: string) => {
   const safeStatus: OrderStatus = (status as OrderStatus) || "pending";
  const canCancel = ![
   "cancelled",
+  "ready_to_ship",
   "delivered",
+  "return_to_store",
+  "returned_to_store",
   "received",        // <- thêm dòng này
   "shipped",
   "return_requested",
@@ -272,161 +281,149 @@ const handleConfirmReceived = async (orderId: string) => {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-10  ">
-      <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">
-        Chi tiết đơn hàng{" "}
-        <span className="text-blue-600">
-          #{(_id || "").slice(-8).toUpperCase()}
-        </span>
-      </h1>
+      
+<div className="bg-gray-500 h-14 flex items-center px-6 rounded-xl shadow-md mb-1 ">
+  <h1 className="text-gray-100 text-xl font-bold flex-1">Chi tiết đơn hàng</h1>
+
+</div>
+
+
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
         {/* LEFT */}
         <div className="col-span-12 md:col-span-9 space-y-6">
           {/* Shipping Card */}
-<div className="bg-white shadow-lg rounded-2xl p-8 border border-gray-200 space-y-5 relative">
-  {/* Header chính - Thông tin giao hàng */}
-  <div className="flex justify-between items-center pb-4 border-b border-gray-200">
-    <h2 className="text-2xl font-bold text-gray-800">Thông tin giao hàng</h2>
-    {(safeStatus === "pending" || safeStatus === "processing") && (
-      <Button type="primary" ghost onClick={showEditModal}>
-        Chỉnh sửa
-      </Button>
-    )}
+<div className="bg-white shadow-lg rounded-2xl p-8 border border-gray-200 space-y-6 relative">
+
+  {/* S1: Thông tin đơn hàng */}
+<div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg shadow-sm space-y-4">
+  <h3 className="text-lg font-bold text-gray-800">Thông tin đơn hàng</h3>
+
+  {/* Thông tin cơ bản */}
+  <div className="space-y-1 text-gray-700">
+    <div className="flex justify-between">
+      <span className="font-semibold">Mã đơn hàng:</span>
+      <span>{order._id}</span>
+    </div>
+    <div className="flex justify-between">
+      <span className="font-semibold">Ngày đặt:</span>
+      <span>{formatDate(order.createdAt)}</span>
+    </div>
+    <div className="flex justify-between">
+      <span className="font-semibold">Phương thức thanh toán:</span>
+      <span>{order.paymentMethod || "—"}</span>
+    </div>
   </div>
 
-  {/* Nội dung thông tin giao hàng */}
-  <div className="space-y-3 pt-2">
-    <p className="text-gray-700 text-base flex items-center gap-2">
-      <UserOutlined className="text-lg text-gray-600" />
-      <b className="font-semibold text-gray-900">Họ tên:</b>{" "}
-      {shippingInfo?.fullName || "—"}
-    </p>
-    <p className="text-gray-700 text-base flex items-center gap-2">
-      <PhoneOutlined className="text-lg text-gray-600" />
-      <b className="font-semibold text-gray-900">SĐT:</b> {shippingInfo?.phone || "—"}
-    </p>
-    <p className="text-gray-700 text-base flex items-center gap-2">
-      <EnvironmentOutlined className="text-lg text-gray-600" />
-      <b className="font-semibold text-gray-900">Địa chỉ:</b>{" "}
-      {shippingInfo?.address || "—"}
-    </p>
-  </div>
-  
-  {/* Đường phân cách */}
-  <div className="border-t border-gray-200 my-4"></div>
-
-{/* Container chứa thông tin Đơn hàng và Shipper (2 cột) */}
-<div className="flex flex-col md:flex-row justify-between gap-8">
-  {/* Cột 1: Thông tin Shipper */}
-  {shipperId ? (
-    <div className="flex-1">
-      <h3 className="text-xl font-bold text-gray-800 mb-4">Thông tin Shipper</h3>
-      <div className="space-y-3">
-        <p className="text-gray-700 text-base flex items-center gap-2">
+  {/* Thông tin shipper */}
+  <div className="pt-2 border-t border-gray-200">
+    <h4 className="text-md font-semibold text-gray-800 mb-2">Shipper</h4>
+    {shipperId ? (
+      <div className="space-y-1 text-gray-700">
+        <p className="flex items-center gap-2">
           <UserOutlined className="text-lg text-gray-600" />
-          <b className="font-semibold text-gray-900">Họ tên:</b>{" "}
-          {shipperId.full_name || shipperId.username || "—"}
+          <b className="font-semibold text-gray-900">Họ tên:</b> {shipperId.full_name || shipperId.username || "—"}
         </p>
-        <p className="text-gray-700 text-base flex items-center gap-2">
+        <p className="flex items-center gap-2">
           <PhoneOutlined className="text-lg text-gray-600" />
-          <b className="font-semibold text-gray-900">SĐT:</b>{" "}
-          {shipperId.phone || "—"}
+          <b className="font-semibold text-gray-900">SĐT:</b> {shipperId.phone || "—"}
         </p>
       </div>
-    </div>
-  ) : (
-    <div className="flex-1">
-      <h3 className="text-xl font-bold text-gray-800 mb-4">Thông tin Shipper</h3>
+    ) : (
       <p className="text-gray-500 italic">Chưa có thông tin Shipper</p>
+    )}
+  </div>
+</div>
+
+
+  {/* Thông tin giao hàng */}
+  <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded-lg shadow-sm space-y-2">
+    <div className="flex justify-between items-center pb-2 border-b border-gray-200">
+      <h2 className="text-2xl font-bold text-gray-800">Thông tin giao hàng</h2>
+      {(safeStatus === "pending" || safeStatus === "processing") && (
+        <Button type="primary" ghost onClick={showEditModal}>
+          Chỉnh sửa
+        </Button>
+      )}
     </div>
-  )}
+    <div className="space-y-3 pt-2 text-gray-700">
+      <p className="flex items-center gap-2">
+        <UserOutlined className="text-lg text-gray-600" />
+        <b className="font-semibold text-gray-900">Họ tên:</b> {shippingInfo?.fullName || "—"}
+      </p>
+      <p className="flex items-center gap-2">
+        <PhoneOutlined className="text-lg text-gray-600" />
+        <b className="font-semibold text-gray-900">SĐT:</b> {shippingInfo?.phone || "—"}
+      </p>
+      <p className="flex items-center gap-2">
+        <EnvironmentOutlined className="text-lg text-gray-600" />
+        <b className="font-semibold text-gray-900">Địa chỉ:</b> {shippingInfo?.address || "—"}
+      </p>
+    </div>
+  </div>
 
-  {/* Dấu gạch chia ở giữa (cho desktop) */}
-  <div className="hidden md:block border-l border-gray-300"></div>
 
-  {/* Cột 2: Thông tin đơn hàng */}
-  <div className="flex-1">
-    <h3 className="text-xl font-bold text-gray-800 mb-4">Thông tin đơn hàng</h3>
-   <div className="space-y-3 text-gray-700">
-  <div className="flex justify-between">
-    <span className="font-semibold text-gray-900">Mã đơn hàng:</span>
-    <span className="font-medium text-gray-700">{order._id}</span>
-  </div>
-  <div className="flex justify-between">
-    <span className="font-semibold text-gray-900">Ngày đặt:</span>
-    <span className="font-medium text-gray-700">
-      {formatDate(order.createdAt)}
-    </span>
-  </div>
-  <div className="flex justify-between">
-    <span className="font-semibold text-gray-900">Thanh toán:</span>
-    <span className="font-medium text-gray-700">
-      {order.paymentMethod || "—"}
-    </span>
-  </div>
+
 </div>
-  </div>
-</div>
-</div>
+
           {/* Items */}
-          <div className="bg-white shadow-md rounded-xl p-6 border border-gray-200 space-y-4">
-            <h2 className="text-lg font-semibold text-gray-700 border-b pb-2">
-              Sản phẩm trong đơn
-            </h2>
+         <div className="bg-white shadow rounded-xl p-6 border border-gray-200 space-y-4">
+  <h2 className="text-lg font-semibold text-gray-800 border-b border-gray-200 pb-3">
+    Sản phẩm trong đơn
+  </h2>
 
-            {Array.isArray(items) && items.length > 0 ? (
-              items.map((item, idx) => {
-                const variant = item.variantId || {};
-                const product = item.productId || {};
-                const image = getFirstImage(variant.imageUrl);
-                const name = variant.name || product.title || "Không rõ";
-                const unitPrice = Number(variant.price) || 0;
+  {Array.isArray(items) && items.length > 0 ? (
+    items.map((item, idx) => {
+      const variant = item.variantId || {};
+      const product = item.productId || {};
+      const image = getFirstImage(variant.imageUrl);
+      const name = variant.name || product.title || "Không rõ";
+      const unitPrice = Number(variant.price) || 0;
 
-                const capacity =
-                  product.capacity || (variant as Variant).capacity || "Không rõ";
-                const color =
-                  variant.attributes?.find((a) =>
-                    a.attributeId?.name?.toLowerCase().includes("màu")
-                  )?.attributeValueId?.value || "Không rõ";
+      const capacity =
+        product.capacity || (variant as Variant).capacity || "Không rõ";
+      const color =
+        variant.attributes?.find((a) =>
+          a.attributeId?.name?.toLowerCase().includes("màu")
+        )?.attributeValueId?.value || "Không rõ";
 
-                return (
-                  <Link
-                    to={product?._id ? `/product/${product._id}` : "#"}
-                    key={`${product?._id || idx}-${idx}`}
-                    className="flex gap-4 border-b pb-4 rounded-lg cursor-pointer hover:bg-gray-50"
-                  >
-                    <img
-                      src={image}
-                      alt={name}
-                      className="w-20 h-20 object-cover rounded-lg border"
-                    />
-                    <div className="flex-1 flex flex-col justify-between">
-                      <p className="text-gray-800 font-semibold text-base">{name}</p>
-                      <div className="flex justify-between text-sm text-gray-600 mt-1">
-                        <div>
-                          <p>Dung lượng: {capacity}</p>
-                          <p>Màu: {color}</p>
-                          <p>Số lượng: {item.quantity}</p>
-                        </div>
-                        <div className="text-right whitespace-nowrap">
-                          <p className="font-bold text-gray-800">
-                            {formatVND(unitPrice * (item.quantity || 0))}
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            {formatVND(unitPrice)} / món
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })
-            ) : (
-              <div className="text-gray-500">Không có sản phẩm.</div>
-            )}
-
-            <hr className="my-4" />
+      return (
+        <Link
+          to={product?._id ? `/product/${product._id}` : "#"}
+          key={`${product?._id || idx}-${idx}`}
+          className="flex gap-4 border-b border-gray-100 pb-4 last:border-0 rounded-lg transition-colors duration-200 hover:bg-gray-50"
+        >
+          <img
+            src={image}
+            alt={name}
+            className="w-20 h-20 object-cover rounded-lg border border-gray-200"
+          />
+          <div className="flex-1 flex flex-col justify-between">
+            <p className="text-gray-900 font-medium text-base">{name}</p>
+            <div className="flex justify-between text-sm text-gray-600 mt-2">
+              <div className="space-y-0.5">
+                <p>Dung lượng: <span className="font-medium text-gray-700">{capacity}</span></p>
+                <p>Màu: <span className="font-medium text-gray-700">{color}</span></p>
+                <p>Số lượng: <span className="font-medium text-gray-700">{item.quantity}</span></p>
+              </div>
+              <div className="text-right whitespace-nowrap">
+                <p className="font-semibold text-gray-900">
+                  {formatVND(unitPrice * (item.quantity || 0))}
+                </p>
+                <p className="text-sm text-gray-500">
+                  {formatVND(unitPrice)} / sản phẩm
+                </p>
+              </div>
+            </div>
           </div>
+        </Link>
+      );
+    })
+  ) : (
+    <div className="text-gray-500 italic">Không có sản phẩm.</div>
+  )}
+</div>
+
         </div>
 
        {/* RIGHT */}
@@ -465,40 +462,33 @@ const handleConfirmReceived = async (orderId: string) => {
             : "Lý do yêu cầu trả hàng:"}
         </b>
       </p>
-      <span
-        className={`px-3 py-1 rounded-full text-xs font-medium ${
-          order.returnRequest.status === "rejected"
-            ? "bg-pink-100 text-pink-800"
-            : "bg-orange-100 text-orange-800"
-        }`}
-      >
-        {order.returnRequest.reason || "—"}
-      </span>
+    <span
+  className={`inline-flex items-center px-3 py-1 rounded-lg text-sm font-semibold border
+    ${
+      order.returnRequest.status === "rejected"
+        ? "bg-pink-50 text-pink-700 border-pink-200"
+        : "bg-orange-50 text-orange-700 border-orange-200"
+    }`}
+>
+  {order.returnRequest.reason || "—"}
+</span>
+
     </div>
   )}
-  {order.status === "delivery_failed" && order.deliveryFailedReason && (
-  <div className="mt-2 p-3 rounded-lg bg-red-50 border border-red-200">
-    <p className="text-sm text-red-600 font-medium">
-      Lý do giao hàng thất bại: {order.deliveryFailedReason}
-    </p>
-  </div>
+{["delivery_failed", "return_to_store", "returned_to_store"].includes(order.status) &&
+  order.deliveryFailedReason && (
+    <div className="mt-2 inline-flex items-center px-3 py-2 rounded-lg border bg-red-50 border-red-200">
+      <span className="text-sm font-semibold text-red-700">
+        Lý do giao hàng thất bại:
+      </span>
+      <span className="ml-1 text-sm text-red-600">
+        {order.deliveryFailedReason || "—"}
+      </span>
+    </div>
 )}
 
-{/* Nút xác nhận đã nhận và yêu cầu trả hàng */}
-{(safeStatus === "delivered" || safeStatus === "received") && (
-  <div className="space-y-2">
-    {/* Nút xác nhận đã nhận */}
-    {safeStatus === "delivered" && (
-      <Button
-        type="primary"
-        block
-        onClick={() => handleConfirmReceived(order._id)}
-      >
-        Đã nhận hàng
-      </Button>
-    )}
-  </div>
-)}
+
+
 
 {/* Hiển thị lý do trả hàng ngay sau nút */}
 {order.returnReason && (
@@ -622,6 +612,20 @@ const handleConfirmReceived = async (orderId: string) => {
   </div>
 
   {/* Nút hủy */}
+  {(safeStatus === "delivered" || safeStatus === "received") && (
+  <div className="space-y-2">
+    {/* Nút xác nhận đã nhận */}
+    {safeStatus === "delivered" && (
+      <Button
+        type="primary"
+        block
+        onClick={() => handleConfirmReceived(order._id)}
+      >
+        Đã nhận hàng
+      </Button>
+    )}
+  </div>
+)}
 {/* Nút Hủy hoặc Yêu cầu trả hàng */}
 <div className="mt-4">
   {safeStatus === "received" && !order.returnReason ? (

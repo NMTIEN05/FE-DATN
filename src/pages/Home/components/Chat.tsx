@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { MessageCircle, X, Send, Phone, Mail, Clock } from "lucide-react";
 import useChatLogic from "../../../hooks/useChatLogic";
 
@@ -15,17 +15,52 @@ const ChatIcons: React.FC = () => {
     marked,
     renderer,
   } = useChatLogic();
+  // const [showChat, setShowChat] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(true);
 
+  // Ẩn tooltip sau 5 giây
+  useEffect(() => {
+    const timer = setTimeout(() => setShowTooltip(false), 500000);
+    return () => clearTimeout(timer);
+  }, []);
   return (
     <>
       {/* Chat Button */}
       <div className="fixed bottom-8 right-8 z-50">
-        <button
-          onClick={() => setShowChat(!showChat)}
-          className="w-16 h-16 rounded-full shadow-2xl bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white flex items-center justify-center hover:scale-105 transition-all duration-300 border-2 border-blue-500"
-        >
-          <MessageCircle size={24} className="drop-shadow-sm" />
-        </button>
+ <div className="fixed bottom-6 right-6 flex flex-col gap-4">
+    {showTooltip && (
+  <div className="absolute bottom-[calc(100%+10px)] right-0 w-64 bg-white shadow-lg rounded-xl border p-4 text-sm text-gray-700">
+    <div className="font-semibold text-blue-600 mb-1">🤖 Trợ lý ảo</div>
+    <p className="mb-3">Xin chào! Mình có thể giúp gì cho bạn? ✨</p>
+
+  
+  </div>
+)}
+
+
+      {/* Nút chat */}
+      <button
+        onClick={() => setShowChat(!showChat)}
+        className="w-16 h-16 rounded-full shadow-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white flex items-center justify-center hover:scale-110 transition-transform duration-300"
+      >
+        {/* Ảnh robot thay cho icon */}
+        <img
+          src="https://png.pngtree.com/background/20230617/original/pngtree-adorable-ai-robot-with-interactive-hud-display-3d-render-picture-image_3668085.jpg" // 👉 để file robot.png trong public/
+          alt="Chatbot"
+          className="w-10 h-10"
+        />
+      </button>
+
+  {/* Nút Zalo */}
+  <a
+    href="https://zalo.me/0372229304"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="w-16 h-16 rounded-full shadow-lg bg-gradient-to-r from-blue-400 to-blue-500 text-white flex items-center justify-center hover:scale-110 transition-transform duration-300"
+  >
+    <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg" alt="Zalo" className="w-10 h-10 drop-shadow-sm" />
+  </a>
+</div>
 
         {/* Status Indicator */}
         <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white animate-pulse">
@@ -35,7 +70,7 @@ const ChatIcons: React.FC = () => {
 
       {/* Chat Window */}
       {showChat && (
-        <div className="fixed bottom-20 right-[6.5rem] w-[350px] h-[480px] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col z-50 overflow-hidden">
+<div className="fixed bottom-20 right-8 w-2/5 h-4/5 bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col z-50 overflow-hidden mr-[60px] ">
           {/* Header */}
           <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 flex justify-between items-center">
             <div className="flex items-center">

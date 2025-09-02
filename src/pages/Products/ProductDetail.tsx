@@ -227,31 +227,34 @@ const handleBuyNow = async () => {
     const token = localStorage.getItem("token");
     if (!token) return alert("Bạn cần đăng nhập để mua hàng");
 
-    const selectedItem = {
-      productId: product._id,
-      variantId: variant._id,
-      quantity: 1,
-      price: variant.price,
-      name: product.title,
-      image: Array.isArray(variant.imageUrl) ? variant.imageUrl[0] : variant.imageUrl,
-    };
+    // Giá ưu tiên flash sale nếu có
+    const price = flashSale && flashSale.variant?._id === variant._id
+      ? flashSale.salePrice
+      : variant.price;
 
-    // Thêm vào giỏ
-    await axios.post(
+    // Thêm vào giỏ (backend tự tăng quantity nếu đã có)
+    const res = await axios.post(
       "/cart/add",
       { productId: product._id, variantId: variant._id, quantity: 1 },
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
-    // Lưu tạm để dùng ở /checkout
-    localStorage.setItem("selectedCheckoutItems", JSON.stringify([selectedItem]));
+    const addedItem = res.data; // object cart item vừa thêm
 
-    navigate("/checkout");
+    // Lưu _id của cart item vào localStorage để Cart auto chọn
+    localStorage.setItem("selectedCartItemId", addedItem._id);
+
+    // Navigate sang trang giỏ hàng
+    navigate("/cart");
   } catch (error) {
     console.error("❌ Lỗi khi mua ngay:", error);
     alert("Mua ngay thất bại, vui lòng thử lại.");
   }
 };
+
+
+
+
 
   if (loading) {
     return (

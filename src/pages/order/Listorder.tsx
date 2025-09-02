@@ -246,18 +246,7 @@ const handleConfirmReceived = async (orderId: string) => {
 
 
 
-                          {["rejected", "return_requested"].includes(order.status) &&
-                            order.returnRequest?.reason && (
-                              <div className="text-red-600 text-xs mt-1">
-                                <strong>
-                                  {order.status === "rejected"
-                                    ? "Lý do từ chối:"
-                                    : "Lý do yêu cầu trả hàng:"}
-                                </strong>{" "}
-                                {order.returnRequest.reason}
-                              </div>
-                            )}
-
+                       
                         </div>
                       </div>
                       <p className="text-xs text-gray-600">SL: x{item.quantity}</p>

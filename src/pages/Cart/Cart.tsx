@@ -43,15 +43,27 @@ const Cart: React.FC = () => {
     fetchCart();
   }, []);
 
-  useEffect(() => {
-    setSelectedItems(items.map((item) => item._id!));
-  }, [items]);
+useEffect(() => {
+  const selectedCartItemId = localStorage.getItem("selectedCartItemId");
+  if (!selectedCartItemId) return;
+  if (!items || items.length === 0) return; // đợi items fetch xong
 
-  const toggleSelectItem = (id: string) => {
-    setSelectedItems((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-    );
-  };
+  const selectedCartItem = items.find(
+    item => String(item._id) === selectedCartItemId
+  );
+
+  if (selectedCartItem?._id) {
+    setSelectedItems([selectedCartItem._id]);
+    localStorage.removeItem("selectedCartItemId");
+  }
+}, [items]); // chạy lại khi items thay đổi
+
+const toggleSelectItem = (id: string) => {
+  setSelectedItems((prev) =>
+    prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+  );
+};
+
 
   const isChecked = (id: string) => selectedItems.includes(id);
 
@@ -94,11 +106,15 @@ const Cart: React.FC = () => {
 
   return (
     <>
-      <h1 className="text-3xl font-bold text-center mt-6 mb-8">🛒 Giỏ hàng</h1>
+<h1 className="text-2xl font-extrabold text-center text-black-9000">
+  Giỏ hàng của bạn
+</h1>
 
-      <div className="flex flex-col lg:flex-row gap-4 p-4 bg-gray-50 min-h-screen">
+
+
+      <div className="flex flex-col lg:flex-row gap-4 p-4  min-h-screen">
         {/* Danh sách sản phẩm */}
-        <div className="w-full lg:w-[65%] bg-white p-4 rounded-lg shadow">
+<div className="w-full lg:w-[65%] min-h-[230px] bg-white p-4 rounded-lg shadow transition-all duration-300">
           {items.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-10 text-gray-500">
               <BsCartX size={60} className="mb-4" />
@@ -222,7 +238,7 @@ const Cart: React.FC = () => {
         </div>
 
         {/* Thông tin đơn hàng */}
-        <div className="w-full lg:w-[350px] bg-white p-4 rounded-lg shadow">
+        <div className="w-full lg:w-[350px] h-[230px] bg-white p-4 rounded-lg shadow">
           <h3 className="text-lg font-semibold mb-4">Thông tin đơn hàng</h3>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
